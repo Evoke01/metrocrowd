@@ -495,3 +495,177 @@ input[type=checkbox]{accent-color:var(--accent)}
   border-bottom:1px solid var(--border);
 }
 #rplist .rpit:last-child{ border-bottom:none; }
+
+/* ═══ ROUTE RESULT v4 ════════════════════════════════════════════ */
+
+#rres{
+  margin-top:10px;
+  border-radius:12px;
+  overflow:hidden;
+  border:1px solid var(--border);
+  background:var(--bg2);
+}
+
+.route-error{
+  padding:16px;
+  font-size:10px;
+  font-family:'Space Mono',monospace;
+  color:var(--muted);
+  text-align:center;
+}
+
+/* ── Header: from → to + line chips ─────────────────────────── */
+.rs-header{
+  padding:14px 14px 10px;
+  border-bottom:1px solid var(--border);
+  background:linear-gradient(135deg,rgba(255,107,0,.06),transparent);
+}
+.rs-route-title{
+  display:flex;align-items:center;gap:6px;
+  flex-wrap:wrap;margin-bottom:8px;
+}
+.rs-from,.rs-to{
+  font-size:13px;font-weight:800;
+  font-family:'Syne',sans-serif;color:#fff;
+  line-height:1.2;
+}
+.rs-to{ color:var(--accent); }
+.rs-arrow{
+  font-size:14px;color:var(--muted);flex-shrink:0;
+}
+.rs-chips{
+  display:flex;align-items:center;gap:4px;flex-wrap:wrap;
+}
+.rs-line-chip{
+  font-size:8px;font-family:'Space Mono',monospace;
+  font-weight:700;padding:2px 8px;border-radius:10px;
+  letter-spacing:.04em;white-space:nowrap;
+}
+.rs-chip-arrow{
+  font-size:9px;color:var(--muted);flex-shrink:0;
+}
+
+/* ── Stats row ───────────────────────────────────────────────── */
+.rs-stats{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  border-bottom:1px solid var(--border);
+}
+.rs-stat{
+  padding:10px 6px;text-align:center;
+  border-right:1px solid var(--border);
+}
+.rs-stat:last-child{border-right:none;}
+.rs-stat-val{
+  font-size:16px;font-weight:800;
+  font-family:'Space Mono',monospace;
+  color:#fff;line-height:1;
+}
+.rs-stat-lbl{
+  font-size:7px;color:var(--muted);
+  font-family:'Space Mono',monospace;
+  margin-top:3px;text-transform:uppercase;
+  letter-spacing:.06em;
+}
+
+/* ── Fare row ────────────────────────────────────────────────── */
+.rs-fare-row{
+  display:flex;align-items:stretch;
+  border-bottom:1px solid var(--border);
+  background:rgba(255,107,0,.04);
+}
+.rs-fare-item{
+  flex:1;padding:8px 10px;
+  display:flex;flex-direction:column;gap:2px;
+}
+.rs-fare-divider{
+  width:1px;background:var(--border);flex-shrink:0;
+}
+.rs-fare-lbl{
+  font-size:7px;color:var(--muted);
+  font-family:'Space Mono',monospace;
+  text-transform:uppercase;letter-spacing:.06em;
+}
+.rs-fare-val{
+  font-size:14px;font-weight:800;
+  font-family:'Space Mono',monospace;color:#fff;
+}
+.rs-fare-sc{ color:var(--low); }
+.rs-fare-note .rs-fare-val{ font-size:8px!important;color:var(--muted); }
+
+/* ── Segment section headers ─────────────────────────────────── */
+.rh-list{ padding:0 0 8px; }
+.rh-segment-header{
+  display:flex;align-items:center;gap:7px;
+  padding:8px 14px 4px;
+  background:rgba(255,255,255,.02);
+  border-bottom:1px solid var(--border);
+  margin-bottom:2px;
+}
+.rh-seg-dot{
+  width:8px;height:8px;border-radius:50%;flex-shrink:0;
+}
+.rh-seg-name{
+  font-size:9px;font-weight:700;
+  font-family:'Space Mono',monospace;
+  color:var(--lc,#fff);letter-spacing:.04em;
+  text-transform:uppercase;
+}
+.rh-seg-badge{
+  font-size:7px;font-family:'Space Mono',monospace;
+  color:var(--a2);background:rgba(255,214,0,.1);
+  border:1px solid rgba(255,214,0,.25);
+  border-radius:6px;padding:1px 6px;margin-left:auto;
+}
+
+/* ── Hop rows ────────────────────────────────────────────────── */
+.rhop{
+  display:flex;gap:10px;
+  padding:5px 14px;
+}
+.rhop-first,.rhop-last{ padding-top:8px; }
+.rhl{
+  display:flex;flex-direction:column;
+  align-items:center;width:14px;flex-shrink:0;
+  padding-top:2px;
+}
+.hdot{
+  flex-shrink:0;transition:background .3s;
+}
+.hln{
+  width:2px;flex:1;margin:2px 0;
+  min-height:14px;border-radius:1px;
+  transition:background .3s;
+}
+.hin{
+  flex:1;padding-bottom:6px;min-width:0;
+}
+.hnm{
+  font-size:11px;font-weight:700;color:#fff;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  display:flex;align-items:center;gap:5px;
+}
+.rix-badge{
+  font-size:9px;color:var(--a2);flex-shrink:0;
+  background:rgba(255,214,0,.1);border:1px solid rgba(255,214,0,.2);
+  border-radius:5px;padding:0 4px;
+}
+.hmt{
+  display:flex;flex-wrap:wrap;gap:3px;margin-top:3px;
+}
+.line-dot-chip{
+  font-size:7px;font-family:'Space Mono',monospace;
+  padding:1px 5px;border-radius:5px;
+  white-space:nowrap;letter-spacing:.03em;
+}
+.hcrowd{
+  display:flex;align-items:center;gap:4px;
+  font-size:8px;font-family:'Space Mono',monospace;
+  margin-top:3px;flex-wrap:wrap;
+}
+.hcrowd-bar{
+  height:3px;border-radius:2px;
+  display:inline-block;max-width:60px;
+  min-width:4px;flex-shrink:0;
+  opacity:.6;
+}
+.hcrowd-dot{ opacity:.4; }
