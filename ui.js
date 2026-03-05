@@ -37,6 +37,21 @@ window.UI=(function(){
     const v=CROWD.state.crowdMap[id]||0,c=CROWD.color(v);
     _s('spn',s.n);
     _s('spl',s.l.map(l=>METRO.LINE_NAMES[l]).join(' · ')+(s.ix?' · Interchange':''));
+
+    // ── Service hours indicator ───────────────────────────────
+    const shEl=document.getElementById('sp-service-hours');
+    if(shEl){
+      const sh=METRO.stationServiceHours(id);
+      const nowH=CROWD.state.hour;
+      const isOpen=nowH>=sh.open&&nowH<=sh.close;
+      const openLines=s.l.map(l=>METRO.SERVICE_HOURS[l]).filter(Boolean);
+      // Earliest first train and latest last train across this station's lines
+      const firstTrain=openLines.map(l=>l.firstTrain).sort()[0]||'—';
+      const lastTrain =openLines.map(l=>l.lastTrain).sort().reverse()[0]||'—';
+      shEl.innerHTML=isOpen
+        ?`<span style="color:var(--low)">● Open</span> · First ${firstTrain} · Last ${lastTrain}`
+        :`<span style="color:var(--muted)">○ Closed</span> · Opens ${firstTrain} · Last train ${lastTrain}`;
+    }
     _sc('sc1',v+'%',c);_sc('sc2',CROWD.label(v),c);_s('sc3',CROWD.waitLabel(v));
     _st('spb','width',v+'%');_st('spb','background',c);
 
@@ -120,7 +135,8 @@ window.UI=(function(){
         <div class="sg-lbl">Busiest ↗</div></div>
       <div class="sg-card"><div class="sg-val">${CROWD.hourLabel(CROWD.state.hour)}</div><div class="sg-lbl">Sim Time</div></div>
       <div class="sg-card"><div class="sg-val">${ns.total}</div><div class="sg-lbl">Total Stations</div></div>
-      <div class="sg-card"><div class="sg-val" style="color:${anomCount>0?'var(--pk)':'var(--muted)'}">${anomCount}</div><div class="sg-lbl">⚡ Anomalies</div></div>`;
+      <div class="sg-card"><div class="sg-val" style="color:${anomCount>0?'var(--pk)':'var(--muted)'}">${anomCount}</div><div class="sg-lbl">⚡ Anomalies</div></div>
+      <div class="sg-card"><div class="sg-val" style="color:var(--muted)">${ns.closed||0}</div><div class="sg-lbl">Closed Now</div></div>`;
   }
 
   function renderAnomalies(){
@@ -173,11 +189,16 @@ window.UI=(function(){
 
   // LINES
   function renderLines(){
-    document.getElementById('lclist').innerHTML=CROWD.lineAverages().map(({l,avg,name,color,count})=>`
-      <div class="lr"><div class="ldot" style="background:${color}"></div>
-      <div class="lnm">${name} <span style="color:var(--muted);font-size:8px">(${count})</span></div>
-      <div class="lbw"><div class="lbar" style="width:${avg}%;background:${color};opacity:.85"></div></div>
-      <div class="lpct" style="color:${CROWD.color(avg)}">${avg}%</div></div>`).join('');
+    document.getElementById('lclist').innerHTML=CROWD.lineAverages().map(({l,avg,name,color,count,isOpen,firstTrain,lastTrain})=>`
+      <div class="lr">
+        <div class="ldot" style="background:${isOpen?color:'#2A3F58'}"></div>
+        <div class="lnm" style="flex:1;min-width:0">
+          <div>${name} <span style="color:var(--muted);font-size:8px">(${count})</span></div>
+          <div style="font-size:7px;font-family:'Space Mono',monospace;color:var(--muted);margin-top:1px">${isOpen?`● Open · Last ${lastTrain}`:`○ Closed · Opens ${firstTrain}`}</div>
+        </div>
+        <div class="lbw"><div class="lbar" style="width:${avg}%;background:${isOpen?color:'#2A3F58'};opacity:${isOpen?.85:.35}"></div></div>
+        <div class="lpct" style="color:${isOpen?CROWD.color(avg):'var(--muted)'}">${isOpen?avg+'%':'—'}</div>
+      </div>`).join('');
     const top=CROWD.topStations(12);
     document.getElementById('toplist').innerHTML=top.map(({id,v,s},i)=>s?`
       <div class="ixr" onclick="UI.openStationFromStats('${id}')">
