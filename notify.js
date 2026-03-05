@@ -89,8 +89,10 @@ window.NOTIFY = (function(){
     const s = METRO.STATIONS[stationId];
     if(!s) return null;
 
-    // Pure model prediction (no news/reports)
-    const modelVal = Math.min(100, Math.max(5, Math.round(s.b * METRO.RUSH[CROWD.state.hour])));
+    // Pure model prediction (no news/reports) — respects service hours via CROWD.modelValue
+    const modelVal = CROWD.modelValue(stationId, CROWD.state.hour);
+    // If station is closed, no anomaly possible
+    if(modelVal === 0) return null;
     const blended  = CROWD.state.crowdMap[stationId] || modelVal;
     const conf     = state.confidenceMap[stationId];
 
