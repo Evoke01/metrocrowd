@@ -1,7 +1,7 @@
 // ══════════════════════════════════════════════════════════════════
 //  CROWD ENGINE  — combines DMRC timetable model + events + reports
 // ══════════════════════════════════════════════════════════════════
-window.CROWD = (function () {
+window.CROWD = (function() {
   const state = {
     hour: new Date().getHours(),
     isLive: true,
@@ -25,7 +25,7 @@ window.CROWD = (function () {
     // Blend with user crowdsource report (40% weight)
     if (state.userReports[id]) {
       const rv = state.userReports[id] === 'empty' ? 14 :
-        state.userReports[id] === 'moderate' ? 50 : 88;
+                 state.userReports[id] === 'moderate' ? 50 : 88;
       v = v * 0.6 + rv * 0.4;
     }
 
@@ -36,6 +36,8 @@ window.CROWD = (function () {
     Object.keys(METRO.STATIONS).forEach(id => {
       state.crowdMap[id] = compute(id);
     });
+    // Trigger confidence + anomaly + threshold alerts
+    if(typeof NOTIFY !== 'undefined') NOTIFY.onCrowdUpdate();
   }
 
   // ── Helpers ──────────────────────────────────────────────────
@@ -81,10 +83,10 @@ window.CROWD = (function () {
       max: Math.max(...vals),
       low: vals.filter(v => v < 36).length,
       med: vals.filter(v => v >= 36 && v < 61).length,
-      hi: vals.filter(v => v >= 61 && v < 81).length,
-      pk: vals.filter(v => v >= 81).length,
+      hi:  vals.filter(v => v >= 61 && v < 81).length,
+      pk:  vals.filter(v => v >= 81).length,
       total: vals.length,
-      maxId: Object.entries(state.crowdMap).sort((a, b) => b[1] - a[1])[0]?.[0] || ''
+      maxId: Object.entries(state.crowdMap).sort((a,b) => b[1]-a[1])[0]?.[0] || ''
     };
   }
 
