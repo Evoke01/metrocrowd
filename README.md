@@ -1,43 +1,98 @@
-# metrocrowd
-🚇 **Delhi Metro Crowd Monitor**
+# 🚇 Delhi Metro Crowd Monitor
 
-An interactive web dashboard that visualizes estimated passenger density across major stations of the Delhi Metro network in real time. The system combines rush-hour patterns, simulated city events, and crowdsourced user reports to predict congestion and help commuters navigate the metro smarter.
+An interactive web dashboard that visualizes estimated passenger density across stations of the Delhi Metro network. The system combines rush-hour patterns, simulated events, and community reports to estimate congestion and help commuters plan smarter routes.
 
-🗺 **Core Features**
-• Live interactive metro map with station markers
-• Color-coded crowd intensity levels
-• Hourly crowd prediction timeline
-• Station-level congestion insights
-• Community crowd reporting system
-• Event impact simulation (concerts, IPL matches, festivals)
-• Smart route planner that avoids crowded stations
-• Line-by-line congestion analytics
-• Interchange pressure ranking
+---
 
-⚙️ **How It Works**
-The platform models crowd density using historical rush-hour behavior, dynamic event simulations, and user-submitted reports. Each station’s congestion level updates visually on the map, allowing commuters to quickly identify low-traffic routes and plan journeys more efficiently.
+## 🌐 Live Demo
 
-📊 **Capabilities**
-• Visual urban mobility analytics
-• Crowd forecasting across the metro network
-• Real-time commuter awareness
-• Data-driven route optimization
-• Public participation through crowd reporting
+🔗 https://evoke01.github.io/metrocrowd/
 
-🚀 **Potential Applications**
-• Smart city transit analytics
-• Urban mobility research
-• Metro congestion monitoring
-• Public transport planning tools
-• Emergency crowd management systems
-• AI-driven transit optimization
+---
 
-💡 **Future Potential**
-• Real-time data integration from metro APIs
-• AI crowd prediction models
-• Live disruption alerts from news feeds
-• Mobile app version
-• Passenger flow heatmaps
-• Multi-city metro monitoring
+## ✨ Features
 
-This project explores how data visualization, prediction models, and crowdsourced intelligence can be combined to build a smarter and more transparent urban transit experience.
+🗺 **Interactive Metro Map**
+View stations across the metro network with color-coded crowd levels.
+
+📊 **Crowd Prediction**
+Estimates congestion using rush-hour patterns and station activity.
+
+⚡ **Event Impact Simulation**
+Simulate crowd spikes during concerts, IPL matches, and festivals.
+
+🚦 **Line-by-Line Analytics**
+Compare congestion across different metro lines.
+
+📍 **Station Insights**
+See crowd percentage, congestion level, and expected wait time.
+
+🧭 **Smart Route Planner**
+Find routes that avoid heavily packed stations.
+
+📣 **Community Reports**
+Users can submit crowd reports to improve predictions.
+
+---
+
+## 🚀 Getting Started
+
+### Clone the repository
+
+```bash
+git clone https://github.com/Evoke01/metrocrowd.git
+cd metrocrowd
+```
+
+### Run locally
+
+Open the project folder and launch:
+
+```bash
+index.html
+```
+
+or run a local server:
+
+```bash
+npx live-server
+```
+
+Then open:
+
+```
+http://localhost:8080
+```
+
+---
+
+## 🧠 How It Works
+
+The platform estimates metro congestion using a combination of:
+
+• Rush-hour traffic patterns
+• Station activity modeling
+• Simulated city events
+• Crowdsourced user reports
+
+These signals are blended to estimate crowd levels across the network.
+
+---
+
+## 🚀 Potential Applications
+
+🏙 Smart city transit analytics
+🚇 Metro congestion monitoring
+📊 Urban mobility research
+🚨 Crowd management during events
+📱 Future transit planning tools
+
+---
+
+## 📄 License
+
+AGPL-3.0 — You can use and modify this project, but any public deployment must share the source code.
+
+---
+
+Built by **Evoke01**
