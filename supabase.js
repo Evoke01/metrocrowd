@@ -2,8 +2,8 @@
 //  SUPABASE BACKEND MODULE
 //  Paste your credentials below after following SUPABASE_SETUP.md
 // ══════════════════════════════════════════════════════════════════
-const SUPABASE_URL = "https://tfuxpslcmhdvwidfcdch.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_nmPz260NMnm3AIk7ZGVowQ_dlfkOKEp";
+const SUPABASE_URL      = 'https://tfuxpslcmhdvwidfcdch.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_nmPz260NMnm3AIk7ZGVowQ_dlfkOKEp';
 
 window.SB = (function(){
   let client = null;
@@ -18,14 +18,14 @@ window.SB = (function(){
            !SUPABASE_ANON_KEY.includes('YOUR_ANON_KEY');
   }
 
-  // ── Stable anonymous session ID (persists across reloads) ─────
+  // ── Anonymous ID — delegated to ANON module ──────────────────
+  // ANON generates a stable UUID in localStorage, syncs to Supabase,
+  // and handles cross-device QR/link import.
   function getSessionId(){
-    let sid = sessionStorage.getItem('metro_session');
-    if(!sid){
-      sid = 'sess_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2);
-      sessionStorage.setItem('metro_session', sid);
-    }
-    return sid;
+    if(typeof ANON !== 'undefined' && ANON.id()) return ANON.id();
+    // Fallback for race: read localStorage directly
+    return localStorage.getItem('metro_anon_id') ||
+           sessionStorage.getItem('metro_session') || 'local';
   }
 
   // ── Init ──────────────────────────────────────────────────────
@@ -48,6 +48,8 @@ window.SB = (function(){
         realtime: { params: { eventsPerSecond: 10 } }
       });
 
+      // Init ANON module with Supabase client so it can sync the UUID
+      if(typeof ANON !== 'undefined') await ANON.init(client);
       sessionId = getSessionId();
 
       // Sign in anonymously so RLS allows writes
@@ -113,6 +115,7 @@ window.SB = (function(){
           crowd_value:  crowdValue,
           user_id:      userId,
           session_id:   sessionId,
+          anon_id:      (typeof ANON!=='undefined'?ANON.id():null),
           line_codes:   s.l,
         });
 
