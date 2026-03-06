@@ -135,6 +135,8 @@ window.ROUTE=(function(){
   };
 
   function haversineKm(lat1,lng1,lat2,lng2){
+    // Delegate to GPS module if available, else inline
+    if(typeof GPS !== 'undefined') return GPS.distanceM(lat1,lng1,lat2,lng2)/1000;
     const R=6371,dLat=(lat2-lat1)*Math.PI/180,dLng=(lng2-lng1)*Math.PI/180;
     const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
     return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
@@ -421,44 +423,41 @@ window.ROUTE=(function(){
     res.innerHTML=summaryHTML+`<div class="rh-list">${hopsHTML}</div>`;
   }
 
-  // ── GPS Nearest Station ───────────────────────────────────────
-  function nearestStation(lat,lng){
-    let best=null,bestDist=Infinity;
+  // ── GPS — delegated to gps.js module ─────────────────────────
+  // gps.js handles: Haversine distance, rolling-average smoothing,
+  // station lock/hysteresis, watchPosition, coordinate patches.
+
+  function nearestStation(lat, lng){
+    return (typeof GPS !== 'undefined')
+      ? GPS.nearestStation(lat, lng)
+      : _legacyNearest(lat, lng);
+  }
+
+  // Fallback if gps.js not loaded (should not happen in normal use)
+  function _legacyNearest(lat, lng){
+    let best=null, bestDist=Infinity;
     Object.entries(METRO.GPS||{}).forEach(([id,[slat,slng]])=>{
-      const d=Math.hypot(lat-slat,lng-slng);
+      // Use proper degree-to-metre conversion instead of raw hypot
+      const dLat=(lat-slat)*111320;
+      const dLng=(lng-slng)*111320*Math.cos(lat*Math.PI/180);
+      const d=Math.hypot(dLat,dLng);
       if(d<bestDist){bestDist=d;best=id;}
     });
     return best;
   }
 
-  function requestLocation(targetSelect){
-    if(!navigator.geolocation){showGeoError('Geolocation not supported.');return;}
-    setGeoBtn('📡 Locating…',true);
-    navigator.geolocation.getCurrentPosition(
-      pos=>{
-        const{latitude:lat,longitude:lng}=pos.coords;
-        const nearest=nearestStation(lat,lng);
-        if(nearest&&METRO.STATIONS[nearest]){
-          const sel=document.getElementById(targetSelect);
-          if(sel){sel.value=nearest;sel.dispatchEvent(new Event('change'));}
-          showGeoSuccess(`📍 Nearest: ${METRO.STATIONS[nearest].n}`);
-        }else{showGeoError('No nearby station found.');}
-        setGeoBtn('📍 Use My Location',false);
-      },
-      err=>{
-        const msg=err.code===1?'Location access denied.':err.code===2?'Location unavailable.':'Timed out.';
-        showGeoError(msg);setGeoBtn('📍 Use My Location',false);
-      },
-      {timeout:10000,maximumAge:60000,enableHighAccuracy:false}
-    );
+  function requestLocation(selectId){
+    if(typeof GPS !== 'undefined'){
+      GPS.requestLocation(selectId);
+    } else {
+      // Minimal fallback
+      if(!navigator.geolocation) return;
+      navigator.geolocation.getCurrentPosition(pos=>{
+        const nearest=nearestStation(pos.coords.latitude,pos.coords.longitude);
+        if(nearest){ const s=document.getElementById(selectId); if(s)s.value=nearest; }
+      },{},{enableHighAccuracy:true,timeout:12000,maximumAge:0});
+    }
   }
-
-  function setGeoBtn(txt,disabled){
-    const b=document.getElementById('geo-btn');
-    if(b){b.textContent=txt;b.disabled=disabled;b.style.opacity=disabled?'.6':'1';}
-  }
-  function showGeoSuccess(msg){const el=document.getElementById('geo-msg');if(el){el.textContent=msg;el.style.color='var(--low)';el.style.display='block';setTimeout(()=>el.style.display='none',4000);}}
-  function showGeoError(msg){const el=document.getElementById('geo-msg');if(el){el.textContent=msg;el.style.color='var(--pk)';el.style.display='block';setTimeout(()=>el.style.display='none',5000);}}
 
   function populateSelects(){
     const opts=Object.entries(METRO.STATIONS).sort((a,b)=>a[1].n.localeCompare(b[1].n))
