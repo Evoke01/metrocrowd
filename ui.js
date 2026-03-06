@@ -404,7 +404,7 @@ window.UI=(function(){
       const icon=lv==='empty'?'🟢':lv==='moderate'?'🟡':'🔴';
       const name=stationName||(r.station_name||METRO.STATIONS[r.station_id]?.n||r.station_id);
       const ago=timeAgo(r.created_at);
-      const isOwn=r.session_id&&r.session_id===sessionStorage.getItem('metro_session');
+      const isOwn=r.session_id&&r.session_id===(typeof ANON!=='undefined'?ANON.id():localStorage.getItem('metro_anon_id'));
       return`<div class="rpit" id="rp-${r.id||r.created_at}">
         <div style="flex:1;min-width:0">
           ${stationName?'':`<div class="rpnm" style="font-size:10px">${name}</div>`}
@@ -453,7 +453,7 @@ window.UI=(function(){
           station_name:METRO.STATIONS[stationId]?.n||stationId,
           level:local,
           created_at:new Date().toISOString(),
-          session_id:sessionStorage.getItem('metro_session'),
+          session_id:(typeof ANON!=='undefined'?ANON.id():localStorage.getItem('metro_anon_id')),
         }], listEl, METRO.STATIONS[stationId]?.n);
         if(statusEl) statusEl.textContent='Local only (Supabase not connected)';
       } else {
@@ -502,7 +502,7 @@ window.UI=(function(){
       _renderRows(entries.map(([sid,lv])=>({
         station_id:sid, station_name:METRO.STATIONS[sid]?.n||sid,
         level:lv, created_at:new Date().toISOString(),
-        session_id:sessionStorage.getItem('metro_session'),
+        session_id:(typeof ANON!=='undefined'?ANON.id():localStorage.getItem('metro_anon_id')),
       })),listEl);
       if(statusEl)statusEl.textContent='Local session only';
       return;
@@ -547,7 +547,7 @@ window.UI=(function(){
       const local=CROWD.state.userReports[stationId];
       _renderRows(local?[{station_id:stationId,station_name:METRO.STATIONS[stationId]?.n,
         level:local,created_at:new Date().toISOString(),
-        session_id:sessionStorage.getItem('metro_session')}]:[], listEl, METRO.STATIONS[stationId]?.n);
+        session_id:(typeof ANON!=='undefined'?ANON.id():localStorage.getItem('metro_anon_id'))}]:[], listEl, METRO.STATIONS[stationId]?.n);
       if(countEl) countEl.textContent='';
       return;
     }
@@ -639,7 +639,7 @@ window.UI=(function(){
     prependReport({
       station_id:id, station_name:METRO.STATIONS[id]?.n||id,
       level:selLevel, created_at:new Date().toISOString(),
-      session_id:sessionStorage.getItem('metro_session'),
+      session_id:(typeof ANON!=='undefined'?ANON.id():localStorage.getItem('metro_anon_id')),
     });
 
     // Persist to Supabase
