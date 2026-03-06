@@ -669,3 +669,189 @@ input[type=checkbox]{accent-color:var(--accent)}
   opacity:.6;
 }
 .hcrowd-dot{ opacity:.4; }
+
+/* ═══ ANONYMOUS IDENTITY / SYNC UI ══════════════════════════════ */
+
+/* ── Expand button in auth modal ────────────────────────────────── */
+.anon-expand-btn{
+  width:100%;padding:10px;margin-top:4px;
+  background:rgba(100,180,255,.08);
+  border:1px dashed rgba(100,180,255,.3);
+  color:var(--a2);border-radius:8px;
+  font-family:'Space Mono',monospace;font-size:10px;
+  cursor:pointer;transition:background .2s;
+}
+.anon-expand-btn:hover{ background:rgba(100,180,255,.15); }
+
+/* ── Full sync panel ────────────────────────────────────────────── */
+.anon-panel{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:12px;
+  overflow:hidden;
+  margin-top:6px;
+}
+.anon-header{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 14px 10px;
+  background:linear-gradient(135deg,rgba(100,180,255,.08),transparent);
+  border-bottom:1px solid var(--border);
+}
+.anon-icon{ font-size:22px; flex-shrink:0; }
+.anon-title{
+  font-size:11px;font-weight:700;color:#fff;
+  font-family:'Syne',sans-serif;
+}
+.anon-id-display{
+  font-size:9px;font-family:'Space Mono',monospace;
+  color:var(--a2);margin-top:2px;letter-spacing:.04em;
+}
+
+/* ── Tabs ────────────────────────────────────────────────────────── */
+.anon-tabs{
+  display:flex;border-bottom:1px solid var(--border);
+}
+.anon-tab{
+  flex:1;padding:8px 4px;
+  background:none;border:none;
+  font-family:'Space Mono',monospace;font-size:9px;
+  color:var(--muted);cursor:pointer;
+  border-bottom:2px solid transparent;
+  transition:color .15s,border-color .15s;
+}
+.anon-tab.on{
+  color:var(--a2);
+  border-bottom-color:var(--a2);
+}
+.anon-tab:hover:not(.on){ color:var(--text); }
+
+/* ── Pane shared ─────────────────────────────────────────────────── */
+.anon-pane{ padding:14px; }
+.anon-hint{
+  font-size:9px;color:var(--muted);
+  font-family:'Space Mono',monospace;
+  text-align:center;margin-bottom:10px;line-height:1.5;
+}
+
+/* ── QR box ─────────────────────────────────────────────────────── */
+.anon-qr-box{
+  display:flex;justify-content:center;
+  margin-bottom:10px;
+  /* QRCode.js renders a table or canvas inside here */
+}
+.anon-qr-box img, .anon-qr-box canvas{
+  border-radius:8px;
+  border:4px solid #fff;
+}
+
+/* ── Copy link button ────────────────────────────────────────────── */
+.anon-copy-btn{
+  width:100%;padding:9px;
+  background:rgba(100,180,255,.1);
+  border:1px solid rgba(100,180,255,.3);
+  color:var(--a2);border-radius:8px;
+  font-family:'Space Mono',monospace;font-size:10px;
+  cursor:pointer;transition:all .15s;margin-bottom:10px;
+}
+.anon-copy-btn:hover{ background:rgba(100,180,255,.2); }
+
+/* ── Small ID display ────────────────────────────────────────────── */
+.anon-small-id{
+  font-size:8px;color:var(--muted);
+  font-family:'Space Mono',monospace;
+  text-align:center;
+}
+.anon-full-id{
+  color:var(--a2);word-break:break-all;
+  user-select:all;cursor:text;
+}
+
+/* ── Restore input ───────────────────────────────────────────────── */
+.anon-restore-input{
+  width:100%;box-sizing:border-box;
+  padding:9px 10px;margin-bottom:6px;
+  background:var(--bg3);border:1px solid var(--border);
+  color:var(--text);border-radius:8px;
+  font-family:'Space Mono',monospace;font-size:10px;outline:none;
+}
+.anon-restore-input:focus{ border-color:var(--a2); }
+.anon-restore-err{
+  font-size:8px;color:var(--pk);
+  font-family:'Space Mono',monospace;
+  min-height:14px;margin-bottom:6px;
+}
+.anon-restore-btn{
+  width:100%;padding:10px;
+  background:var(--accent);border:none;
+  color:#fff;border-radius:8px;
+  font-family:'Syne',sans-serif;font-size:12px;
+  font-weight:800;cursor:pointer;transition:all .15s;
+  margin-bottom:8px;
+}
+.anon-restore-btn:hover:not(:disabled){ background:#FF8500; }
+.anon-restore-btn:disabled{ opacity:.4;cursor:default; }
+.anon-restore-warn{
+  font-size:8px;color:var(--muted);
+  font-family:'Space Mono',monospace;
+  line-height:1.5;text-align:center;
+}
+
+/* ── History list ────────────────────────────────────────────────── */
+.anon-history-list{
+  display:flex;flex-direction:column;gap:0;
+  max-height:220px;overflow-y:auto;
+}
+.anon-history-loading, .anon-history-empty{
+  font-size:9px;color:var(--muted);
+  font-family:'Space Mono',monospace;
+  text-align:center;padding:20px 0;
+}
+.anon-history-row{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 0;
+  border-bottom:1px solid var(--border);
+}
+.anon-history-row:last-child{ border-bottom:none; }
+.anon-hist-icon{ font-size:14px;flex-shrink:0; }
+.anon-hist-info{ flex:1;min-width:0; }
+.anon-hist-station{
+  font-size:10px;font-weight:700;color:#fff;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.anon-hist-meta{
+  font-size:8px;color:var(--muted);
+  font-family:'Space Mono',monospace;margin-top:1px;
+}
+.anon-hist-val{
+  font-size:10px;font-family:'Space Mono',monospace;
+  color:var(--a2);flex-shrink:0;
+}
+
+/* ── Import banner (top-of-screen toast) ─────────────────────────── */
+.anon-import-banner{
+  position:fixed;top:0;left:0;right:0;z-index:9999;
+  display:flex;align-items:center;gap:10px;
+  padding:12px 16px;
+  background:#0F2236;
+  border-bottom:2px solid var(--a2);
+  font-size:10px;color:var(--text);
+  font-family:'Space Mono',monospace;
+  animation:slideDown .3s ease;
+}
+@keyframes slideDown{
+  from{ transform:translateY(-100%); }
+  to{   transform:translateY(0); }
+}
+.anon-import-yes{
+  padding:5px 12px;border-radius:6px;
+  background:var(--a2);border:none;
+  color:#000;font-family:'Space Mono',monospace;
+  font-size:9px;font-weight:700;cursor:pointer;
+  flex-shrink:0;
+}
+.anon-import-no{
+  padding:5px 10px;border-radius:6px;
+  background:var(--bg3);border:1px solid var(--border);
+  color:var(--muted);font-family:'Space Mono',monospace;
+  font-size:9px;cursor:pointer;flex-shrink:0;
+}
