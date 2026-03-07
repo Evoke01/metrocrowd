@@ -20,7 +20,7 @@ window.MAP=(function(){
 
   function init(id,cb){
     svg=document.getElementById(id);onCk=cb;
-    svg.setAttribute('viewBox','0 0 1100 820');
+    svg.setAttribute('viewBox','0 0 1100 900');
     resize();
     // ── Defs ────────────────────────────────────────────────────
     const defs=el('defs',{},svg);
@@ -164,7 +164,7 @@ window.MAP=(function(){
       BW:'B',BE:'B',BNE:'B',BSE:'B',
       RW:'R',RE:'R',
       GA:'G',GB:'G',GC:'G',
-      PNW:'P',PW:'P',PE:'P',PNE:'P',PTR:'P',PWEL:'P',PAZ:'P',
+      PNW:'P',PW:'P',PE:'P',PNE:'P',PTR:'P',PWEL:'P',PIE:'P',
       M:'M',
       VN:'V',VITO:'V',VS:'V',
       A:'A',Gr:'Gr',Aq:'Aq',
