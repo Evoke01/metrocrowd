@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/_app/static/js/analytics.js",
+      "destination": "/_vercel/insights/script.js"
+    },
+    {
+      "source": "/_app/static/js/v/:path*",
+      "destination": "/_vercel/insights/:path*"
+    }
+  ]
+}
