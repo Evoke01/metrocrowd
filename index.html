@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script>if(location.hostname==='evoke01.github.io')location.replace('https://metrocrowd.vercel.app'+location.pathname+location.search+location.hash);</script>
+<script>if(location.hostname==='evoke01.github.io')location.replace('https://metrocrowd.vercel.app'+location.pathname+location.search+location.hash);if(location.hostname!=='localhost'&&location.hostname!=='127.0.0.1')location.replace('/maintenance.html');</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Delhi Metro · Crowd Monitor</title>
@@ -130,7 +130,7 @@
     <div id="map-vw" class="vw on">
       <div id="mwrap">
         <div id="ticker"><span id="ticker-inner"></span></div>
-        <svg id="msvg" viewBox="0 0 1100 820"></svg>
+        <svg id="msvg" viewBox="0 0 1100 820" preserveAspectRatio="xMidYMid meet"></svg>
       </div>
       <div id="sp">
         <button id="spc" onclick="UI.closePanel()">✕</button>
@@ -291,4 +291,4 @@
 <script src="notify.js" defer></script>
 <script src="app.js" defer></script>
 </body>
-</html>
+  </html>
