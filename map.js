@@ -20,7 +20,7 @@ window.MAP=(function(){
 
   function init(id,cb){
     svg=document.getElementById(id);onCk=cb;
-    svg.setAttribute('viewBox','0 0 1100 900');
+    svg.setAttribute('viewBox','0 0 1100 820');
     resize();
     // ── Defs ────────────────────────────────────────────────────
     const defs=el('defs',{},svg);
@@ -53,12 +53,15 @@ window.MAP=(function(){
     buildLabels();
     setupInput();
 
-    const wrap=svg.parentElement;
-    const W=wrap.clientWidth||360,H=wrap.clientHeight||440;
-    sc=Math.min(W/1100,H/820)*1.35;
-    px=(W-1100*sc)/2+15;py=(H-820*sc)/2-5;
-    apply();ready=true;
-    console.log('[MAP] ready');
+    // Defer initial fit to next frame so layout is fully painted
+    requestAnimationFrame(()=>{
+      const wrap=svg.parentElement;
+      const W=wrap.clientWidth||360,H=wrap.clientHeight||440;
+      sc=Math.min(W/1100,H/820)*1.35;
+      px=(W-1100*sc)/2+15;py=(H-820*sc)/2-5;
+      resize();apply();ready=true;
+      console.log('[MAP] ready W='+W+' H='+H+' sc='+sc.toFixed(2));
+    });
   }
 
   // ── Delhi NCR Boundary Outline ──────────────────────────────────
@@ -320,8 +323,10 @@ window.MAP=(function(){
 
   function resize(){
     const w=svg.parentElement;if(!w)return;
-    svg.setAttribute('width',w.clientWidth||360);
-    svg.setAttribute('height',w.clientHeight||440);
+    const W=w.clientWidth||window.innerWidth||360;
+    const H=w.clientHeight||window.innerHeight||440;
+    svg.setAttribute('width',W);
+    svg.setAttribute('height',H);
   }
 
   return{init,updateMarkers,setLineFilter,clearRoute,flyTo,resize};
