@@ -52,6 +52,11 @@ window.UI=(function(){
         ?`<span style="color:var(--low)">● Open</span> · First ${firstTrain} · Last ${lastTrain}`
         :`<span style="color:var(--muted)">○ Closed</span> · Opens ${firstTrain} · Last train ${lastTrain}`;
     }
+    // ── Coach Guide ───────────────────────────────────────────
+    const coachEl = document.getElementById('sp-coach');
+    if (coachEl && typeof COACH !== 'undefined') {
+      coachEl.innerHTML = COACH.renderCoachStrip(id, s.l[0], v);
+    }
     _sc('sc1',v+'%',c);_sc('sc2',CROWD.label(v),c);_s('sc3',CROWD.waitLabel(v));
     _st('spb','width',v+'%');_st('spb','background',c);
 
