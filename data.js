@@ -287,7 +287,7 @@ METRO.LINE_PATHS={
   GC:   ['PBW','SJP','ESI','MAD','PVE','PVW','PRG','UGN','SRS','NGL','NRS','RDK','MDK','MDI','GHV','TKK','TKB','PGH','BHC','BHS'],
   PNW:  ['MJP','AZA','SHB','SKK','NJS','PBW','RJG'],
   PW:   ['RJG','MYP','NRV','DCT','DGB','SMV','BCP','SNR','INA'],
-  PE:   ['INA','SEX','LPN','VNP','ASH','HNZ','SKN','JGP','MLC','KLC','NPL','KLK','ONS','SKV','JMI','OKV','JVS','KLJ','OBS'],,
+  PE:   ['INA','SEX','LPN','VNP','ASH','HNZ','SKN','JGP','MLC','KLC','NPL','KLK','ONS','SKV','JMI','OKV','JVS','KLJ','OBS'],
   PNE:  ['WEL','JAF','MPB','GKP','JHE','SVH'],
 
   PTR:  ['YMB','TRL','EVN','MWV','KRN','EAZ','ANV'],
