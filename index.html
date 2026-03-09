@@ -15,19 +15,23 @@
 <script defer src="/_app/static/js/analytics.js" onerror="void 0"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
 <script>
-// Fix 100vh on Android Chrome — sets actual visible height as CSS var
-function setVH(){
-  var vh = window.innerHeight * 0.01;
-  document.documentElement.style.setProperty('--vh',''+vh+'px');
-  // Also clamp #app to actual window height
-  var app = document.getElementById('app');
-  if(app) app.style.height = window.innerHeight + 'px';
-  var gate = document.getElementById('login-gate');
-  if(gate) gate.style.height = window.innerHeight + 'px';
-}
-setVH();
-window.addEventListener('resize', setVH);
-window.addEventListener('orientationchange', function(){ setTimeout(setVH,150); });
+// Android Chrome 100vh fix — runs before paint
+(function(){
+  function fix(){
+    var h = window.innerHeight+'px';
+    var app = document.getElementById('app');
+    if(app){ app.style.height = h; }
+    var gate = document.getElementById('login-gate');
+    if(gate){ gate.style.height = h; gate.style.minHeight = h; }
+  }
+  fix();
+  window.addEventListener('resize', fix, {passive:true});
+  window.addEventListener('orientationchange', function(){ setTimeout(fix,200); }, {passive:true});
+  // Also fix after any visual viewport change (Android keyboard etc)
+  if(window.visualViewport){
+    window.visualViewport.addEventListener('resize', fix, {passive:true});
+  }
+})();
 </script>
 </head>
 <body>
