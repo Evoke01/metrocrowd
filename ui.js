@@ -453,8 +453,8 @@ window.UI=(function(){
     if(overlayMode==='home') _applyHomeStation(id,true);
     else if(overlayMode==='station') showStationScreen(id);
     else if(overlayMode==='coach-station') pickCoachStation(id);
-    else if(overlayMode==='route-from') _setRouteStation('from',id);
-    else if(overlayMode==='route-to') _setRouteStation('to',id);
+    else if(overlayMode==='r-from'||overlayMode==='route-from') _setRouteStation('from',id);
+    else if(overlayMode==='r-to'||overlayMode==='route-to') _setRouteStation('to',id);
     else if(overlayMode==='report') _setReportStation(id);
   }
 
