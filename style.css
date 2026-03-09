@@ -23,8 +23,21 @@
   --border:rgba(255,255,255,0.07); --text:#EFEFEF; --muted:rgba(255,255,255,0.38); --a2:#FFD000;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-html,body{height:100%;font-family:'DM Sans',sans-serif;background:#0a0a0a;color:var(--txt);overflow:hidden;}
-#app{width:100vw;height:100vh;background:var(--blk);display:flex;flex-direction:column;position:relative;overflow:hidden;max-width:480px;margin:0 auto;}
+html,body{height:100%;height:100dvh;font-family:'DM Sans',sans-serif;background:#0a0a0a;color:var(--txt);overflow:hidden;overscroll-behavior:none;}
+#app{
+  width:100%;
+  width:100vw;
+  height:100vh;
+  height:100dvh;
+  background:var(--blk);
+  display:flex;
+  flex-direction:column;
+  position:fixed;
+  top:0;left:0;right:0;bottom:0;
+  overflow:hidden;
+  max-width:480px;
+  margin:0 auto;
+}
 #sbar{height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0;z-index:200;}
 #sbar-brand{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:var(--txt);letter-spacing:-.2px;}
 #sbar-brand em{font-style:normal;color:var(--y);}
@@ -32,12 +45,33 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:#0a0a0a;color:
 #sbar-clock{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--sub);}
 #auth-btn{width:32px;height:32px;border-radius:50%;background:var(--card);border:1px solid var(--brd2);display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;transition:border-color .15s;}
 #auth-btn:hover{border-color:rgba(255,208,0,.3);}
-#screens{flex:1;position:relative;overflow:hidden;}
-.screen{position:absolute;inset:0;opacity:0;transform:translateY(16px);pointer-events:none;transition:opacity .26s cubic-bezier(.22,1,.36,1),transform .26s cubic-bezier(.22,1,.36,1);overflow:hidden;}
+#screens{flex:1;position:relative;overflow:hidden;min-height:0;}
+.screen{position:absolute;top:0;left:0;right:0;bottom:0;opacity:0;transform:translateY(16px);pointer-events:none;transition:opacity .26s cubic-bezier(.22,1,.36,1),transform .26s cubic-bezier(.22,1,.36,1);overflow:hidden;}
 .screen.active{opacity:1;transform:translateY(0);pointer-events:all;}
-.sv{position:absolute;inset:0;overflow-y:auto;padding:12px 15px 28px;scrollbar-width:none;}
+.sv{
+  position:absolute;
+  top:0;left:0;right:0;bottom:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior-y:contain;
+  padding:12px 15px 100px;
+  scrollbar-width:none;
+}
 .sv::-webkit-scrollbar{display:none;}
-#bnav{height:72px;background:rgba(6,6,6,.97);border-top:1px solid var(--brd);display:flex;align-items:center;justify-content:space-around;padding:0 4px 8px;flex-shrink:0;z-index:100;}
+#bnav{
+  height:64px;
+  background:rgba(8,8,8,.98);
+  border-top:1px solid var(--brd);
+  display:flex;
+  align-items:center;
+  justify-content:space-around;
+  padding:0 4px;
+  padding-bottom:max(8px, env(safe-area-inset-bottom));
+  flex-shrink:0;
+  z-index:200;
+  position:relative;
+}
 .bni{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:7px 2px;border-radius:14px;transition:all .18s;}
 .bni .ico{font-size:20px;transition:transform .24s cubic-bezier(.34,1.56,.64,1);}
 .bni .lbl{font-size:9px;font-weight:600;color:var(--sub);letter-spacing:.3px;transition:color .18s;}
@@ -307,7 +341,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:#0a0a0a;color:
 .rep-detail textarea:focus{border-color:rgba(255,208,0,.3);}
 .rep-feed{background:var(--card);border:1px solid var(--brd);border-radius:16px;overflow:hidden;}
 /* OVERLAY */
-.overlay{position:absolute;inset:0;z-index:800;background:var(--blk);display:none;flex-direction:column;}
+.overlay{position:absolute;top:0;left:0;right:0;bottom:0;z-index:800;background:var(--blk);display:none;flex-direction:column;overflow:hidden;}
 .overlay.open{display:flex;animation:fup .24s cubic-bezier(.22,1,.36,1);}
 @keyframes fup{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
 .ov-hd{padding:12px 15px;display:flex;align-items:center;gap:9px;border-bottom:1px solid var(--brd);}
@@ -341,131 +375,118 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:#0a0a0a;color:
 .t-x{font-size:13px;color:var(--sub);cursor:pointer;flex-shrink:0;}
 #map-hidden{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;left:-9999px;}
 
+
 /* ═══════════════════════════════════════════════════════════════
-   MOBILE OPTIMIZATIONS
+   MOBILE & CROSS-PLATFORM OPTIMIZATIONS
    ═══════════════════════════════════════════════════════════════ */
 
-/* 1. Dynamic viewport — fixes iOS Safari bottom bar pushing content up */
-html, body { height: 100%; height: 100dvh; }
-#app {
-  height: 100vh;
-  height: 100dvh;
-  /* Prevent iOS bounce/pull-to-refresh on the outer shell */
-  overscroll-behavior: none;
-}
-
-/* 2. Safe area insets — iPhone notch / home indicator / Dynamic Island */
+/* Safe area insets — iPhone notch, Dynamic Island, Android gesture bar */
 #sbar {
-  padding-top: max(0px, env(safe-area-inset-top));
+  padding-top: env(safe-area-inset-top);
   height: calc(48px + env(safe-area-inset-top));
 }
 #bnav {
-  padding-bottom: max(10px, env(safe-area-inset-bottom));
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
   height: calc(64px + env(safe-area-inset-bottom));
 }
 #toast {
-  bottom: calc(72px + env(safe-area-inset-bottom) + 6px);
+  bottom: calc(68px + env(safe-area-inset-bottom) + 8px);
 }
-
-/* 3. Prevent iOS auto-zoom on input focus (must be ≥16px) */
-.ov-input,
-.rep-detail textarea {
-  font-size: 16px;
-}
-
-/* 4. Minimum 44px touch targets — Apple HIG standard */
-.bni          { min-height: 44px; }
-.back-btn,
-.gps-btn      { min-width: 44px; min-height: 44px; }
-.ir-opt       { min-height: 44px; padding: 0 13px; }
-.sel-row      { min-height: 50px; }
-.ri           { min-height: 50px; }
-.ov-item      { min-height: 48px; }
-.line-row     { min-height: 48px; }
-.chip         { min-height: 38px; padding: 8px 14px; }
-.dir-btn      { min-height: 44px; }
-.ov-back      { min-width: 44px; min-height: 44px; }
-.line-btn     { min-height: 52px; }
-.rep-stn-btn  { min-height: 52px; }
-
-/* 5. Faster tap response — removes 300ms delay */
-* { touch-action: manipulation; }
-/* But allow vertical scroll on scrollable containers */
-.sv, .ov-list, .fc-strip, .chips-scroll, .opts-row, .train-row, .nt-row {
-  touch-action: pan-y;
-}
-
-/* 6. Remove sticky :hover on touch devices */
-@media (hover: none) {
-  .hero-card:hover      { border-color: var(--brd); }
-  .qa-btn:hover         { border-color: var(--brd); }
-  .line-row:hover       { background: transparent; }
-  .sel-row:hover        { background: transparent; }
-  .ri:hover             { background: transparent; }
-  .swap-btn:hover       { background: var(--card2); border-color: var(--brd); }
-  .gps-btn:hover        { border-color: var(--brd); background: var(--card); }
-  .btn-y:hover          { transform: none; background: var(--y); }
-  .ov-item:hover .ov-name { color: var(--txt); }
-  .coach-card:hover     { border-color: var(--brd); }
-}
-
-/* 7. Responsive font sizes — prevent overflow on small screens */
-.hero-num {
-  font-size: clamp(38px, 13vw, 56px);
-}
-.cc-num {
-  font-size: clamp(60px, 20vw, 82px);
-}
-.pg-title {
-  font-size: clamp(17px, 5vw, 22px);
-}
-
-/* 8. Smooth momentum scroll on iOS */
-.sv, .ov-list {
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: contain;
-}
-
-/* 9. Small screen adjustments (≤360px — older Androids, SE) */
-@media (max-width: 360px) {
-  .sv             { padding: 10px 12px 24px; }
-  .hero-card      { padding: 14px; }
-  .crowd-card     { padding: 18px 13px; }
-  .qa             { gap: 7px; }
-  .qa-btn         { padding: 10px; }
-  .cpick          { gap: 6px; }
-  .cp             { padding: 11px 9px; }
-  .rs-stats       { grid-template-columns: repeat(2,1fr); }
-  .coach-card     { width: 54px; }
-  #bnav           { height: calc(58px + env(safe-area-inset-bottom)); }
-  .bni .lbl       { font-size: 8px; }
-}
-
-/* 10. Landscape on phones — compress vertical spacing */
-@media (max-height: 600px) and (orientation: landscape) {
-  #sbar   { height: 40px; }
-  #bnav   { height: 52px; padding-bottom: env(safe-area-inset-bottom); }
-  .sv     { padding: 8px 15px 16px; }
-  .empty-state { height: 180px; }
-  .cc-num { font-size: 52px; }
-  .hero-num { font-size: 38px; }
-}
-
-/* 11. Overlay full-screen safe area */
 .overlay {
   padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* 12. Prevent text selection on interactive elements */
+/* Login gate safe area */
+#login-gate {
+  padding-top: max(32px, env(safe-area-inset-top));
+  padding-bottom: max(32px, env(safe-area-inset-bottom));
+}
+
+/* Remove 300ms tap delay on all devices */
+* { touch-action: manipulation; }
+
+/* Re-allow vertical scroll on containers that need it */
+.sv, .ov-list {
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Re-allow horizontal scroll on horizontal containers */
+.fc-strip, .chips-scroll, .opts-row, .train-row, .nt-row {
+  touch-action: pan-x;
+}
+
+/* Minimum 44×44px touch targets */
+.bni         { min-height: 48px; }
+.back-btn,
+.gps-btn     { min-width: 44px; min-height: 44px; }
+.ir-opt      { min-height: 44px; padding: 0 13px; }
+.sel-row     { min-height: 50px; }
+.ri          { min-height: 50px; }
+.ov-item     { min-height: 50px; }
+.line-row    { min-height: 48px; }
+.chip        { min-height: 38px; padding: 8px 14px; }
+.dir-btn     { min-height: 44px; }
+.ov-back     { min-width: 44px; min-height: 44px; }
+.line-btn    { min-height: 52px; }
+.rep-stn-btn { min-height: 52px; }
+
+/* Prevent iOS auto-zoom on input focus (must be ≥ 16px) */
+.ov-input,
+.rep-detail textarea { font-size: 16px; }
+
+/* No sticky hover states on touch */
+@media (hover: none) {
+  .hero-card:hover    { border-color: var(--brd); }
+  .qa-btn:hover       { border-color: var(--brd); }
+  .line-row:hover     { background: transparent; }
+  .sel-row:hover      { background: transparent; }
+  .ri:hover           { background: transparent; }
+  .btn-y:hover        { transform: none; background: var(--y); }
+  .ov-item:hover .ov-name { color: var(--txt); }
+  .coach-card:hover   { border-color: var(--brd); }
+  .swap-btn:hover     { background: var(--card2); border-color: var(--brd); }
+  .gps-btn:hover      { border-color: var(--brd); background: var(--card); }
+}
+
+/* Fluid display font sizes */
+.hero-num { font-size: clamp(36px, 12vw, 54px); }
+.cc-num   { font-size: clamp(58px, 19vw, 82px); }
+.pg-title { font-size: clamp(17px, 5vw, 22px); }
+
+/* Prevent text selection on tap */
 .bni, .btn-y, .chip, .ir-opt, .cp, .sel-row, .ri,
 .qa-btn, .line-row, .ov-item, .dir-btn, .back-btn,
-.gps-btn, .swap-btn, .coach-card, .line-btn {
+.gps-btn, .swap-btn, .coach-card, .line-btn, .rep-stn-btn {
   -webkit-user-select: none;
   user-select: none;
 }
 
-/* 13. Fix auth modal for phones */
+/* Small phones ≤ 360px */
+@media (max-width: 360px) {
+  .sv             { padding: 10px 11px 96px; }
+  .hero-card      { padding: 13px; }
+  .crowd-card     { padding: 16px 12px; }
+  .qa             { gap: 7px; }
+  .qa-btn         { padding: 10px; }
+  .cpick          { gap: 6px; }
+  .cp             { padding: 11px 8px; }
+  .rs-stats       { grid-template-columns: repeat(2,1fr); }
+  .coach-card     { width: 54px; }
+  .bni .lbl       { font-size: 8px; }
+}
+
+/* Landscape phone */
+@media (max-height: 500px) and (orientation: landscape) {
+  #sbar  { height: 38px; padding-top: 0; }
+  #bnav  { height: calc(52px + env(safe-area-inset-bottom)); }
+  .sv    { padding: 8px 15px 60px; }
+  .cc-num { font-size: 46px; }
+  .hero-num { font-size: 34px; }
+  .empty-state { height: 160px; }
+}
+
+/* Auth modal bottom safe area */
 #auth-modal > div {
   padding-bottom: calc(24px + env(safe-area-inset-bottom));
 }
