@@ -71,7 +71,7 @@ window.AUTH = (function(){
       const { error } = await client.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: window.location.href,
+          redirectTo: 'https://metrocrowd.vercel.app',
           queryParams: { access_type: 'offline', prompt: 'consent' }
         }
       });
@@ -90,7 +90,7 @@ window.AUTH = (function(){
     try{
       const { error } = await client.auth.signInWithOAuth({
         provider: 'github',
-        options: { redirectTo: window.location.href }
+        options: { redirectTo: 'https://metrocrowd.vercel.app' }
       });
       if(error) throw error;
     }catch(err){
