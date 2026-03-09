@@ -9,6 +9,21 @@ window.AUTH = (function(){
   let client      = null;   // Supabase client (set by init)
   let reportCount = 0;
 
+  // ── Login gate ─────────────────────────────────────────────────
+  function showGate(){
+    const g=document.getElementById('login-gate');
+    if(g) g.style.display='flex';
+    const app=document.getElementById('app');
+    if(app) app.style.visibility='hidden';
+  }
+
+  function hideGate(){
+    const g=document.getElementById('login-gate');
+    if(g){ g.style.opacity='0'; g.style.transition='opacity .4s'; setTimeout(()=>g.style.display='none',400); }
+    const app=document.getElementById('app');
+    if(app){ app.style.visibility='visible'; }
+  }
+
   // ── Bootstrap (called by SB.init after client is ready) ────────
   function init(sbClient){
     client = sbClient;
@@ -19,6 +34,7 @@ window.AUTH = (function(){
 
       if(event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED'){
         currentUser = session.user;
+        hideGate();
         await onSignedIn(session.user, event);
       }
       else if(event === 'SIGNED_OUT'){
@@ -28,10 +44,16 @@ window.AUTH = (function(){
     });
 
     // Restore existing session on page load
-    client.auth.getSession().then(({ data: { session } }) => {
+    client.auth.getSession().then(async ({ data: { session } }) => {
       if(session?.user && !session.user.is_anonymous){
+        // Valid persistent session found — refresh token silently
+        try{ await client.auth.refreshSession(); }catch(_){}
         currentUser = session.user;
+        hideGate();
         onSignedIn(session.user, 'RESTORED');
+      } else {
+        // No valid session — show login gate
+        showGate();
       }
     });
   }
@@ -60,19 +82,25 @@ window.AUTH = (function(){
     updateButtonUI(null);
     updateProfileUI(null, 0);
     showSignedOutView();
-    SB.showToast('Signed out. Continuing anonymously.');
+    closeModal();
+    showGate();
   }
 
   // ── OAuth sign-in ───────────────────────────────────────────────
   async function signInGoogle(){
     if(!client){ SB.showToast('Supabase not configured yet.'); return; }
     showLoading('Redirecting to Google…');
+    const lg=document.getElementById('lg-loading');if(lg)lg.style.display='block';
+    const lgm=document.getElementById('lg-loading-msg');if(lgm)lgm.textContent='Redirecting to Google…';
+    document.getElementById('lg-google')&&(document.getElementById('lg-google').style.opacity='.5');
+    document.getElementById('lg-github')&&(document.getElementById('lg-github').style.opacity='.5');
     try{
       const { error } = await client.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: 'https://metrocrowd.vercel.app',
-          queryParams: { access_type: 'offline', prompt: 'consent' }
+          queryParams: { access_type: 'offline', prompt: 'consent' },
+          skipBrowserRedirect: false,
         }
       });
       if(error) throw error;
@@ -87,10 +115,17 @@ window.AUTH = (function(){
   async function signInGitHub(){
     if(!client){ SB.showToast('Supabase not configured yet.'); return; }
     showLoading('Redirecting to GitHub…');
+    const lg2=document.getElementById('lg-loading');if(lg2)lg2.style.display='block';
+    const lgm2=document.getElementById('lg-loading-msg');if(lgm2)lgm2.textContent='Redirecting to GitHub…';
+    document.getElementById('lg-google')&&(document.getElementById('lg-google').style.opacity='.5');
+    document.getElementById('lg-github')&&(document.getElementById('lg-github').style.opacity='.5');
     try{
       const { error } = await client.auth.signInWithOAuth({
         provider: 'github',
-        options: { redirectTo: 'https://metrocrowd.vercel.app' }
+        options: {
+          redirectTo: 'https://metrocrowd.vercel.app',
+          skipBrowserRedirect: false,
+        }
       });
       if(error) throw error;
     }catch(err){
@@ -290,6 +325,7 @@ window.AUTH = (function(){
   return {
     init, openModal, closeModal,
     signInGoogle, signInGitHub, signOut, continueAnon,
+    showGate, hideGate,
     setStatus,
     get currentUser(){ return currentUser; },
     get isSignedIn(){ return !!(currentUser && !currentUser.is_anonymous); },
