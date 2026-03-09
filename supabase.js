@@ -44,7 +44,14 @@ window.SB = (function(){
 
     try{
       client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-        auth: { persistSession: true, autoRefreshToken: true },
+        auth: {
+          persistSession:   true,
+          autoRefreshToken: true,
+          storageKey:       'metrocrowd_auth',
+          storage:          window.localStorage,
+          detectSessionInUrl: true,
+          flowType:         'pkce',
+        },
         realtime: { params: { eventsPerSecond: 10 } }
       });
 
@@ -100,8 +107,7 @@ window.SB = (function(){
     // Always update local state immediately
     CROWD.state.userReports[stationId] = level;
     CROWD.recomputeAll();
-    MAP.updateMarkers();
-    UI.updateHeader();
+    if(typeof UI !== 'undefined') UI.triggerUpdate();
 
     if(!isReady) return {ok:true, local:true};
 
