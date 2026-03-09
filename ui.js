@@ -54,8 +54,13 @@ window.UI=(function(){
     const el=document.getElementById(screenId);if(el)el.classList.add('active');
     document.querySelectorAll('.bni').forEach(b=>b.classList.toggle('on',b.dataset.tab===screenId));
     if(screenId==='s-route')_refreshRouteDisplay();
-    if(screenId==='s-report')loadNetworkReports();
+    if(screenId==='s-report'){loadNetworkReports();_s('karma-num',karma);}
     if(screenId==='s-home'){buildFC();buildHomeLineList();}
+    if(screenId==='s-station'){
+      // If no station selected yet, auto-open search overlay
+      const pv=document.getElementById('sp-val');
+      if(pv&&pv.classList.contains('ph'))setTimeout(()=>openSearch('station'),200);
+    }
   }
   function switchTab(tab){
     const MAP={map:'s-home',stats:'s-home',route:'s-route',report:'s-report',home:'s-home',coach:'s-coach',station:'s-station'};
@@ -406,9 +411,12 @@ window.UI=(function(){
       if(el)el.innerHTML='<div class="route-error">Route module loading… try again.</div>';
       return;
     }
-    const avoid=true; // always try to avoid packed stations
+    const avoid=document.getElementById('opt-avoid')?.classList.contains('on')??true;
     const result=ROUTE.compute(routeFrom,routeTo,avoid);
     ROUTE.render(result);
+    // Scroll to results
+    const rres=document.getElementById('rres');
+    if(rres)setTimeout(()=>rres.scrollIntoView({behavior:'smooth',block:'start'}),100);
   }
 
     // ── STATION OVERLAY (shared) ──────────────────────────────────
@@ -626,9 +634,11 @@ window.UI=(function(){
     _s('rs-karma',karma);
     const sub=document.getElementById('karma-sub');
     if(sub)sub.textContent=`${karma} report${karma!==1?'s':''} submitted`;
+    // v2 has karma-num in report tab header
   }
 
   function populateRpFilter(){
+    return; // v2: no rp-filter select element
     const sel=document.getElementById('rp-filter');if(!sel)return;
     if(sel.options.length>1)return;
     const opts=Object.keys(METRO.STATIONS).sort((a,b)=>METRO.STATIONS[a].n.localeCompare(METRO.STATIONS[b].n))
@@ -646,7 +656,7 @@ window.UI=(function(){
     const stId=stationName?Object.keys(METRO.STATIONS).find(k=>METRO.STATIONS[k].n===stationName):null;
     const qrStation=stId||panelId;
     if(qrStation){
-      CROWD.state.userReports[panelId]=level;
+      CROWD.state.userReports[qrStation]=level;
       triggerUpdate();
       if(typeof SB!=='undefined'&&SB.isReady)SB.submitReport(qrStation,level);
       showToast('✅','Report submitted — thanks!');
@@ -678,87 +688,10 @@ window.UI=(function(){
   }
 
   function openPanel(id){
-    if(!id){closePanel();return}
-    const s=METRO.STATIONS[id];if(!s)return;
+    if(!id){closePanel();return;}
     panelId=id;
-    const v=CROWD.state.crowdMap[id]||0,c=CROWD.color(v);
-    _s('spn',s.n);
-    _s('spl',s.l.map(l=>METRO.LINE_NAMES[l]).join(' · ')+(s.ix?' · Interchange':''));
-
-    // ── Service hours ─────────────────────────────────────────
-    const shEl=document.getElementById('sp-service-hours');
-    if(shEl){
-      const sh=METRO.stationServiceHours(id);
-      const nowH=CROWD.state.hour;
-      const isOpen=nowH>=sh.open&&nowH<=sh.close;
-      const openLines=s.l.map(l=>METRO.SERVICE_HOURS[l]).filter(Boolean);
-      const firstTrain=openLines.map(l=>l.firstTrain).sort()[0]||'—';
-      const lastTrain=openLines.map(l=>l.lastTrain).sort().reverse()[0]||'—';
-      shEl.innerHTML=isOpen
-        ?`<span style="color:var(--low)">● Open</span> · First ${firstTrain} · Last ${lastTrain}`
-        :`<span style="color:var(--sub)">○ Closed</span> · Opens ${firstTrain} · Last ${lastTrain}`;
-    }
-
-    // ── Coach Guide ───────────────────────────────────────────
-    const coachEl=document.getElementById('sp-coach');
-    if(coachEl&&typeof COACH!=='undefined'){
-      coachEl.innerHTML=COACH.renderCoachStrip(id,s.l[0],v);
-    }
-
-    // ── Confidence + anomaly ──────────────────────────────────
-    const cbEl=document.getElementById('sp-confidence');
-    if(cbEl)cbEl.innerHTML=typeof NOTIFY!=='undefined'?NOTIFY.confidenceBadge(id):'';
-    const abEl=document.getElementById('sp-anomaly');
-    if(abEl)abEl.innerHTML=typeof NOTIFY!=='undefined'?NOTIFY.anomalyBanner(id):'';
-
-    // ── Crowd card ────────────────────────────────────────────
-    const numEl=document.getElementById('sc1');
-    if(numEl){numEl.textContent=v+'%';numEl.style.color=c;}
-    const lblEl=document.getElementById('sc2');
-    if(lblEl){lblEl.textContent=CROWD.label(v);lblEl.style.color=c;}
-    const waitEl=document.getElementById('sc3');
-    if(waitEl)waitEl.textContent=CROWD.waitLabel(v);
-    const barEl=document.getElementById('spb');
-    if(barEl){barEl.style.width=v+'%';barEl.style.background=c;}
-    const dotEl=document.getElementById('sp-dot');
-    if(dotEl)dotEl.style.opacity='1';
-
-    // ── Station name in crowd card ────────────────────────────
-    const ccn=document.getElementById('sp-cc-name');
-    if(ccn)ccn.textContent=s.n.toUpperCase();
-
-    // ── Safe-to-board card ────────────────────────────────────
-    const sc=document.getElementById('sp-safe');
-    if(sc){
-      sc.style.display='flex';
-      if(v<40){sc.className='safe-card yes';_s('sp-safe-icon','✓');_s('sp-safe-ans','Good to board now');_s('sp-safe-sub','Crowd is low. ~1 train wait.');}
-      else if(v<70){sc.className='safe-card';_s('sp-safe-icon','⏱');_s('sp-safe-ans','Wait 10–15 minutes');_s('sp-safe-sub','Crowd will ease soon.');}
-      else{sc.className='safe-card';_s('sp-safe-icon','✕');_s('sp-safe-ans','Avoid right now');_s('sp-safe-sub','Very packed. Try alternate route.');}
-    }
-
-    // ── Line dots ─────────────────────────────────────────────
-    const ld=document.getElementById('sp-line-dots');
-    if(ld)ld.innerHTML=s.l.map(l=>`<span style="width:8px;height:8px;border-radius:50%;background:${METRO.LINE_COLORS[l]};display:inline-block;margin-right:2px"></span><span style="font-size:8px;color:var(--sub);font-weight:600">${METRO.LINE_NAMES[l]}</span>`).join('<span style="color:var(--sub);margin:0 4px">·</span>');
-
-    // ── Subscribe button ──────────────────────────────────────
-    const sbEl=document.getElementById('sp-sub-btn');
-    if(sbEl){
-      const isSub=typeof NOTIFY!=='undefined'&&NOTIFY.isSubscribed(id);
-      sbEl.dataset.id=id;sbEl.dataset.sub=isSub?'1':'0';
-      sbEl.textContent=isSub?'🔔 Alerts on':'🔕 Alert';
-      sbEl.style.borderColor=isSub?'rgba(0,230,118,.4)':'';
-      sbEl.style.color=isSub?'var(--low)':'';
-    }
-
-    // ── Sparkline ─────────────────────────────────────────────
-    const sp=document.getElementById('spspk');
-    if(sp){const fc=CROWD.stationForecast(id);sp.innerHTML=fc.map((fv,h)=>`<div class="spk" style="height:${Math.round(fv*.26)}px;background:${h===CROWD.state.hour?c:CROWD.color(fv)};opacity:${h===CROWD.state.hour?1:.5};flex:1;min-width:2px;border-radius:1px 1px 0 0"></div>`).join('')}
-
-    document.getElementById('sp')?.classList.add('show');
-    if(activeTab==='map'&&typeof MAP!=='undefined'&&MAP.flyTo)MAP.flyTo(id);
-    loadPanelReports(id);
+    showStationScreen(id);
   }
-
   function closePanel(){panelId=null;document.getElementById('sp')?.classList.remove('show')}
   function refreshPanel(){if(panelId)openPanel(panelId)}
 
@@ -796,7 +729,7 @@ window.UI=(function(){
   function renderSummary(){
     const ns=CROWD.networkStats();const bs=METRO.STATIONS[ns.maxId];
     const anomCount = typeof NOTIFY!=='undefined' ? Object.keys(NOTIFY.anomalyMap).length : 0;
-    document.getElementById('sg').innerHTML=`
+    (document.getElementById('sg')||{innerHTML:''}).innerHTML=`
       <div class="sg-card"><div class="sg-val" style="color:${CROWD.color(ns.avg)}">${ns.avg}%</div><div class="sg-lbl">Network Avg</div></div>
       <div class="sg-card"><div class="sg-val" style="color:${CROWD.color(ns.max)}">${ns.max}%</div><div class="sg-lbl">Peak Crowd</div></div>
       <div class="sg-card"><div class="sg-val" style="color:var(--low)">${ns.low}</div><div class="sg-lbl">Low Stations</div></div>
@@ -851,7 +784,7 @@ window.UI=(function(){
 
   function renderIX(){
     const data=CROWD.interchangePressure(10);
-    document.getElementById('ixlist').innerHTML=data.map(({id,n,v},i)=>`
+    (document.getElementById('ixlist')||{innerHTML:''}).innerHTML=data.map(({id,n,v},i)=>`
       <div class="ixr" onclick="UI.openStationFromStats('${id}')">
         <div class="ixrk">${i+1}</div><div class="ixnm">${n}</div>
         <div class="ixbw"><div class="ixbar" style="width:${v}%;background:${CROWD.color(v)}"></div></div>
@@ -860,7 +793,7 @@ window.UI=(function(){
 
   // LINES
   function renderLines(){
-    document.getElementById('lclist').innerHTML=CROWD.lineAverages().map(({l,avg,name,color,count,isOpen,firstTrain,lastTrain})=>`
+    (document.getElementById('lclist')||{innerHTML:''}).innerHTML=CROWD.lineAverages().map(({l,avg,name,color,count,isOpen,firstTrain,lastTrain})=>`
       <div class="lr">
         <div class="ldot" style="background:${isOpen?color:'#2A3F58'}"></div>
         <div class="lnm" style="flex:1;min-width:0">
@@ -871,7 +804,7 @@ window.UI=(function(){
         <div class="lpct" style="color:${isOpen?CROWD.color(avg):'var(--muted)'}">${isOpen?avg+'%':'—'}</div>
       </div>`).join('');
     const top=CROWD.topStations(12);
-    document.getElementById('toplist').innerHTML=top.map(({id,v,s},i)=>s?`
+    (document.getElementById('toplist')||{innerHTML:''}).innerHTML=top.map(({id,v,s},i)=>s?`
       <div class="ixr" onclick="UI.openStationFromStats('${id}')">
         <div class="ixrk">#${i+1}</div><div class="ixnm">${s.n}</div>
         <div style="font-size:8px;font-family:'Space Mono',monospace;flex-shrink:0;margin-right:3px;color:${METRO.LINE_COLORS[s.l[0]]}">${s.l[0]}</div>
@@ -891,10 +824,10 @@ window.UI=(function(){
         :'Scanning Google News RSS…';
     }
     if(!all.length){
-      document.getElementById('evlist').innerHTML='<div style="font-size:9px;color:var(--muted);font-family:Space Mono,monospace;padding:14px;text-align:center;line-height:1.8">📡 Scanning Google News RSS for Delhi Metro alerts…<br>Results appear within 30 seconds.</div>';
+      (document.getElementById('evlist')||{innerHTML:''}).innerHTML='<div style="font-size:9px;color:var(--muted);font-family:Space Mono,monospace;padding:14px;text-align:center;line-height:1.8">📡 Scanning Google News RSS for Delhi Metro alerts…<br>Results appear within 30 seconds.</div>';
       return;
     }
-    document.getElementById('evlist').innerHTML=all.map(ev=>{
+    (document.getElementById('evlist')||{innerHTML:''}).innerHTML=all.map(ev=>{
 
       // ── Severity colour ────────────────────────────────────────
       const sevCol={
@@ -1025,7 +958,8 @@ window.UI=(function(){
   let reportFilterId = '';           // current filter in report tab
 
   function populateReportSelect(){
-    // Submit station selector
+    // v2: station selection uses overlay picker, not a <select> element
+    return;
     const sel=document.getElementById('rpst');if(!sel)return;
     const prev=sel.value;
     sel.innerHTML='<option value="">— Select your station —</option>'+
@@ -1093,8 +1027,8 @@ window.UI=(function(){
   // ── Load reports for a specific station from Supabase ───────
   async function loadStationReports(stationId){
     reportFilterId = stationId||'';
-    const listEl   = document.getElementById('rplist');
-    const statusEl = document.getElementById('rplist-status');
+    const listEl   = document.getElementById('comm-items');
+    const statusEl = null;
     if(!listEl) return;
 
     // Show loading state
@@ -1164,7 +1098,7 @@ window.UI=(function(){
   // ── Load recent reports across the whole network ─────────────
   async function loadNetworkReports(){
     const listEl  =document.getElementById('rep-feed');
-    const statusEl=document.getElementById('rplist-status');
+    const statusEl=null; // no status element in v2
 
     if(!window.SB?.isReady){
       // Fall back to local memory
@@ -1199,7 +1133,7 @@ window.UI=(function(){
 
   // ── Station panel mini-report list (top 5 for selected station) ─
   async function loadPanelReports(stationId){
-    const listEl  =document.getElementById('sp-replist');
+    const listEl  =document.getElementById('comm-items');
     const countEl =document.getElementById('sp-rep-count');
     if(!listEl) return;
 
@@ -1252,7 +1186,7 @@ window.UI=(function(){
 
     // Prepend to station panel if it's currently open
     if(panelId===row.station_id){
-      const listEl=document.getElementById('sp-replist');
+      const listEl=document.getElementById('comm-items');
       const countEl=document.getElementById('sp-rep-count');
       if(listEl){
         const emptyMsg=listEl.querySelector('.rp-empty');
