@@ -340,3 +340,132 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:#0a0a0a;color:
 .t-txt{font-size:13px;color:var(--txt);font-weight:500;flex:1;}
 .t-x{font-size:13px;color:var(--sub);cursor:pointer;flex-shrink:0;}
 #map-hidden{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;left:-9999px;}
+
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE OPTIMIZATIONS
+   ═══════════════════════════════════════════════════════════════ */
+
+/* 1. Dynamic viewport — fixes iOS Safari bottom bar pushing content up */
+html, body { height: 100%; height: 100dvh; }
+#app {
+  height: 100vh;
+  height: 100dvh;
+  /* Prevent iOS bounce/pull-to-refresh on the outer shell */
+  overscroll-behavior: none;
+}
+
+/* 2. Safe area insets — iPhone notch / home indicator / Dynamic Island */
+#sbar {
+  padding-top: max(0px, env(safe-area-inset-top));
+  height: calc(48px + env(safe-area-inset-top));
+}
+#bnav {
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+  height: calc(64px + env(safe-area-inset-bottom));
+}
+#toast {
+  bottom: calc(72px + env(safe-area-inset-bottom) + 6px);
+}
+
+/* 3. Prevent iOS auto-zoom on input focus (must be ≥16px) */
+.ov-input,
+.rep-detail textarea {
+  font-size: 16px;
+}
+
+/* 4. Minimum 44px touch targets — Apple HIG standard */
+.bni          { min-height: 44px; }
+.back-btn,
+.gps-btn      { min-width: 44px; min-height: 44px; }
+.ir-opt       { min-height: 44px; padding: 0 13px; }
+.sel-row      { min-height: 50px; }
+.ri           { min-height: 50px; }
+.ov-item      { min-height: 48px; }
+.line-row     { min-height: 48px; }
+.chip         { min-height: 38px; padding: 8px 14px; }
+.dir-btn      { min-height: 44px; }
+.ov-back      { min-width: 44px; min-height: 44px; }
+.line-btn     { min-height: 52px; }
+.rep-stn-btn  { min-height: 52px; }
+
+/* 5. Faster tap response — removes 300ms delay */
+* { touch-action: manipulation; }
+/* But allow vertical scroll on scrollable containers */
+.sv, .ov-list, .fc-strip, .chips-scroll, .opts-row, .train-row, .nt-row {
+  touch-action: pan-y;
+}
+
+/* 6. Remove sticky :hover on touch devices */
+@media (hover: none) {
+  .hero-card:hover      { border-color: var(--brd); }
+  .qa-btn:hover         { border-color: var(--brd); }
+  .line-row:hover       { background: transparent; }
+  .sel-row:hover        { background: transparent; }
+  .ri:hover             { background: transparent; }
+  .swap-btn:hover       { background: var(--card2); border-color: var(--brd); }
+  .gps-btn:hover        { border-color: var(--brd); background: var(--card); }
+  .btn-y:hover          { transform: none; background: var(--y); }
+  .ov-item:hover .ov-name { color: var(--txt); }
+  .coach-card:hover     { border-color: var(--brd); }
+}
+
+/* 7. Responsive font sizes — prevent overflow on small screens */
+.hero-num {
+  font-size: clamp(38px, 13vw, 56px);
+}
+.cc-num {
+  font-size: clamp(60px, 20vw, 82px);
+}
+.pg-title {
+  font-size: clamp(17px, 5vw, 22px);
+}
+
+/* 8. Smooth momentum scroll on iOS */
+.sv, .ov-list {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+/* 9. Small screen adjustments (≤360px — older Androids, SE) */
+@media (max-width: 360px) {
+  .sv             { padding: 10px 12px 24px; }
+  .hero-card      { padding: 14px; }
+  .crowd-card     { padding: 18px 13px; }
+  .qa             { gap: 7px; }
+  .qa-btn         { padding: 10px; }
+  .cpick          { gap: 6px; }
+  .cp             { padding: 11px 9px; }
+  .rs-stats       { grid-template-columns: repeat(2,1fr); }
+  .coach-card     { width: 54px; }
+  #bnav           { height: calc(58px + env(safe-area-inset-bottom)); }
+  .bni .lbl       { font-size: 8px; }
+}
+
+/* 10. Landscape on phones — compress vertical spacing */
+@media (max-height: 600px) and (orientation: landscape) {
+  #sbar   { height: 40px; }
+  #bnav   { height: 52px; padding-bottom: env(safe-area-inset-bottom); }
+  .sv     { padding: 8px 15px 16px; }
+  .empty-state { height: 180px; }
+  .cc-num { font-size: 52px; }
+  .hero-num { font-size: 38px; }
+}
+
+/* 11. Overlay full-screen safe area */
+.overlay {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* 12. Prevent text selection on interactive elements */
+.bni, .btn-y, .chip, .ir-opt, .cp, .sel-row, .ri,
+.qa-btn, .line-row, .ov-item, .dir-btn, .back-btn,
+.gps-btn, .swap-btn, .coach-card, .line-btn {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* 13. Fix auth modal for phones */
+#auth-modal > div {
+  padding-bottom: calc(24px + env(safe-area-inset-bottom));
+}
