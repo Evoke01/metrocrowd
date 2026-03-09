@@ -4,282 +4,352 @@
 <script>(function(){var h=location.hostname;if(h==='evoke01.github.io'){var p=location.pathname.replace(/^\/metrocrowd/,'');location.replace('https://metrocrowd.vercel.app'+(p||'/')+location.search+location.hash);}else if(h!=='localhost'&&h!=='127.0.0.1'){location.replace('/maintenance.html');}})();</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Delhi Metro · Crowd Monitor</title>
+<meta name="theme-color" content="#080808">
+<title>MetroCrowd · Delhi Metro</title>
 <link rel="stylesheet" href="style.css">
-<!-- Supabase JS SDK -->
-<!-- Vercel Analytics — vanilla JS / static HTML (no npm needed) -->
 <script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};</script>
-<script defer src="/_vercel/insights/script.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script defer src="/_app/static/js/analytics.js" onerror="void 0"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 <div id="app">
-  <div id="hdr">
-    <div class="logo">🚇</div>
-    <div><div class="t1">Delhi Metro</div><div class="t2">CROWD MONITOR</div></div>
-    <div id="live-b"><div class="ld"></div><span>LIVE</span></div>
-    <div style="margin-left:6px;text-align:right"><div id="navg">—</div><div id="navg-l">NET AVG</div></div>
-  </div>
-  <div id="dsb">
-    <div class="dsp"><div class="dsd" style="background:#2979FF"></div>DMRC Model</div>
-    <div class="dsp"><div class="dsd" style="background:var(--accent)"></div>Prediction AI</div>
-    <div class="dsp"><div class="dsd" style="background:var(--low)"></div><span id="rtxt">0 Reports</span></div>
-    <div class="dsp"><div class="dsd" style="background:#E040FB" id="edot"></div><span id="etxt">Fetching News…</span></div>
-    <div class="dsp" style="margin-left:auto">
-      <div class="dsd" style="background:#7E57C2"></div>
-      <span id="sb-status" style="color:var(--muted)">Connecting…</span>
+
+  <!-- ═══ STATUS BAR ═══════════════════════════════════════════ -->
+  <div id="sbar">
+    <div id="sbar-brand">Metro<em>Crowd</em></div>
+    <div id="sbar-right">
+      <span id="sbar-clock"></span>
+      <div id="auth-btn" title="Account">😊</div>
     </div>
-    <!-- Auth avatar button — opens modal -->
-    <button id="auth-btn" onclick="AUTH.openModal()" style="flex-shrink:0;display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:3px 9px 3px 4px;cursor:pointer;transition:border-color .2s" title="Sign in">
-      <div id="auth-avatar" style="width:20px;height:20px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;overflow:hidden;flex-shrink:0">👤</div>
-      <span id="auth-label" style="font-size:8px;font-family:'Space Mono',monospace;color:var(--muted);white-space:nowrap">Sign in</span>
-    </button>
   </div>
 
-  <!-- ═══ AUTH MODAL ═══════════════════════════════════════════ -->
-  <div id="auth-modal" style="display:none">
-    <div id="auth-backdrop" onclick="AUTH.closeModal()"></div>
-    <div id="auth-sheet">
-      <div id="auth-sheet-handle"></div>
+  <!-- ═══ SCREENS ══════════════════════════════════════════════ -->
+  <div id="screens">
 
-      <!-- Signed-OUT state -->
-      <div id="auth-signout-view">
-        <div class="auth-logo">🚇</div>
-        <div class="auth-title">Delhi Metro Monitor</div>
-        <div class="auth-sub">Sign in to save your crowd reports across devices and get personalised alerts.</div>
-
-        <button class="auth-oauth-btn google" onclick="AUTH.signInGoogle()">
-          <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.9z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.5 15.1 18.9 12 24 12c3.1 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.3 35.5 26.8 36 24 36c-5.2 0-9.6-3.3-11.3-8H6.1C9.5 35.6 16.3 44 24 44z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.3 4.1-4.2 5.5l6.2 5.2C36.9 40.5 44 35 44 24c0-1.3-.1-2.7-.4-3.9z"/></svg>
-          Continue with Google
-        </button>
-
-        <button class="auth-oauth-btn github" onclick="AUTH.signInGitHub()">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.5-1.4-1.3-1.8-1.3-1.8-1-.7.1-.7.1-.7 1.1.1 1.7 1.2 1.7 1.2 1 1.7 2.6 1.2 3.2.9.1-.7.4-1.2.7-1.5-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17 4.7 18 5 18 5c.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3z"/></svg>
-          Continue with GitHub
-        </button>
-
-        <div class="auth-divider"><span>or</span></div>
-
-        <button class="auth-anon-btn" onclick="AUTH.continueAnon()">
-          Continue anonymously
-          <span style="font-size:8px;color:var(--muted);display:block;margin-top:2px;font-weight:400">Reports sync via anonymous ID — no account needed</span>
-        </button>
-
-        <div class="auth-divider" style="margin:10px 0 6px"><span>anonymous sync</span></div>
-
-        <!-- Anonymous ID sync panel (always visible, no sign-in needed) -->
-        <div id="anon-sync-container">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-            <span style="font-size:9px;font-family:'Space Mono',monospace;color:var(--muted)">Your anonymous ID</span>
-            <span id="anon-id-badge" style="font-size:8px;font-family:'Space Mono',monospace;color:var(--a2);background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:2px 8px">—</span>
+    <!-- ── HOME ─────────────────────────────────────────────── -->
+    <div class="screen active" id="s-home">
+      <div class="sv">
+        <!-- Greeting + date -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div>
+            <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--txt)" id="h-greet">Good Morning</div>
+            <div style="font-size:12px;color:var(--sub);margin-top:1px" id="h-date">—</div>
           </div>
-          <button class="anon-expand-btn" onclick="ANON.renderSyncPanel('anon-sync-container');this.remove()">
-            🔗 Sync across devices
-          </button>
-        </div>
-
-        <div class="auth-terms">By signing in you agree to our <a href="#" style="color:var(--a2)">Terms</a>. Your data is stored securely in Supabase.</div>
-      </div>
-
-      <!-- Signed-IN state -->
-      <div id="auth-signin-view" style="display:none">
-        <div style="text-align:center;margin-bottom:16px">
-          <img id="auth-user-avatar" src="" alt="" style="width:56px;height:56px;border-radius:50%;border:2px solid var(--border);object-fit:cover;display:block;margin:0 auto 10px">
-          <div id="auth-user-name"  style="font-size:16px;font-weight:800;color:#fff"></div>
-          <div id="auth-user-email" style="font-size:10px;color:var(--muted);font-family:'Space Mono',monospace;margin-top:2px"></div>
-          <div id="auth-user-provider" style="display:inline-flex;align-items:center;gap:4px;margin-top:6px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:2px 10px;font-size:8px;font-family:'Space Mono',monospace;color:var(--a2)"></div>
-        </div>
-
-        <!-- User stats -->
-        <div class="auth-stats">
-          <div class="auth-stat"><div id="auth-stat-reports" class="auth-stat-val">0</div><div class="auth-stat-lbl">Reports</div></div>
-          <div class="auth-stat"><div id="auth-stat-session"  class="auth-stat-val">—</div><div class="auth-stat-lbl">Member since</div></div>
-        </div>
-
-        <div class="auth-sect">Danger zone</div>
-        <button class="auth-signout-btn" onclick="AUTH.signOut()">Sign out</button>
-        <button class="auth-close-btn" onclick="AUTH.closeModal()">Close</button>
-      </div>
-
-      <!-- Loading state -->
-      <div id="auth-loading-view" style="display:none;text-align:center;padding:40px 0">
-        <div class="auth-spinner"></div>
-        <div id="auth-loading-msg" style="font-size:10px;color:var(--muted);font-family:'Space Mono',monospace;margin-top:14px">Signing in…</div>
-      </div>
-    </div>
-  </div>
-  <div id="strip">
-    <div class="si"><div class="sv" style="color:var(--low)"  id="sn0">—</div><div class="sl">Low</div></div>
-    <div class="si"><div class="sv" style="color:var(--med)"  id="sn1">—</div><div class="sl">Med</div></div>
-    <div class="si"><div class="sv" style="color:var(--hi)"   id="sn2">—</div><div class="sl">High</div></div>
-    <div class="si"><div class="sv" style="color:var(--pk)"   id="sn3">—</div><div class="sl">Packed</div></div>
-    <div class="si"><div class="sv" style="color:#fff"        id="sn4">—</div><div class="sl">Stations</div></div>
-  </div>
-  <div id="tabs">
-    <button class="tab on"  data-t="map"    onclick="UI.switchTab('map')"   ><span class="ti">🗺</span>Map</button>
-    <button class="tab"     data-t="stats"  onclick="UI.switchTab('stats')" ><span class="ti">📊</span>Stats</button>
-    <button class="tab"     data-t="lines"  onclick="UI.switchTab('lines')" ><span class="ti">🚦</span>Lines</button>
-    <button class="tab"     data-t="events" onclick="UI.switchTab('events')"><span class="ti">📡</span>News</button>
-    <button class="tab"     data-t="route"  onclick="UI.switchTab('route')" ><span class="ti">🧭</span>Route</button>
-    <button class="tab"     data-t="report" onclick="UI.switchTab('report')"><span class="ti">📣</span>Report</button>
-  </div>
-
-  <div id="cnt">
-    <!-- MAP -->
-    <div id="map-vw" class="vw on">
-      <div id="mwrap">
-        <div id="ticker"><span id="ticker-inner"></span></div>
-        <svg id="msvg" viewBox="0 0 1100 820" preserveAspectRatio="xMidYMid meet"></svg>
-      </div>
-      <div id="sp">
-        <button id="spc" onclick="UI.closePanel()">✕</button>
-        <div id="spn">—</div><div id="spl">—</div>
-        <div id="sp-line-dots"></div>
-        <div id="sp-service-hours" style="font-size:9px;font-family:'Space Mono',monospace;color:var(--muted);margin:3px 0 4px;line-height:1.5"></div>
-        <!-- Coach Guide -->
-        <div id="sp-coach"></div>
-        <!-- Confidence badge + anomaly banner -->
-        <div id="sp-confidence" style="margin:4px 0 2px"></div>
-        <div id="sp-anomaly"></div>
-        <div class="spg">
-          <div class="spc2"><div class="scv" id="sc1">—</div><div class="scl">Crowd</div></div>
-          <div class="spc2"><div class="scv" id="sc2">—</div><div class="scl">Status</div></div>
-          <div class="spc2"><div class="scv" id="sc3">—</div><div class="scl">Wait</div></div>
-        </div>
-        <div id="spbw"><div id="spb"></div></div>
-        <!-- Subscribe button -->
-        <button id="sp-sub-btn" data-id="" data-sub="0"
-          onclick="NOTIFY.toggleSubscription(this.dataset.id)"
-          style="width:100%;margin:8px 0 4px;padding:8px;background:var(--bg3);border:1px dashed var(--border);border-radius:9px;color:var(--muted);font-size:11px;font-family:'Space Mono',monospace;cursor:pointer;transition:all .2s">
-          🔕 Subscribe for alerts
-        </button>
-        <div class="sfsec">HOURLY FORECAST</div>
-        <div id="spspk"></div>
-        <div class="sfsec" style="margin-top:10px">COMMUNITY REPORTS <span id="sp-rep-count" style="color:var(--muted);font-weight:400"></span></div>
-        <div id="sp-replist"></div>
-      </div>
-      <div id="tb">
-        <div class="tbr">
-          <div id="tl">12:00 AM</div>
-          <input type="range" id="ts" min="0" max="23" value="0">
-          <div id="tm">● LIVE</div>
-        </div>
-        <div id="lf">
-          <button class="lfb on" data-l="all" style="background:var(--accent);color:#000;border-color:transparent">ALL</button>
-          <button class="lfb" data-l="Y"  style="color:#FFD600">Yellow</button>
-          <button class="lfb" data-l="B"  style="color:#2979FF">Blue</button>
-          <button class="lfb" data-l="R"  style="color:#F44336">Red</button>
-          <button class="lfb" data-l="P"  style="color:#E040FB">Pink</button>
-          <button class="lfb" data-l="M"  style="color:#AB47BC">Magenta</button>
-          <button class="lfb" data-l="V"  style="color:#7E57C2">Violet</button>
-          <button class="lfb" data-l="G"  style="color:#4CAF50">Green</button>
-          <button class="lfb" data-l="A"  style="color:#FF9800">Airport</button>
-          <button class="lfb" data-l="Gr" style="color:#9E9E9E">Grey</button>
-          <button class="lfb" data-l="Aq" style="color:#00BCD4">Aqua</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- STATS -->
-    <div id="stats-vw" class="vw">
-      <div class="pnl">
-        <div class="sec">Network Snapshot</div>
-        <div class="stats-grid" id="sg"></div>
-        <div class="sec">Crowd Timeline — Today</div>
-        <div class="card" style="padding:10px"><svg id="tlsvg" height="80" viewBox="0 0 360 80"></svg></div>
-        <div class="sec">Interchange Pressure Index</div>
-        <div class="card" id="ixlist"></div>
-        <div class="sec">⚡ Anomaly Detection</div>
-        <div class="card" id="anomaly-list"><div style="font-size:9px;color:var(--muted);font-family:'Space Mono',monospace;padding:10px;text-align:center">No anomalies detected ✓</div></div>
-        <div class="sec">Platform Wait Guide</div>
-        <div class="stats-grid" style="margin-bottom:0">
-          <div class="sg-card"><div class="sg-val" style="color:var(--low)">Now</div><div class="sg-lbl">Under 40%</div></div>
-          <div class="sg-card"><div class="sg-val" style="color:var(--med)">~1 train</div><div class="sg-lbl">40–65%</div></div>
-          <div class="sg-card"><div class="sg-val" style="color:var(--hi)">2 trains</div><div class="sg-lbl">65–82%</div></div>
-          <div class="sg-card"><div class="sg-val" style="color:var(--pk)">3+ trains</div><div class="sg-lbl">Over 82%</div></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- LINES -->
-    <div id="lines-vw" class="vw">
-      <div class="pnl">
-        <div class="sec">Line Crowd Comparison</div>
-        <div class="card" id="lclist"></div>
-        <div class="sec">Top 12 Busiest Stations Now</div>
-        <div class="card" id="toplist"></div>
-      </div>
-    </div>
-
-    <!-- EVENTS/NEWS -->
-    <div id="events-vw" class="vw">
-      <div class="pnl">
-        <div class="sec">📡 Live News → Auto Crowd Events
-          <span id="news-status" style="font-weight:400;color:var(--a2);font-size:8px;display:block;margin-top:2px"></span>
-        </div>
-        <div style="font-size:9px;color:var(--muted);font-family:'Space Mono',monospace;margin-bottom:10px;line-height:1.6">
-          GNews API scans 13 Delhi Metro query clusters every 30s. Matching articles auto-generate crowd events. High severity (fire/protest/delay) activates automatically and boosts the crowd model.
-        </div>
-        <div id="evlist"></div>
-      </div>
-    </div>
-
-    <!-- ROUTE -->
-    <div id="route-vw" class="vw">
-      <div class="pnl">
-        <div class="sec">Crowd-Aware Route Planner</div>
-        <div class="card">
-          <!-- GPS location button -->
-          <button id="geo-btn" style="width:100%;padding:9px;background:var(--bg3);border:1px dashed var(--border);color:var(--a2);border-radius:7px;font-family:'Space Mono',monospace;font-size:10px;cursor:pointer;margin-bottom:8px;transition:all .2s">
-            📍 Use My Location (auto-fill nearest station)
-          </button>
-          <div id="geo-msg" style="display:none;font-size:9px;font-family:'Space Mono',monospace;padding:5px 8px;border-radius:6px;background:var(--bg3);margin-bottom:8px"></div>
-          <select class="rsel" id="rfrom"><option value="">— From Station —</option></select>
-          <select class="rsel" id="rto"  ><option value="">— To Station —</option></select>
-          <div class="avd">
-            <input type="checkbox" id="avck" checked>
-            <label for="avck">Avoid packed interchange stations (&gt;82% crowd)</label>
+          <div style="display:flex;align-items:center;gap:6px">
+            <div class="ldot"></div>
+            <span style="font-size:10px;color:var(--sub);font-weight:700;letter-spacing:.6px">LIVE</span>
           </div>
-          <button class="rbtn" id="go-route">Find Smartest Route →</button>
-          <div style="font-size:8px;color:var(--muted);font-family:'Space Mono',monospace;text-align:center;margin-top:4px">Route animates on map with correct line colors</div>
         </div>
-        <div id="rres" style="display:none"></div>
-      </div>
-    </div>
 
-    <!-- REPORT -->
-    <div id="report-vw" class="vw">
-      <div class="pnl">
-        <div class="sec">Submit Crowd Report</div>
-        <div class="card">
-          <div style="font-size:9px;color:var(--muted);font-family:'Space Mono',monospace;margin-bottom:9px;line-height:1.5">60% AI model + 40% crowd reports blend. Your report updates instantly.</div>
-          <select class="rpsel" id="rpst"><option value="">— Select your station —</option></select>
-          <div class="clbs">
-            <div class="clb" data-lv="empty"    onclick="UI.pickLevel('empty')"   ><span class="ci">🟢</span><span class="cn">Empty</span></div>
-            <div class="clb" data-lv="moderate" onclick="UI.pickLevel('moderate')"><span class="ci">🟡</span><span class="cn">Moderate</span></div>
-            <div class="clb" data-lv="packed"   onclick="UI.pickLevel('packed')"  ><span class="ci">🔴</span><span class="cn">Packed</span></div>
+        <!-- Hero route card -->
+        <div class="hero-card" onclick="UI.navTo('s-route')" id="hero-card">
+          <div class="hero-badge"><div class="ldot"></div>YOUR ROUTE · LIVE CROWD</div>
+          <div class="hero-route">
+            <div class="hero-stn"><div class="hero-stn-name" id="h-from">Rajiv Chowk</div><div class="hero-stn-type">Origin</div></div>
+            <div class="hero-arrow">→</div>
+            <div class="hero-stn" style="text-align:right"><div class="hero-stn-name" id="h-to">Hauz Khas</div><div class="hero-stn-type">Destination</div></div>
           </div>
-          <button class="sbb" onclick="UI.submitReport()">Submit Report</button>
-          <div class="suc" id="sucmsg">✓ Report submitted — thank you!</div>
+          <div class="hero-crowd">
+            <div class="hero-num" id="h-num">—<sup>%</sup></div>
+            <div class="hero-info">
+              <div class="hero-lbl" id="h-lbl">Loading…</div>
+              <div class="hero-sub" id="h-sub">Yellow Line</div>
+              <div class="hero-bar"><div class="hero-bar-fill" id="h-bar" style="width:0%"></div></div>
+            </div>
+          </div>
+          <div class="hero-tag" id="h-tag">Tap to plan route</div>
         </div>
-        <div class="sec">Community Reports
-          <span id="rplist-status" style="font-weight:400;color:var(--muted);font-size:8px;display:block;margin-top:1px"></span>
+
+        <!-- Forecast strip -->
+        <div class="forecast-card">
+          <div class="fc-title">Network Crowd — Next 4 Hours</div>
+          <div class="fc-strip" id="fc-strip"></div>
         </div>
-        <div class="card" style="padding:8px 10px 6px">
-          <select class="rpsel" id="rp-filter" onchange="UI.loadStationReports(this.value)" style="margin-bottom:0">
-            <option value="">— All recent reports —</option>
-          </select>
+
+        <!-- Quick actions -->
+        <div class="qa">
+          <div class="qa-btn" onclick="UI.navTo('s-station')"><div class="qa-ico">🔍</div><div><div class="qa-label">Check Station</div><div class="qa-desc">Instant crowd lookup</div></div></div>
+          <div class="qa-btn" onclick="UI.navTo('s-report')"><div class="qa-ico">📣</div><div><div class="qa-label">Report Crowd</div><div class="qa-desc">2-tap submit</div></div></div>
         </div>
-        <div id="rplist"></div>
+
+        <!-- All lines -->
+        <div class="sec-head">
+          <span class="sec-t">All Lines</span>
+          <span class="sec-l" onclick="UI.navTo('s-route')">Route planner →</span>
+        </div>
+        <div class="card" id="line-list"></div>
       </div>
     </div>
-  </div>
-</div>
 
-<style>
-:root{--Y:#FFD600;--B:#2979FF;--R:#F44336;--P:#E040FB;--M:#AB47BC;--V:#7E57C2;--G:#4CAF50;--A:#FF9800;--Gr:#9E9E9E;--Aq:#00BCD4}
-</style>
+    <!-- ── STATION ────────────────────────────────────────────── -->
+    <div class="screen" id="s-station">
+      <div class="sv">
+        <div class="stn-top">
+          <div class="back-btn" onclick="UI.navTo('s-home')">←</div>
+          <div class="stn-pick" onclick="UI.openSearch('station')">
+            <span style="font-size:14px;color:var(--sub)">🚉</span>
+            <span class="sp-val ph" id="sp-val">Select a station</span>
+          </div>
+          <div class="gps-btn" onclick="UI.gpsStation()">📡</div>
+        </div>
+
+        <!-- Big crowd number -->
+        <div class="crowd-card" id="cc-wrap">
+          <div class="cc-sname" id="cc-name">—</div>
+          <div class="cc-num" id="cc-num" style="opacity:.18">—<span class="cc-pct">%</span></div>
+          <div class="cc-lbl" id="cc-lbl" style="opacity:.18">Select a station</div>
+          <div class="cc-bar"><div class="cc-bar-fill" id="cc-bar" style="width:0"></div></div>
+          <div class="cc-meta"><span class="ldot" id="cc-dot" style="opacity:0"></span>&nbsp;<span id="cc-meta">—</span></div>
+        </div>
+
+        <!-- Safe/board card -->
+        <div class="safe-card" id="safe-card" style="display:none">
+          <div class="sc-icon" id="sc-icon">—</div>
+          <div><div class="sc-answer" id="sc-ans">—</div><div class="sc-sub" id="sc-sub">—</div></div>
+        </div>
+
+        <!-- Quick inline report -->
+        <div class="inline-rep" id="inline-rep" style="display:none">
+          <div class="ir-lbl">How's the crowd right now?</div>
+          <div class="ir-opts">
+            <div class="ir-opt" onclick="UI.quickReport(this,'low')">Low</div>
+            <div class="ir-opt" onclick="UI.quickReport(this,'moderate')">Mod</div>
+            <div class="ir-opt" onclick="UI.quickReport(this,'high')">High</div>
+            <div class="ir-opt" onclick="UI.quickReport(this,'packed')">Full</div>
+          </div>
+        </div>
+
+        <!-- Mini forecast -->
+        <div class="inner-card" id="mf-card" style="display:none">
+          <div class="inner-t">Next 4 Hours</div>
+          <div id="mf-rows"></div>
+        </div>
+
+        <!-- Coach finder quick access -->
+        <div id="stn-coach-link" style="display:none;margin-bottom:10px">
+          <div style="background:var(--card);border:1px solid var(--brd);border-radius:14px;padding:11px 14px;display:flex;align-items:center;gap:10px;cursor:pointer" onclick="UI.goCoachFromStation()">
+            <span style="font-size:18px">🚃</span>
+            <div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--txt)">Coach Finder</div><div style="font-size:10px;color:var(--sub);margin-top:1px">Find the least crowded coach</div></div>
+            <span style="font-size:13px;color:var(--dim)">›</span>
+          </div>
+        </div>
+
+        <!-- Community reports -->
+        <div class="card" id="comm-card" style="display:none">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 13px;border-bottom:1px solid var(--brd)">
+            <span style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--txt)">Community Reports</span>
+            <span style="font-size:10px;color:var(--sub)">Last 30 min</span>
+          </div>
+          <div id="comm-items"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── COACH ──────────────────────────────────────────────── -->
+    <div class="screen" id="s-coach">
+      <div class="sv">
+        <div class="pg-title">Coach Finder</div>
+        <div class="pg-sub">Least crowded coach · fastest exit</div>
+
+        <!-- Station + Line selector -->
+        <div class="sel-group">
+          <div class="sel-row" onclick="UI.openSearch('coach-station')">
+            <div class="sel-lbl">Station</div>
+            <div class="sel-val ph" id="c-stn-val">Select station</div>
+            <div class="sel-arr">›</div>
+          </div>
+          <div class="sel-row" id="c-line-row" onclick="UI.openCoachLineSelect()" style="opacity:.38;pointer-events:none">
+            <div class="sel-lbl">Line</div>
+            <div class="sel-val ph" id="c-line-val">Select line</div>
+            <div class="sel-arr">›</div>
+          </div>
+        </div>
+
+        <!-- Time chips -->
+        <div class="time-row">
+          <div class="time-lbl">Time</div>
+          <div class="chips-scroll" id="c-time-chips"></div>
+        </div>
+
+        <!-- Direction -->
+        <div class="dir-row" id="c-dir-row" style="display:none">
+          <div class="dir-btn on" id="c-dir-a" onclick="UI.coachSetDir('a')"><span id="c-dir-a-lbl">→ Terminus</span></div>
+          <div class="dir-btn" id="c-dir-b" onclick="UI.coachSetDir('b')"><span id="c-dir-b-lbl">← Origin</span></div>
+        </div>
+
+        <!-- Dynamic coach content -->
+        <div id="coach-content">
+          <div class="empty-state">
+            <div class="es-icon">🚇</div>
+            <div class="es-title">Pick a station & line</div>
+            <div class="es-sub">We'll show which coach to board based on real gate positions and crowd patterns</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ROUTE ──────────────────────────────────────────────── -->
+    <div class="screen" id="s-route">
+      <div class="sv">
+        <div class="pg-title">Route Planner</div>
+        <div class="pg-sub">Crowd-aware · Finds the least-packed path</div>
+
+        <div class="r-inputs">
+          <div class="ri" onclick="UI.openSearch('r-from')">
+            <div class="ri-dot" style="background:var(--txt);border:2px solid var(--txt)"></div>
+            <div style="flex:1">
+              <div class="ri-lbl">From</div>
+              <div class="ri-val ph" id="rFrom">Select origin</div>
+              <div class="ri-crowd" id="rFromC"></div>
+            </div>
+          </div>
+          <div class="div" style="margin:0 12px"></div>
+          <div class="ri" onclick="UI.openSearch('r-to')">
+            <div class="ri-dot" style="background:var(--y);border:2px solid var(--y)"></div>
+            <div style="flex:1">
+              <div class="ri-lbl">To</div>
+              <div class="ri-val ph" id="rTo">Select destination</div>
+              <div class="ri-crowd" id="rToC"></div>
+            </div>
+          </div>
+          <div class="swap-btn" onclick="UI.swapRoute()">⇅</div>
+        </div>
+
+        <div class="opts-row">
+          <div class="chip on" id="opt-avoid" onclick="this.classList.toggle('on')">Avoid packed</div>
+          <div class="chip" id="opt-fastest" onclick="this.classList.toggle('on')">Fastest</div>
+          <div class="chip" id="opt-fewest" onclick="this.classList.toggle('on')">Fewest stops</div>
+        </div>
+
+        <button class="btn-y" id="go-route" onclick="UI.doRoute()">🧭 Find Smartest Route</button>
+        <div id="rres" style="margin-top:12px"></div>
+      </div>
+    </div>
+
+    <!-- ── REPORT ─────────────────────────────────────────────── -->
+    <div class="screen" id="s-report">
+      <div class="sv">
+        <div class="pg-title">Report Crowd</div>
+        <div class="pg-sub">60% AI + 40% community blend</div>
+
+        <div class="karma-row">
+          <div class="kr-ico">🏅</div>
+          <div class="kr-info"><div class="kr-title">Your Impact This Week</div><div class="kr-sub">Reports submitted</div></div>
+          <div class="kr-val" id="karma-num">0</div>
+        </div>
+
+        <div class="rep-stn-btn" onclick="UI.openSearch('report')">
+          <span style="font-size:17px;color:var(--sub)">📍</span>
+          <div style="flex:1">
+            <div class="rsb-lbl">Station</div>
+            <div class="rsb-val ph" id="rep-stn">Select your station</div>
+          </div>
+          <span style="font-size:13px;color:var(--dim)">›</span>
+        </div>
+
+        <div class="cpick">
+          <div class="cp" onclick="UI.pickLevel(this)" data-v="empty">
+            <div class="cp-check">✓</div>
+            <div class="cp-level">E</div>
+            <div class="cp-label">Empty</div>
+            <div class="cp-desc">Seats available, easy boarding</div>
+          </div>
+          <div class="cp" onclick="UI.pickLevel(this)" data-v="moderate">
+            <div class="cp-check">✓</div>
+            <div class="cp-level">M</div>
+            <div class="cp-label">Moderate</div>
+            <div class="cp-desc">Some people, still comfortable</div>
+          </div>
+          <div class="cp" onclick="UI.pickLevel(this)" data-v="crowded">
+            <div class="cp-check">✓</div>
+            <div class="cp-level">C</div>
+            <div class="cp-label">Crowded</div>
+            <div class="cp-desc">Standing room, busy platform</div>
+          </div>
+          <div class="cp" onclick="UI.pickLevel(this)" data-v="packed">
+            <div class="cp-check">✓</div>
+            <div class="cp-level">P</div>
+            <div class="cp-label">Packed</div>
+            <div class="cp-desc">Train full, skip advised</div>
+          </div>
+        </div>
+
+        <div class="rep-dtoggle" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.nextElementSibling.classList.contains('open')?'▲ Hide details':'▼ Add details (optional)'">▼ Add details (optional)</div>
+        <div class="rep-detail">
+          <textarea id="rep-note" placeholder="Anything unusual? e.g. signal delay, maintenance, event crowd…"></textarea>
+        </div>
+
+        <button class="btn-y" id="rep-btn" onclick="UI.submitReport()" disabled>📣 Submit Report</button>
+
+        <div class="rep-success" id="rep-ok">
+          <div class="rs-icon">✅</div>
+          <div class="rs-title">Report submitted!</div>
+          <div class="rs-sub">Your data helps other commuters</div>
+          <div class="rs-karma2">+1 🏅 Karma · Total: <span id="rs-karma">0</span></div>
+        </div>
+
+        <!-- Community feed -->
+        <div style="margin-top:14px">
+          <div class="sec-head"><span class="sec-t">Recent Reports</span></div>
+          <div class="rep-feed" id="rep-feed"></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /screens -->
+
+  <!-- ═══ BOTTOM NAV ══════════════════════════════════════════ -->
+  <nav id="bnav">
+    <div class="bni on" data-tab="s-home" onclick="UI.navTo('s-home')">
+      <div class="ico">🏠</div><div class="lbl">Home</div>
+    </div>
+    <div class="bni" data-tab="s-station" onclick="UI.navTo('s-station')">
+      <div class="ico">🔍</div><div class="lbl">Station</div>
+    </div>
+    <div class="bni" data-tab="s-coach" onclick="UI.navTo('s-coach')">
+      <div class="ico">🚃</div><div class="lbl">Coach</div>
+    </div>
+    <div class="bni" data-tab="s-route" onclick="UI.navTo('s-route')">
+      <div class="ico">🧭</div><div class="lbl">Route</div>
+    </div>
+    <div class="bni" data-tab="s-report" onclick="UI.navTo('s-report')">
+      <div class="ico">📣</div><div class="lbl">Report</div>
+    </div>
+  </nav>
+
+  <!-- ═══ STATION SEARCH OVERLAY ══════════════════════════════ -->
+  <div class="overlay" id="ov-search">
+    <div class="ov-hd">
+      <div class="ov-back" onclick="UI.closeSearch()">←</div>
+      <input class="ov-input" id="ov-input" placeholder="Search station…" oninput="UI.filterSearch(this.value)" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="ov-lbl" id="ov-lbl">All Stations</div>
+    <div class="ov-list" id="ov-list"></div>
+  </div>
+
+  <!-- ═══ LINE SELECTION OVERLAY ══════════════════════════════ -->
+  <div class="overlay" id="ov-line">
+    <div class="ov-hd">
+      <div class="ov-back" onclick="UI.closeLineSelect()">←</div>
+      <div class="ov-title">Select Line</div>
+    </div>
+    <div class="line-grid" id="ov-line-grid"></div>
+  </div>
+
+  <!-- ═══ TOAST ════════════════════════════════════════════════ -->
+  <div id="toast">
+    <span class="t-ico" id="t-ico">🚇</span>
+    <span class="t-txt" id="t-txt"></span>
+    <span class="t-x" onclick="UI.hideToast()">✕</span>
+  </div>
+
+  <!-- ═══ HIDDEN SVG FOR ROUTE DRAW (route.js) ════════════════ -->
+  <svg id="map-hidden" viewBox="0 0 1100 820">
+    <g id="g-route"></g>
+  </svg>
+
+</div><!-- /app -->
+
 <script src="anon.js" defer></script>
 <script src="supabase.js" defer></script>
 <script src="auth.js" defer></script>
