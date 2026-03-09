@@ -1,108 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script>(function(){if(location.hostname==='evoke01.github.io'){var p=location.pathname.replace(/^\/metrocrowd/,'');location.replace('https://metrocrowd.vercel.app'+(p||'/')+location.search+location.hash);}else if(location.hostname!=='localhost'&&location.hostname!=='127.0.0.1'){window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};var s=document.createElement('script');s.src='/_app/static/js/analytics.js';s.defer=true;s.onerror=function(){};document.head.appendChild(s);}})();</script>
+<script>(function(){
+  var h=location.hostname;
+  if(h==='evoke01.github.io'){
+    var p=location.pathname.replace(/^\/metrocrowd/,'');
+    location.replace('https://metrocrowd.vercel.app'+(p||'/')+location.search+location.hash);
+  }
+})();</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Delhi Metro · Under Maintenance</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@700;800;900&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#080C12;--bg2:#0E1420;--border:#1C2A3C;--text:#BDD0E8;--muted:#3E5272;--accent:#FF6B00;--a2:#FFAB40;--low:#00E676;--grid:rgba(28,42,60,0.55)}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Space Mono',monospace}
-.grid-bg{position:fixed;inset:0;z-index:0;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:40px 40px;animation:grid-drift 20s linear infinite}
-@keyframes grid-drift{from{background-position:0 0}to{background-position:40px 40px}}
-.metro-lines{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.07}
-.glow-orb{position:fixed;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(255,107,0,.18) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);z-index:1;animation:orb-pulse 4s ease-in-out infinite}
-@keyframes orb-pulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.7}50%{transform:translate(-50%,-50%) scale(1.2);opacity:1}}
-.card{position:relative;z-index:10;height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center}
-.logo-wrap{display:flex;align-items:center;gap:12px;margin-bottom:40px;animation:fade-down .6s ease both}
-.logo-icon{width:44px;height:44px;border-radius:11px;background:linear-gradient(135deg,#FF6B00,#CC3300);display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 0 28px rgba(255,107,0,.5)}
-.t1{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#fff;letter-spacing:.02em;line-height:1.1}
-.t2{font-size:8px;color:var(--accent);letter-spacing:.14em;text-transform:uppercase}
-.train-track{width:min(340px,90vw);height:2px;background:var(--border);border-radius:1px;position:relative;margin-bottom:40px;overflow:hidden;animation:fade-up .7s .2s ease both}
-.train-track::before{content:'';position:absolute;top:-3px;left:-60px;width:60px;height:8px;border-radius:4px;background:linear-gradient(90deg,transparent,var(--accent),var(--a2));animation:train-run 2.4s ease-in-out infinite;box-shadow:0 0 12px var(--accent)}
-@keyframes train-run{0%{left:-60px;opacity:0}10%{opacity:1}90%{opacity:1}100%{left:calc(100% + 10px);opacity:0}}
-.title{font-family:'Syne',sans-serif;font-size:clamp(28px,8vw,52px);font-weight:900;line-height:1;letter-spacing:-.02em;color:#fff;margin-bottom:10px;animation:fade-up .7s .3s ease both}
-.title span{background:linear-gradient(90deg,var(--accent),var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.subtitle{font-size:11px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:36px;animation:fade-up .7s .4s ease both}
-.status-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,107,0,.08);border:1px solid rgba(255,107,0,.25);border-radius:24px;padding:8px 18px;font-size:10px;color:var(--accent);letter-spacing:.08em;text-transform:uppercase;margin-bottom:36px;animation:fade-up .7s .5s ease both}
-.status-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:blink 1.2s ease-in-out infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-.msg-box{width:min(420px,92vw);background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:22px 24px;text-align:left;margin-bottom:28px;animation:fade-up .7s .6s ease both}
-.msg-header{display:flex;align-items:center;gap:8px;font-size:9px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border)}
-.msg-header .dot{width:5px;height:5px;border-radius:50%;background:var(--low)}
-.msg-body{font-size:12px;line-height:1.7;color:var(--text)}
-.msg-body strong{color:#fff}
-.progress-wrap{width:min(420px,92vw);animation:fade-up .7s .7s ease both;margin-bottom:28px}
-.progress-label{display:flex;justify-content:space-between;font-size:9px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:7px}
-.progress-track{width:100%;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
-.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--a2));border-radius:2px;width:0;animation:progress-grow 2s 1.2s ease forwards;box-shadow:0 0 8px rgba(255,107,0,.5)}
-@keyframes progress-grow{from{width:0}to{width:72%}}
-.lines-row{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;width:min(420px,92vw);margin-bottom:32px;animation:fade-up .7s .85s ease both}
-.line-pill{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;border:1px solid;font-size:9px;font-weight:700;letter-spacing:.05em;opacity:.6}
-.line-pill .pip{width:6px;height:6px;border-radius:50%}
-.footer{font-size:9px;color:var(--muted);letter-spacing:.06em;animation:fade-up .7s 1s ease both}
-.footer a{color:var(--accent);text-decoration:none}
-.ticker-bar{position:fixed;top:0;left:0;right:0;z-index:20;background:var(--accent);color:#000;font-size:9px;font-weight:700;letter-spacing:.1em;padding:5px 0;overflow:hidden;white-space:nowrap}
-.ticker-inner{display:inline-block;animation:ticker-scroll 18s linear infinite}
-@keyframes ticker-scroll{from{transform:translateX(100vw)}to{transform:translateX(-100%)}}
-@keyframes fade-down{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:translateY(0)}}
-@keyframes fade-up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-</style>
+<meta name="theme-color" content="#080808">
+<title>MetroCrowd · Delhi Metro</title>
+<meta http-equiv="refresh" content="0; url=app.html">
+<style>html,body{margin:0;background:#080808;height:100%}</style>
 </head>
 <body>
-<div class="ticker-bar"><span class="ticker-inner">🚇 &nbsp; DELHI METRO CROWD MONITOR &nbsp;·&nbsp; SCHEDULED MAINTENANCE IN PROGRESS &nbsp;·&nbsp; WE'LL BE BACK SHORTLY &nbsp;·&nbsp; THANK YOU FOR YOUR PATIENCE &nbsp;·&nbsp; 🚇 &nbsp; DELHI METRO CROWD MONITOR &nbsp;·&nbsp; SCHEDULED MAINTENANCE IN PROGRESS &nbsp;·&nbsp; WE'LL BE BACK SHORTLY &nbsp;·&nbsp; THANK YOU FOR YOUR PATIENCE &nbsp;·&nbsp;</span></div>
-<div class="grid-bg"></div>
-<div class="glow-orb"></div>
-<svg class="metro-lines" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice">
-  <polyline points="0,200 200,200 400,300 600,280 800,200 1000,160 1200,180" fill="none" stroke="#2979FF" stroke-width="3"/>
-  <polyline points="0,400 150,380 300,320 500,360 700,340 900,300 1200,320" fill="none" stroke="#FFD600" stroke-width="3"/>
-  <polyline points="100,800 200,600 350,500 500,480 600,280" fill="none" stroke="#F44336" stroke-width="3"/>
-  <polyline points="600,280 700,340 800,480 850,650 900,800" fill="none" stroke="#E040FB" stroke-width="3"/>
-  <polyline points="0,600 200,580 400,500 600,480 800,500 1000,460 1200,480" fill="none" stroke="#AB47BC" stroke-width="3"/>
-  <polyline points="300,0 320,200 400,300 500,360 550,500 500,650 480,800" fill="none" stroke="#4CAF50" stroke-width="3"/>
-  <circle cx="600" cy="280" r="8" fill="none" stroke="#fff" stroke-width="2"/>
-  <circle cx="500" cy="360" r="6" fill="none" stroke="#fff" stroke-width="1.5"/>
-  <circle cx="700" cy="340" r="6" fill="none" stroke="#fff" stroke-width="1.5"/>
-</svg>
-<div class="card">
-  <div class="logo-wrap">
-    <div class="logo-icon">🚇</div>
-    <div>
-      <div class="t1">Delhi Metro</div>
-      <div class="t2">Crowd Monitor</div>
-    </div>
-  </div>
-  <div class="train-track"></div>
-  <h1 class="title">Under <span>Maintenance</span></h1>
-  <p class="subtitle">Scheduled system update in progress</p>
-  <div class="status-badge"><div class="status-dot"></div>Maintenance Active · ETA Soon</div>
-  <div class="msg-box">
-    <div class="msg-header"><div class="dot"></div>System Status — Live Update</div>
-    <div class="msg-body">
-      We're updating <strong>station data, GPS coordinates</strong> and the <strong>route engine</strong> to improve accuracy across all <strong>255 stations</strong>. The app will be back online shortly.<br><br>
-      In the meantime check real-time updates on the official <strong>DMRC</strong> website or the <strong>Delhi Metro Rail</strong> app.
-    </div>
-  </div>
-  <div class="progress-wrap">
-    <div class="progress-label"><span>Update Progress</span><span style="color:var(--accent)">72%</span></div>
-    <div class="progress-track"><div class="progress-fill"></div></div>
-  </div>
-  <div class="lines-row">
-    <div class="line-pill" style="border-color:#FFD60040;color:#FFD600"><div class="pip" style="background:#FFD600"></div>Yellow</div>
-    <div class="line-pill" style="border-color:#2979FF40;color:#2979FF"><div class="pip" style="background:#2979FF"></div>Blue</div>
-    <div class="line-pill" style="border-color:#F4433640;color:#F44336"><div class="pip" style="background:#F44336"></div>Red</div>
-    <div class="line-pill" style="border-color:#E040FB40;color:#E040FB"><div class="pip" style="background:#E040FB"></div>Pink</div>
-    <div class="line-pill" style="border-color:#AB47BC40;color:#AB47BC"><div class="pip" style="background:#AB47BC"></div>Magenta</div>
-    <div class="line-pill" style="border-color:#7E57C240;color:#7E57C2"><div class="pip" style="background:#7E57C2"></div>Violet</div>
-    <div class="line-pill" style="border-color:#4CAF5040;color:#4CAF50"><div class="pip" style="background:#4CAF50"></div>Green</div>
-    <div class="line-pill" style="border-color:#FF980040;color:#FF9800"><div class="pip" style="background:#FF9800"></div>Airport</div>
-    <div class="line-pill" style="border-color:#9E9E9E40;color:#9E9E9E"><div class="pip" style="background:#9E9E9E"></div>Grey</div>
-    <div class="line-pill" style="border-color:#00BCD440;color:#00BCD4"><div class="pip" style="background:#00BCD4"></div>Aqua</div>
-  </div>
-  <div class="footer">metrocrowd.vercel.app &nbsp;·&nbsp; <a href="https://www.delhimetrorail.com" target="_blank">delhimetrorail.com</a> &nbsp;·&nbsp; DMRC Official</div>
-</div>
+<script>location.replace('app.html');</script>
 </body>
 </html>
