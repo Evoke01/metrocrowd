@@ -19,7 +19,7 @@
     <div id="sbar-brand">Metro<em>Crowd</em></div>
     <div id="sbar-right">
       <span id="sbar-clock"></span>
-      <div id="auth-btn" title="Account">😊</div>
+      <div id="auth-btn" title="Account" onclick="AUTH.openModal()">😊</div>
     </div>
   </div>
 
@@ -363,5 +363,56 @@
 <script src="ui.js" defer></script>
 <script src="notify.js" defer></script>
 <script src="app.js" defer></script>
+
+  <!-- ── AUTH MODAL ──────────────────────────────────────────────── -->
+  <div id="auth-modal" style="display:none;position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);align-items:flex-end;justify-content:center" onclick="if(event.target===this)AUTH.closeModal()">
+    <div style="width:100%;max-width:480px;background:var(--card);border-radius:20px 20px 0 0;padding:24px 20px 36px;position:relative">
+      <div style="width:36px;height:3px;background:var(--brd);border-radius:2px;margin:0 auto 20px"></div>
+
+      <!-- Sign-in view -->
+      <div id="auth-signout-view">
+        <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--txt);margin-bottom:4px">Sign In</div>
+        <div style="font-size:11px;color:var(--sub);margin-bottom:22px">Your reports sync across devices when signed in</div>
+        <button onclick="AUTH.signInGoogle()" style="width:100%;background:#fff;color:#222;border:none;border-radius:12px;padding:13px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px">
+          <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.8 2.5 30.2 0 24 0 14.7 0 6.8 5.5 3 13.5l7.8 6C12.8 13.2 17.9 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4 7.1-10 7.1-17z"/><path fill="#FBBC05" d="M10.8 28.5A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.1.8-4.5L2.5 13.5A24 24 0 0 0 0 24c0 3.8.9 7.4 2.5 10.5l8.3-6z"/><path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.2-5.5l-7.5-5.8c-2 1.4-4.6 2.3-7.7 2.3-6.1 0-11.2-3.7-13.2-9l-7.8 6C6.8 42.5 14.7 48 24 48z"/></svg>
+          Continue with Google
+        </button>
+        <button onclick="AUTH.signInGitHub()" style="width:100%;background:#24292e;color:#fff;border:none;border-radius:12px;padding:13px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:16px">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.38.6.1.82-.26.82-.58v-2.04c-3.34.72-4.04-1.6-4.04-1.6-.54-1.38-1.33-1.75-1.33-1.75-1.08-.74.08-.72.08-.72 1.2.08 1.83 1.23 1.83 1.23 1.06 1.82 2.78 1.3 3.46 1 .1-.77.42-1.3.76-1.6-2.66-.3-5.47-1.33-5.47-5.93 0-1.3.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.17 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.3-1.23 3.3-1.23.66 1.65.24 2.87.12 3.17.77.84 1.24 1.9 1.24 3.22 0 4.6-2.8 5.63-5.48 5.92.43.37.82 1.1.82 2.22v3.3c0 .32.22.7.83.58A12 12 0 0 0 24 12C24 5.37 18.63 0 12 0z"/></svg>
+          Continue with GitHub
+        </button>
+        <div onclick="AUTH.continueAnon()" style="text-align:center;font-size:11px;color:var(--sub);cursor:pointer;padding:4px">Continue without signing in →</div>
+      </div>
+
+      <!-- Signed-in view -->
+      <div id="auth-signin-view" style="display:none">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
+          <img id="auth-user-avatar" src="" style="width:48px;height:48px;border-radius:50%;object-fit:cover;display:none">
+          <div>
+            <div id="auth-user-name" style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--txt)"></div>
+            <div id="auth-user-email" style="font-size:10px;color:var(--sub);margin-top:1px"></div>
+            <div id="auth-user-provider" style="font-size:10px;color:var(--y);margin-top:2px"></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:20px">
+          <div style="flex:1;background:var(--card2);border-radius:10px;padding:12px;text-align:center">
+            <div id="auth-stat-reports" style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--y)">0</div>
+            <div style="font-size:9px;color:var(--sub);margin-top:2px">REPORTS</div>
+          </div>
+          <div style="flex:1;background:var(--card2);border-radius:10px;padding:12px;text-align:center">
+            <div id="auth-stat-session" style="font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:var(--txt)">—</div>
+            <div style="font-size:9px;color:var(--sub);margin-top:2px">MEMBER SINCE</div>
+          </div>
+        </div>
+        <button onclick="AUTH.signOut()" style="width:100%;background:var(--card2);color:var(--sub);border:1px solid var(--brd);border-radius:12px;padding:12px;font-size:12px;font-weight:700;cursor:pointer">Sign Out</button>
+      </div>
+
+      <!-- Loading view -->
+      <div id="auth-loading-view" style="display:none;text-align:center;padding:30px 0">
+        <div style="font-size:24px;margin-bottom:10px">⏳</div>
+        <div id="auth-loading-msg" style="font-size:12px;color:var(--sub)">Please wait…</div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
