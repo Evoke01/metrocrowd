@@ -14,18 +14,37 @@ window.UI=(function(){
 
   function init(){
     buildHomeGreeting();
-    buildFC();
-    buildHomeLineList();
     buildCFTimeChips();
     _initKarma();
-    if(homeStation)_applyHomeStation(homeStation,false);
+
+    // Default to Rajiv Chowk if no saved station
+    if(!homeStation){
+      const rjc=Object.keys(METRO.STATIONS).find(id=>METRO.STATIONS[id].n==='Rajiv Chowk')
+               ||Object.keys(METRO.STATIONS)[0];
+      homeStation=rjc;
+      localStorage.setItem('v3_home_station',homeStation);
+    }
+
+    // Ensure crowd data is populated before rendering home
+    CROWD.recomputeAll();
+    _applyHomeStation(homeStation,false);
+    buildFC();
+    buildHomeLineList();
+
     setTimeout(()=>loadNetworkReports(),800);
+
     // Clock
     function tick(){const d=new Date(),h=d.getHours(),m=d.getMinutes();
       _s('sbar-clock',`${h}:${m<10?'0'+m:m}`);}
     setInterval(tick,30000);tick();
-    // Greeting refresh
+    // Greeting refresh + crowd refresh every 2 min
     setInterval(buildHomeGreeting,60000);
+    setInterval(()=>{
+      CROWD.recomputeAll();
+      _applyHomeStation(homeStation,false);
+      buildFC();
+      buildHomeLineList();
+    },120000);
   }
 
   // ── NAV ───────────────────────────────────────────────────────
@@ -111,25 +130,25 @@ window.UI=(function(){
     const ll=document.getElementById('line-list');if(!ll)return;
     const avgs=CROWD.lineAverages?CROWD.lineAverages():[];
     if(!avgs.length){ll.innerHTML='<div style="padding:14px;font-size:11px;color:var(--sub);text-align:center">Loading…</div>';return;}
-    ll.innerHTML=avgs.map(({l,avg,name,color,count,isOpen})=>{
-      if(!isOpen)return'';
-      const c=_v3Color(avg);
-      return`<div class="line-row" onclick="UI.navTo('s-route')">
-        <div class="lr-dot" style="background:${color||'#888'}"></div>
-        <div class="lr-name">${name}</div>
-        <div class="lr-st">${count} st</div>
+    ll.innerHTML=avgs.map(({l,avg,name,color,count,isOpen,firstTrain,lastTrain})=>{
+      const c=isOpen?_v3Color(avg):'var(--dim)';
+      const pct=isOpen?avg+'%':'Closed';
+      return`<div class="line-row" onclick="UI.openSearch('station')">
+        <div class="lr-dot" style="background:${color||'#888'};opacity:${isOpen?1:.4}"></div>
+        <div class="lr-name" style="opacity:${isOpen?1:.55}">${name}</div>
+        <div class="lr-st" style="opacity:${isOpen?1:.4}">${count} st</div>
         <div class="lr-right">
-          <div class="lr-pct" style="color:${c}">${avg}%</div>
-          <div class="lr-bar-bg"><div class="lr-bar-fill" style="width:${avg}%;background:${c}"></div></div>
+          <div class="lr-pct" style="color:${c}">${pct}</div>
+          ${isOpen?`<div class="lr-bar-bg"><div class="lr-bar-fill" style="width:${avg}%;background:${c}"></div></div>`:''}
         </div>
       </div>`;
     }).join('');
   }
 
   // ── v3 colour helpers ─────────────────────────────────────────
-  function _v3Color(p){return p<40?'var(--sub)':p<70?'var(--y)':'var(--txt)'}
-  function _v3Fill(p){return p<40?'rgba(255,255,255,.12)':p<70?'var(--y)':'rgba(255,255,255,.8)'}
-  function _v3Label(p){return p<40?'Low Crowd':p<70?'Moderate Crowd':'High Crowd'}
+  function _v3Color(p){return p===0?'var(--dim)':p<40?'#4ade80':p<70?'var(--y)':'#f87171'}
+  function _v3Fill(p){return p===0?'rgba(255,255,255,.06)':p<40?'#4ade80':p<70?'var(--y)':'#f87171'}
+  function _v3Label(p){return p===0?'Station Closed':p<40?'Low Crowd':p<70?'Moderate Crowd':p<85?'High Crowd':'Packed'}
 
   // ── HOME STATION PICKER ───────────────────────────────────────
   function openHomeStationPicker(){
@@ -382,14 +401,14 @@ window.UI=(function(){
 
   function doRoute(){
     if(!routeFrom||!routeTo){showToast('⚠','Pick both stations first');return;}
-    if(typeof ROUTE!=='undefined'&&ROUTE.find){
-      ROUTE.find(routeFrom,routeTo,document.getElementById('rres'));
-    } else {
-      // fallback render
-      const s=METRO.STATIONS[routeFrom],t=METRO.STATIONS[routeTo];
-      document.getElementById('rres').innerHTML=
-        '<div class="route-error">Route module loading… try again in a moment.</div>';
+    if(typeof ROUTE==='undefined'){
+      const el=document.getElementById('rres');
+      if(el)el.innerHTML='<div class="route-error">Route module loading… try again.</div>';
+      return;
     }
+    const avoid=true; // always try to avoid packed stations
+    const result=ROUTE.compute(routeFrom,routeTo,avoid);
+    ROUTE.render(result);
   }
 
     // ── STATION OVERLAY (shared) ──────────────────────────────────
@@ -736,7 +755,7 @@ window.UI=(function(){
     if(sp){const fc=CROWD.stationForecast(id);sp.innerHTML=fc.map((fv,h)=>`<div class="spk" style="height:${Math.round(fv*.26)}px;background:${h===CROWD.state.hour?c:CROWD.color(fv)};opacity:${h===CROWD.state.hour?1:.5};flex:1;min-width:2px;border-radius:1px 1px 0 0"></div>`).join('')}
 
     document.getElementById('sp')?.classList.add('show');
-    if(activeTab==='map')MAP.flyTo(id);
+    if(activeTab==='map'&&typeof MAP!=='undefined'&&MAP.flyTo)MAP.flyTo(id);
     loadPanelReports(id);
   }
 
@@ -766,7 +785,7 @@ window.UI=(function(){
         b.classList.add('on');
         b.style.background=l==='all'?'var(--accent)':(METRO.LINE_COLORS[l]||'var(--accent)');
         b.style.color='#000';b.style.borderColor='transparent';
-        MAP.setLineFilter(l);
+        if(typeof MAP!=='undefined'&&MAP.setLineFilter)MAP.setLineFilter(l);
       });
     });
   }
@@ -1144,7 +1163,7 @@ window.UI=(function(){
 
   // ── Load recent reports across the whole network ─────────────
   async function loadNetworkReports(){
-    const listEl  =document.getElementById('rplist');
+    const listEl  =document.getElementById('rep-feed');
     const statusEl=document.getElementById('rplist-status');
 
     if(!window.SB?.isReady){
@@ -1281,13 +1300,14 @@ window.UI=(function(){
   }
 
   function submitReport(){
-    const id=document.getElementById('rpst').value;if(!id||!selLevel)return;
+    const id=repStation;
+    if(!id||!selLevel){showToast('⚠','Pick a station and crowd level first');return;}
 
     // Optimistic local update
     CROWD.state.userReports[id]=selLevel;
     triggerUpdate();
 
-    // Optimistic prepend into panel + report list
+    // Prepend into report feed
     prependReport({
       station_id:id, station_name:METRO.STATIONS[id]?.n||id,
       level:selLevel, created_at:new Date().toISOString(),
@@ -1297,21 +1317,29 @@ window.UI=(function(){
     // Persist to Supabase
     if(typeof SB!=='undefined'&&SB.isReady){
       SB.submitReport(id,selLevel).then(()=>{
-        // Reload from DB after small delay (debounce vs optimistic)
-        setTimeout(()=>{ delete reportCache[id]; loadPanelReports(id); },1200);
+        setTimeout(()=>{ delete reportCache[id]; },1200);
       });
     }
 
-    const msg=document.getElementById('sucmsg');
-    if(msg){msg.style.display='block';setTimeout(()=>msg.style.display='none',3000)}
-    document.getElementById('rpst').value='';
-    document.querySelectorAll('.clb').forEach(b=>b.className='clb');selLevel='';
+    // Show success card
+    const ok=document.getElementById('rep-ok');
+    if(ok){ok.style.display='flex';setTimeout(()=>ok.style.display='none',3500);}
+    _incKarma();
+
+    // Reset form
+    repStation=null;selLevel='';
+    const btnVal=document.getElementById('rep-stn');
+    if(btnVal){btnVal.textContent='Select your station';btnVal.classList.add('ph');}
+    document.querySelectorAll('.cp').forEach(c=>c.classList.remove('sel'));
+    const btn=document.getElementById('rep-btn');if(btn)btn.disabled=true;
+    const note=document.getElementById('rep-note');if(note)note.value='';
   }
 
   function triggerUpdate(){
-    CROWD.recomputeAll();MAP.updateMarkers();updateHeader();
+    CROWD.recomputeAll();
     if(panelId)refreshPanel();
     if(activeTab==='s-home'){buildFC();buildHomeLineList();}
+    if(activeTab==='s-station'&&panelId)showStationScreen(panelId);
   }
 
   function openStationFromStats(id){showStationScreen(id);}
