@@ -16,7 +16,80 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
 </head>
 <body>
-<div id="app">
+
+  <!-- ═══ LOGIN GATE ════════════════════════════════════════════ -->
+  <div id="login-gate" style="
+    position:fixed;inset:0;z-index:9999;
+    background:#080808;
+    display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    padding:32px 24px;
+    font-family:'DM Sans',sans-serif;
+  ">
+    <!-- Logo -->
+    <div style="text-align:center;margin-bottom:36px">
+      <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#EFEFEF;letter-spacing:-.5px">
+        Metro<span style="color:#FFD000">Crowd</span>
+      </div>
+      <div style="font-size:12px;color:rgba(255,255,255,.38);margin-top:4px;letter-spacing:.5px">DELHI METRO · CROWD MONITOR</div>
+    </div>
+
+    <!-- Illustration -->
+    <div style="font-size:52px;margin-bottom:20px;opacity:.85">🚇</div>
+
+    <!-- Headline -->
+    <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#EFEFEF;text-align:center;margin-bottom:8px;line-height:1.2">
+      Real-time crowd data<br>for every Delhi Metro station
+    </div>
+    <div style="font-size:13px;color:rgba(255,255,255,.4);text-align:center;margin-bottom:36px;line-height:1.6;max-width:280px">
+      Sign in to report crowds, sync across devices, and get personalised alerts
+    </div>
+
+    <!-- Google button -->
+    <button onclick="AUTH.signInGoogle()" id="lg-google" style="
+      width:100%;max-width:360px;
+      background:#fff;color:#1a1a1a;
+      border:none;border-radius:16px;
+      padding:15px 20px;
+      font-size:15px;font-weight:700;
+      cursor:pointer;
+      display:flex;align-items:center;justify-content:center;gap:12px;
+      margin-bottom:10px;
+      box-shadow:0 4px 20px rgba(0,0,0,.4);
+    ">
+      <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.8 2.5 30.2 0 24 0 14.7 0 6.8 5.5 3 13.5l7.8 6C12.8 13.2 17.9 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4 7.1-10 7.1-17z"/><path fill="#FBBC05" d="M10.8 28.5A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.1.8-4.5L2.5 13.5A24 24 0 0 0 0 24c0 3.8.9 7.4 2.5 10.5l8.3-6z"/><path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.2-5.5l-7.5-5.8c-2 1.4-4.6 2.3-7.7 2.3-6.1 0-11.2-3.7-13.2-9l-7.8 6C6.8 42.5 14.7 48 24 48z"/></svg>
+      Continue with Google
+    </button>
+
+    <!-- GitHub button -->
+    <button onclick="AUTH.signInGitHub()" id="lg-github" style="
+      width:100%;max-width:360px;
+      background:#24292e;color:#fff;
+      border:none;border-radius:16px;
+      padding:15px 20px;
+      font-size:15px;font-weight:700;
+      cursor:pointer;
+      display:flex;align-items:center;justify-content:center;gap:12px;
+      margin-bottom:28px;
+      box-shadow:0 4px 20px rgba(0,0,0,.4);
+    ">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.38.6.1.82-.26.82-.58v-2.04c-3.34.72-4.04-1.6-4.04-1.6-.54-1.38-1.33-1.75-1.33-1.75-1.08-.74.08-.72.08-.72 1.2.08 1.83 1.23 1.83 1.23 1.06 1.82 2.78 1.3 3.46 1 .1-.77.42-1.3.76-1.6-2.66-.3-5.47-1.33-5.47-5.93 0-1.3.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.17 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.3-1.23 3.3-1.23.66 1.65.24 2.87.12 3.17.77.84 1.24 1.9 1.24 3.22 0 4.6-2.8 5.63-5.48 5.92.43.37.82 1.1.82 2.22v3.3c0 .32.22.7.83.58A12 12 0 0 0 24 12C24 5.37 18.63 0 12 0z"/></svg>
+      Continue with GitHub
+    </button>
+
+    <!-- Loading state -->
+    <div id="lg-loading" style="display:none;text-align:center">
+      <div style="font-size:13px;color:rgba(255,255,255,.4)" id="lg-loading-msg">Redirecting…</div>
+    </div>
+
+    <!-- Footer -->
+    <div style="font-size:11px;color:rgba(255,255,255,.2);text-align:center;margin-top:16px;line-height:1.7">
+      Your reports help 3M+ daily commuters<br>
+      No spam · No ads · Open data
+    </div>
+  </div>
+
+<div id="app" style="visibility:hidden">
 
   <!-- ═══ STATUS BAR ═══════════════════════════════════════════ -->
   <div id="sbar">
@@ -385,7 +458,7 @@
           <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.38.6.1.82-.26.82-.58v-2.04c-3.34.72-4.04-1.6-4.04-1.6-.54-1.38-1.33-1.75-1.33-1.75-1.08-.74.08-.72.08-.72 1.2.08 1.83 1.23 1.83 1.23 1.06 1.82 2.78 1.3 3.46 1 .1-.77.42-1.3.76-1.6-2.66-.3-5.47-1.33-5.47-5.93 0-1.3.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.17 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.3-1.23 3.3-1.23.66 1.65.24 2.87.12 3.17.77.84 1.24 1.9 1.24 3.22 0 4.6-2.8 5.63-5.48 5.92.43.37.82 1.1.82 2.22v3.3c0 .32.22.7.83.58A12 12 0 0 0 24 12C24 5.37 18.63 0 12 0z"/></svg>
           Continue with GitHub
         </button>
-        <div onclick="AUTH.continueAnon()" style="text-align:center;font-size:11px;color:var(--sub);cursor:pointer;padding:4px">Continue without signing in →</div>
+
       </div>
 
       <!-- Signed-in view -->
