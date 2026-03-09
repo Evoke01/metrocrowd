@@ -45,14 +45,15 @@ window.AUTH = (function(){
 
     // Restore existing session on page load
     client.auth.getSession().then(async ({ data: { session } }) => {
-      if(session?.user && !session.user.is_anonymous){
-        // Valid persistent session found — refresh token silently
+      const u = session?.user;
+      if(u && !u.is_anonymous && u.email){
+        // Valid real session found — refresh token silently
         try{ await client.auth.refreshSession(); }catch(_){}
-        currentUser = session.user;
+        currentUser = u;
         hideGate();
-        onSignedIn(session.user, 'RESTORED');
+        onSignedIn(u, 'RESTORED');
       } else {
-        // No valid session — show login gate
+        // No valid session or anonymous — show login gate
         showGate();
       }
     });
@@ -60,6 +61,7 @@ window.AUTH = (function(){
 
   // ── Triggered whenever user is confirmed signed-in ─────────────
   async function onSignedIn(user, event){
+
     updateButtonUI(user);
     closeModal();
     hideLoading();
@@ -68,9 +70,6 @@ window.AUTH = (function(){
     if(event === 'SIGNED_IN'){
       const name = displayName(user);
       SB.showToast(`✓ Welcome${name ? ', '+name : ''}! Reports now sync across devices.`);
-
-      // Migrate any anonymous reports made before sign-in
-      await migrateAnonReports(user.id);
     }
 
     // Load report count for profile
@@ -143,32 +142,9 @@ window.AUTH = (function(){
     closeModal();
   }
 
-  // Continue without signing in — just close modal
-  function continueAnon(){
-    closeModal();
-    SB.showToast('Continuing anonymously. Reports saved locally only.');
-  }
 
-  // ── Migrate anonymous crowd reports to signed-in user ──────────
-  async function migrateAnonReports(userId){
-    const reports = CROWD.state.userReports;
-    if(!Object.keys(reports).length || !client) return;
-    try{
-      const rows = Object.entries(reports).map(([stationId, level]) => {
-        const s = METRO.STATIONS[stationId];
-        const crowdValue = level==='empty'?14 : level==='moderate'?50 : 88;
-        return {
-          station_id: stationId, station_name: s?.n||stationId,
-          level, crowd_value: crowdValue,
-          user_id: userId, line_codes: s?.l||[],
-        };
-      });
-      await client.from('crowd_reports').insert(rows);
-      console.log(`[AUTH] Migrated ${rows.length} anonymous reports to user ${userId.slice(0,8)}`);
-    }catch(err){
-      console.warn('[AUTH] Migration failed:', err.message);
-    }
-  }
+
+
 
   // ── Fetch how many reports this user has submitted ─────────────
   async function fetchReportCount(userId){
@@ -189,7 +165,7 @@ window.AUTH = (function(){
     const label = document.getElementById('auth-label');
     if(!btn) return;
 
-    if(user && !user.is_anonymous){
+    if(user){
       const avatarUrl = user.user_metadata?.avatar_url;
       const name      = displayName(user);
       const provider  = (user.app_metadata?.provider||'').toLowerCase();
@@ -220,7 +196,7 @@ window.AUTH = (function(){
 
   // ── Update the profile panel inside the modal ──────────────────
   function updateProfileUI(user, reports){
-    if(!user || user.is_anonymous){
+    if(!user){
       showSignedOutView();
       return;
     }
@@ -266,7 +242,7 @@ window.AUTH = (function(){
     if(!modal) return;
     modal.style.display = 'flex';
     // Show correct inner view
-    if(currentUser && !currentUser.is_anonymous){
+    if(currentUser){
       updateProfileUI(currentUser, reportCount);
     } else {
       showSignedOutView();
@@ -324,10 +300,10 @@ window.AUTH = (function(){
   // ── Public API ─────────────────────────────────────────────────
   return {
     init, openModal, closeModal,
-    signInGoogle, signInGitHub, signOut, continueAnon,
+    signInGoogle, signInGitHub, signOut,
     showGate, hideGate,
     setStatus,
     get currentUser(){ return currentUser; },
-    get isSignedIn(){ return !!(currentUser && !currentUser.is_anonymous); },
+    get isSignedIn(){ return !!currentUser; },
   };
 })();
