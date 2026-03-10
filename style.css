@@ -43,7 +43,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:#0a0a0a;color:
 #sbar-clock{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--sub);}
 #auth-btn{width:32px;height:32px;border-radius:50%;background:var(--card);border:1px solid var(--brd2);display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;transition:border-color .15s;}
 #auth-btn:hover{border-color:rgba(255,208,0,.3);}
-#screens{flex:1;position:relative;overflow:hidden;min-height:0;contain:strict;}
+#screens{flex:1;position:relative;overflow:hidden;min-height:0;contain:layout style;}
 .screen{position:absolute;top:0;left:0;right:0;bottom:0;opacity:0;transform:translateY(16px);pointer-events:none;transition:opacity .26s cubic-bezier(.22,1,.36,1),transform .26s cubic-bezier(.22,1,.36,1);overflow:hidden;}
 .screen.active{opacity:1;transform:translateY(0);pointer-events:all;}
 .sv{
@@ -55,11 +55,13 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:#0a0a0a;color:
   overflow-y:scroll;
   overflow-x:hidden;
   -webkit-overflow-scrolling:touch;
-  overscroll-behavior-y:auto;
+  overscroll-behavior-y:contain;
   padding:12px 15px 100px;
   scrollbar-width:none;
-  will-change:scroll-position;
-  touch-action:pan-y;
+  will-change:transform;
+  touch-action:pan-y pinch-zoom;
+  transform:translateZ(0);
+  backface-visibility:hidden;
 }
 .sv::-webkit-scrollbar{display:none;}
 #bnav{
@@ -503,4 +505,10 @@ button, [onclick], .bni, .chip, .ir-opt, .cp, .qa-btn,
 /* Auth modal bottom safe area */
 #auth-modal > div {
   padding-bottom: calc(24px + env(safe-area-inset-bottom));
+}
+
+/* PWA standalone mode — already hides browser chrome, safe area handles the rest */
+.pwa-standalone #sbar {
+  padding-top: env(safe-area-inset-top);
+  height: calc(48px + env(safe-area-inset-top));
 }
