@@ -1,8 +1,8 @@
 fastapi==0.115.0
 uvicorn[standard]==0.30.6
 supabase==2.7.4
-xgboost==2.0.3
-pandas==2.2.2
+xgboost==2.1.1
+pandas==2.1.4
 numpy==1.26.4
 apscheduler==3.10.4
 pywebpush==2.0.0
