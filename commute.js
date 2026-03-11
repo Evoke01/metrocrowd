@@ -387,7 +387,7 @@ window.COMMUTE = (function () {
             style="background:#1a1a1a;border:1px solid #333;border-radius:12px;
             padding:12px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between">
             <div id="cm-home-val" style="font-size:13px;font-weight:600;color:${state.homeName ? '#fff' : '#555'}">
-              ${state.homeName || 'Select home station'}
+              ${_tmpHome && METRO.STATIONS[_tmpHome] ? METRO.STATIONS[_tmpHome].n : (state.homeName || 'Select home station')}
             </div>
             <div style="color:#555;font-size:16px">›</div>
           </div>
@@ -400,7 +400,7 @@ window.COMMUTE = (function () {
             style="background:#1a1a1a;border:1px solid #333;border-radius:12px;
             padding:12px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between">
             <div id="cm-work-val" style="font-size:13px;font-weight:600;color:${state.workName ? '#fff' : '#555'}">
-              ${state.workName || 'Select work station'}
+              ${_tmpWork && METRO.STATIONS[_tmpWork] ? METRO.STATIONS[_tmpWork].n : (state.workName || 'Select work station')}
             </div>
             <div style="color:#555;font-size:16px">›</div>
           </div>
@@ -452,13 +452,13 @@ window.COMMUTE = (function () {
     const which = window._commutePickTarget;
     if (which === 'home') {
       _tmpHome = id;
-      const el = document.getElementById('cm-home-val');
-      if (el) { el.textContent = s.n; el.style.color = '#fff'; }
+      state.homeName = s.n; // update immediately for display
     } else {
       _tmpWork = id;
-      const el = document.getElementById('cm-work-val');
-      if (el) { el.textContent = s.n; el.style.color = '#fff'; }
+      state.workName = s.n;
     }
+    // Re-open the setup modal (search overlay closed it)
+    setTimeout(() => openSetup(), 80);
   }
 
   function _saveFromModal() {
