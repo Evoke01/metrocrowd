@@ -188,64 +188,101 @@
     <!-- ── STATION ────────────────────────────────────────────── -->
     <div class="screen" id="s-station">
       <div class="sv">
-        <div class="stn-top">
-          <div class="back-btn" onclick="UI.navTo('s-home')">←</div>
-          <div class="stn-pick" onclick="UI.openSearch('station')">
-            <span style="font-size:14px;color:var(--sub)">🚉</span>
-            <span class="sp-val ph" id="sp-val">Select a station</span>
+
+        <!-- Header: search bar + GPS -->
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+          <div onclick="SEARCH.open('station')" style="flex:1;display:flex;align-items:center;gap:10px;
+            background:var(--card);border:1px solid var(--brd);border-radius:14px;padding:11px 14px;cursor:pointer">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <span class="sp-val ph" id="sp-val" style="font-size:13px;font-weight:600;flex:1">Search a station…</span>
           </div>
-          <div class="gps-btn" onclick="UI.gpsStation()">📡</div>
-        </div>
-
-        <!-- Big crowd number -->
-        <div class="crowd-card" id="cc-wrap">
-          <div class="cc-sname" id="cc-name">—</div>
-          <div class="cc-num" id="cc-num" style="opacity:.18">—<span class="cc-pct">%</span></div>
-          <div class="cc-lbl" id="cc-lbl" style="opacity:.18">Select a station</div>
-          <div class="cc-bar"><div class="cc-bar-fill" id="cc-bar" style="width:0"></div></div>
-          <div class="cc-meta"><span class="ldot" id="cc-dot" style="opacity:0"></span>&nbsp;<span id="cc-meta">—</span></div>
-        </div>
-
-        <!-- Safe/board card -->
-        <div class="safe-card" id="safe-card" style="display:none">
-          <div class="sc-icon" id="sc-icon">—</div>
-          <div><div class="sc-answer" id="sc-ans">—</div><div class="sc-sub" id="sc-sub">—</div></div>
-        </div>
-
-        <!-- Quick inline report -->
-        <div class="inline-rep" id="inline-rep" style="display:none">
-          <div class="ir-lbl">How's the crowd right now?</div>
-          <div class="ir-opts">
-            <div class="ir-opt" onclick="UI.quickReport(this,'low')">Low</div>
-            <div class="ir-opt" onclick="UI.quickReport(this,'moderate')">Mod</div>
-            <div class="ir-opt" onclick="UI.quickReport(this,'high')">High</div>
-            <div class="ir-opt" onclick="UI.quickReport(this,'packed')">Full</div>
+          <div onclick="UI.gpsStation()" style="width:42px;height:42px;background:var(--card);
+            border:1px solid var(--brd);border-radius:12px;display:flex;align-items:center;
+            justify-content:center;cursor:pointer;flex-shrink:0">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="8" stroke-dasharray="2 2" opacity=".4"/></svg>
           </div>
         </div>
 
-        <!-- Mini forecast -->
-        <div class="inner-card" id="mf-card" style="display:none">
-          <div class="inner-t">Next 4 Hours</div>
-          <div id="mf-rows"></div>
+        <!-- Empty state when no station selected -->
+        <div id="stn-empty" style="text-align:center;padding:48px 20px">
+          <div style="font-size:40px;margin-bottom:12px">🚇</div>
+          <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--txt);margin-bottom:6px">Instant Crowd Lookup</div>
+          <div style="font-size:12px;color:var(--sub);line-height:1.6">Search any Delhi Metro station above<br>or tap the GPS button to auto-detect</div>
         </div>
 
-        <!-- Coach finder quick access -->
-        <div id="stn-coach-link" style="display:none;margin-bottom:10px">
-          <div style="background:var(--card);border:1px solid var(--brd);border-radius:14px;padding:11px 14px;display:flex;align-items:center;gap:10px;cursor:pointer" onclick="UI.goCoachFromStation()">
-            <span style="font-size:18px">🚃</span>
-            <div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--txt)">Coach Finder</div><div style="font-size:10px;color:var(--sub);margin-top:1px">Find the least crowded coach</div></div>
-            <span style="font-size:13px;color:var(--dim)">›</span>
-          </div>
-        </div>
+        <!-- Station data — hidden until station selected -->
+        <div id="stn-data" style="display:none">
 
-        <!-- Community reports -->
-        <div class="card" id="comm-card" style="display:none">
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 13px;border-bottom:1px solid var(--brd)">
-            <span style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--txt)">Community Reports</span>
-            <span style="font-size:10px;color:var(--sub)">Last 30 min</span>
+          <!-- Crowd hero -->
+          <div style="background:var(--card);border:1px solid var(--brd);border-radius:20px;padding:20px;margin-bottom:12px;position:relative;overflow:hidden">
+            <div style="position:absolute;top:-50px;right:-50px;width:160px;height:160px;border-radius:50%;
+              background:radial-gradient(circle,rgba(255,255,255,.03),transparent 70%);pointer-events:none" id="cc-glow"></div>
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px">
+              <div>
+                <div style="font-size:10px;color:var(--sub);letter-spacing:.08em;text-transform:uppercase;font-family:'Syne',sans-serif;margin-bottom:4px" id="cc-meta">—</div>
+                <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:var(--txt)" id="cc-name">—</div>
+              </div>
+              <div style="text-align:right">
+                <div style="font-family:'Syne',sans-serif;font-size:48px;font-weight:900;line-height:1;color:var(--txt)" id="cc-num">—</div>
+                <div style="font-size:11px;font-weight:700;margin-top:2px" id="cc-lbl">—</div>
+              </div>
+            </div>
+            <div style="height:6px;background:var(--card2);border-radius:3px;overflow:hidden;margin-bottom:14px">
+              <div style="height:100%;width:0%;border-radius:3px;transition:width .8s cubic-bezier(.22,1,.36,1)" id="cc-bar"></div>
+            </div>
+            <!-- Safe board indicator -->
+            <div id="safe-card" style="display:none;align-items:center;gap:10px;
+              padding:10px 12px;border-radius:12px;margin-bottom:14px">
+              <div style="font-size:20px" id="sc-icon">—</div>
+              <div>
+                <div style="font-size:12px;font-weight:700;color:var(--txt)" id="sc-ans">—</div>
+                <div style="font-size:10px;color:var(--sub);margin-top:1px" id="sc-sub">—</div>
+              </div>
+            </div>
+            <!-- Quick report -->
+            <div id="inline-rep" style="display:none">
+              <div style="font-size:10px;color:var(--sub);margin-bottom:8px;letter-spacing:.05em">HOW'S IT RIGHT NOW?</div>
+              <div style="display:flex;gap:6px">
+                <div class="ir-opt" onclick="UI.quickReport(this,'low')" style="flex:1;text-align:center;padding:8px 4px;border-radius:10px;font-size:11px;font-weight:700;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.25);color:#4ade80;cursor:pointer">Empty</div>
+                <div class="ir-opt" onclick="UI.quickReport(this,'moderate')" style="flex:1;text-align:center;padding:8px 4px;border-radius:10px;font-size:11px;font-weight:700;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);color:#fbbf24;cursor:pointer">Mod</div>
+                <div class="ir-opt" onclick="UI.quickReport(this,'high')" style="flex:1;text-align:center;padding:8px 4px;border-radius:10px;font-size:11px;font-weight:700;background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.25);color:#f97316;cursor:pointer">Busy</div>
+                <div class="ir-opt" onclick="UI.quickReport(this,'packed')" style="flex:1;text-align:center;padding:8px 4px;border-radius:10px;font-size:11px;font-weight:700;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:#ef4444;cursor:pointer">Packed</div>
+              </div>
+            </div>
           </div>
-          <div id="comm-items"></div>
-        </div>
+
+          <!-- Next 4 hours -->
+          <div id="mf-card" style="display:none;background:var(--card);border:1px solid var(--brd);border-radius:16px;padding:14px;margin-bottom:12px">
+            <div style="font-size:10px;color:var(--sub);letter-spacing:.08em;text-transform:uppercase;font-family:'Syne',sans-serif;margin-bottom:10px">Next 4 Hours</div>
+            <div id="mf-rows"></div>
+          </div>
+
+          <!-- Go to Coach + Route buttons -->
+          <div style="display:flex;gap:8px;margin-bottom:12px" id="stn-coach-link">
+            <button onclick="UI.goCoachFromStation()" style="flex:1;height:42px;background:var(--card);
+              border:1px solid var(--brd);border-radius:12px;font-size:11px;font-weight:700;
+              color:var(--txt);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="11" rx="2"/><line x1="7" y1="12" x2="17" y2="12"/></svg>
+              Coach Finder
+            </button>
+            <button onclick="UI.navTo('s-route')" style="flex:1;height:42px;background:var(--card);
+              border:1px solid var(--brd);border-radius:12px;font-size:11px;font-weight:700;
+              color:var(--txt);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M6 17V8a2 2 0 012-2h4"/><polyline points="14 4 18 4 18 8"/></svg>
+              Plan Route
+            </button>
+          </div>
+
+          <!-- Community reports -->
+          <div id="comm-card" style="display:none;background:var(--card);border:1px solid var(--brd);border-radius:16px;overflow:hidden;margin-bottom:12px">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--brd)">
+              <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--txt)">Community Reports</div>
+              <div style="font-size:10px;color:var(--sub)">Last 2 hrs</div>
+            </div>
+            <div id="comm-items" style="padding:8px 0"></div>
+          </div>
+
+        </div><!-- /stn-data -->
       </div>
     </div>
 
@@ -295,108 +332,137 @@
     <!-- ── ROUTE ──────────────────────────────────────────────── -->
     <div class="screen" id="s-route">
       <div class="sv">
-        <div class="pg-title">Route Planner</div>
-        <div class="pg-sub">Crowd-aware · Finds the least-packed path</div>
+        <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:900;color:var(--txt);margin-bottom:4px">Route Planner</div>
+        <div style="font-size:11px;color:var(--sub);margin-bottom:18px">Crowd-aware · least-packed path</div>
 
-        <div class="r-inputs">
-          <div class="ri" onclick="UI.openSearch('r-from')">
-            <div class="ri-dot" style="background:var(--txt);border:2px solid var(--txt)"></div>
+        <!-- Input card -->
+        <div style="background:var(--card);border:1px solid var(--brd);border-radius:18px;overflow:hidden;margin-bottom:12px;position:relative">
+          <!-- From -->
+          <div onclick="UI.openSearch('r-from')" style="display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;border-bottom:1px solid var(--brd)">
+            <div style="width:10px;height:10px;border-radius:50%;background:var(--txt);border:2px solid var(--txt);flex-shrink:0"></div>
             <div style="flex:1">
-              <div class="ri-lbl">From</div>
-              <div class="ri-val ph" id="rFrom">Select origin</div>
-              <div class="ri-crowd" id="rFromC"></div>
+              <div style="font-size:9px;color:var(--sub);letter-spacing:.06em;text-transform:uppercase;margin-bottom:2px">From</div>
+              <div class="ri-val ph" id="rFrom" style="font-size:14px;font-weight:700">Select origin</div>
+              <div id="rFromC" style="font-size:10px;margin-top:1px;display:none"></div>
             </div>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           </div>
-          <div class="div" style="margin:0 12px"></div>
-          <div class="ri" onclick="UI.openSearch('r-to')">
-            <div class="ri-dot" style="background:var(--y);border:2px solid var(--y)"></div>
+          <!-- Swap button -->
+          <div onclick="UI.swapRoute()" style="position:absolute;right:16px;top:50%;transform:translateY(-50%);
+            width:28px;height:28px;background:var(--card2);border:1px solid var(--brd);border-radius:50%;
+            display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:1">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 16 3 12 7 8"/><polyline points="17 8 21 12 17 16"/><line x1="3" y1="12" x2="21" y2="12"/></svg>
+          </div>
+          <!-- To -->
+          <div onclick="UI.openSearch('r-to')" style="display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer">
+            <div style="width:10px;height:10px;border-radius:50%;background:var(--y);border:2px solid var(--y);flex-shrink:0"></div>
             <div style="flex:1">
-              <div class="ri-lbl">To</div>
-              <div class="ri-val ph" id="rTo">Select destination</div>
-              <div class="ri-crowd" id="rToC"></div>
+              <div style="font-size:9px;color:var(--sub);letter-spacing:.06em;text-transform:uppercase;margin-bottom:2px">To</div>
+              <div class="ri-val ph" id="rTo" style="font-size:14px;font-weight:700">Select destination</div>
+              <div id="rToC" style="font-size:10px;margin-top:1px;display:none"></div>
             </div>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           </div>
-          <div class="swap-btn" onclick="UI.swapRoute()">⇅</div>
         </div>
 
-        <div class="opts-row">
+        <!-- Options -->
+        <div style="display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap">
           <div class="chip on" id="opt-avoid" onclick="this.classList.toggle('on')">Avoid packed</div>
           <div class="chip" id="opt-fastest" onclick="this.classList.toggle('on')">Fastest</div>
           <div class="chip" id="opt-fewest" onclick="this.classList.toggle('on')">Fewest stops</div>
         </div>
 
-        <button class="btn-y" id="go-route" onclick="UI.doRoute()">🧭 Find Smartest Route</button>
-        <div id="rres" style="margin-top:12px"></div>
+        <button class="btn-y" id="go-route" onclick="UI.doRoute()" style="margin-bottom:16px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M6 17V8a2 2 0 012-2h4"/><polyline points="14 4 18 4 18 8"/></svg>
+          Find Smartest Route
+        </button>
+        <div id="rres"></div>
       </div>
     </div>
 
     <!-- ── REPORT ─────────────────────────────────────────────── -->
     <div class="screen" id="s-report">
       <div class="sv">
-        <div class="pg-title">Report Crowd</div>
-        <div class="pg-sub">60% AI + 40% community blend</div>
+        <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:900;color:var(--txt);margin-bottom:4px">Report Crowd</div>
+        <div style="font-size:11px;color:var(--sub);margin-bottom:16px">Your reports power the AI for 3M+ commuters</div>
 
-        <div class="karma-row">
-          <div class="kr-ico">🏅</div>
-          <div class="kr-info"><div class="kr-title">Your Impact This Week</div><div class="kr-sub">Reports submitted</div></div>
-          <div class="kr-val" id="karma-num">0</div>
-        </div>
-
-        <div class="rep-stn-btn" onclick="UI.openSearch('report')">
-          <span style="font-size:17px;color:var(--sub)">📍</span>
+        <!-- Karma banner -->
+        <div style="background:linear-gradient(135deg,rgba(245,168,0,.12),rgba(245,168,0,.04));
+          border:1px solid rgba(245,168,0,.25);border-radius:16px;padding:14px 16px;
+          display:flex;align-items:center;gap:12px;margin-bottom:16px">
+          <div style="font-size:28px">🏅</div>
           <div style="flex:1">
-            <div class="rsb-lbl">Station</div>
-            <div class="rsb-val ph" id="rep-stn">Select your station</div>
+            <div style="font-size:11px;font-weight:700;color:var(--txt)">Your impact this week</div>
+            <div style="font-size:10px;color:var(--sub);margin-top:1px">Reports submitted</div>
           </div>
-          <span style="font-size:13px;color:var(--dim)">›</span>
+          <div style="font-family:'Syne',sans-serif;font-size:32px;font-weight:900;color:var(--y)" id="karma-num">0</div>
         </div>
 
-        <div class="cpick">
-          <div class="cp" onclick="UI.pickLevel(this)" data-v="empty">
-            <div class="cp-check">✓</div>
-            <div class="cp-level">E</div>
-            <div class="cp-label">Empty</div>
-            <div class="cp-desc">Seats available, easy boarding</div>
+        <!-- Station picker -->
+        <div onclick="SEARCH.open('report')" style="display:flex;align-items:center;gap:12px;
+          background:var(--card);border:1px solid var(--brd);border-radius:14px;
+          padding:13px 16px;cursor:pointer;margin-bottom:14px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <div style="flex:1">
+            <div style="font-size:9px;color:var(--sub);letter-spacing:.06em;text-transform:uppercase;margin-bottom:2px">Station</div>
+            <div class="ph" id="rep-stn" style="font-size:14px;font-weight:700;color:var(--txt)">Select your station</div>
           </div>
-          <div class="cp" onclick="UI.pickLevel(this)" data-v="moderate">
-            <div class="cp-check">✓</div>
-            <div class="cp-level">M</div>
-            <div class="cp-label">Moderate</div>
-            <div class="cp-desc">Some people, still comfortable</div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+
+        <!-- Crowd level picker -->
+        <div style="font-size:10px;color:var(--sub);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">Crowd level</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+          <div class="cp" onclick="UI.pickLevel(this)" data-v="empty" style="background:var(--card);border:1.5px solid var(--brd);border-radius:14px;padding:14px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden">
+            <div class="cp-check" style="display:none;position:absolute;top:8px;right:8px;width:18px;height:18px;background:rgba(74,222,128,.2);border-radius:50%;font-size:10px;color:#4ade80;align-items:center;justify-content:center">✓</div>
+            <div style="font-size:22px;margin-bottom:6px">😌</div>
+            <div style="font-size:13px;font-weight:700;color:var(--txt)">Empty</div>
+            <div style="font-size:10px;color:var(--sub);margin-top:2px">Seats available</div>
           </div>
-          <div class="cp" onclick="UI.pickLevel(this)" data-v="crowded">
-            <div class="cp-check">✓</div>
-            <div class="cp-level">C</div>
-            <div class="cp-label">Crowded</div>
-            <div class="cp-desc">Standing room, busy platform</div>
+          <div class="cp" onclick="UI.pickLevel(this)" data-v="moderate" style="background:var(--card);border:1.5px solid var(--brd);border-radius:14px;padding:14px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden">
+            <div class="cp-check" style="display:none;position:absolute;top:8px;right:8px;width:18px;height:18px;background:rgba(251,191,36,.2);border-radius:50%;font-size:10px;color:#fbbf24;align-items:center;justify-content:center">✓</div>
+            <div style="font-size:22px;margin-bottom:6px">🙂</div>
+            <div style="font-size:13px;font-weight:700;color:var(--txt)">Moderate</div>
+            <div style="font-size:10px;color:var(--sub);margin-top:2px">Some people, comfortable</div>
           </div>
-          <div class="cp" onclick="UI.pickLevel(this)" data-v="packed">
-            <div class="cp-check">✓</div>
-            <div class="cp-level">P</div>
-            <div class="cp-label">Packed</div>
-            <div class="cp-desc">Train full, skip advised</div>
+          <div class="cp" onclick="UI.pickLevel(this)" data-v="crowded" style="background:var(--card);border:1.5px solid var(--brd);border-radius:14px;padding:14px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden">
+            <div class="cp-check" style="display:none;position:absolute;top:8px;right:8px;width:18px;height:18px;background:rgba(249,115,22,.2);border-radius:50%;font-size:10px;color:#f97316;align-items:center;justify-content:center">✓</div>
+            <div style="font-size:22px;margin-bottom:6px">😰</div>
+            <div style="font-size:13px;font-weight:700;color:var(--txt)">Crowded</div>
+            <div style="font-size:10px;color:var(--sub);margin-top:2px">Standing room only</div>
+          </div>
+          <div class="cp" onclick="UI.pickLevel(this)" data-v="packed" style="background:var(--card);border:1.5px solid var(--brd);border-radius:14px;padding:14px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden">
+            <div class="cp-check" style="display:none;position:absolute;top:8px;right:8px;width:18px;height:18px;background:rgba(239,68,68,.2);border-radius:50%;font-size:10px;color:#ef4444;align-items:center;justify-content:center">✓</div>
+            <div style="font-size:22px;margin-bottom:6px">😱</div>
+            <div style="font-size:13px;font-weight:700;color:var(--txt)">Packed</div>
+            <div style="font-size:10px;color:var(--sub);margin-top:2px">Skip — next train</div>
           </div>
         </div>
 
-        <div class="rep-dtoggle" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.nextElementSibling.classList.contains('open')?'▲ Hide details':'▼ Add details (optional)'">▼ Add details (optional)</div>
-        <div class="rep-detail">
-          <textarea id="rep-note" placeholder="Anything unusual? e.g. signal delay, maintenance, event crowd…"></textarea>
-        </div>
+        <!-- Optional note -->
+        <details style="margin-bottom:14px">
+          <summary style="font-size:11px;color:var(--sub);cursor:pointer;padding:8px 0;list-style:none;display:flex;align-items:center;gap:6px">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            Add a note (optional)
+          </summary>
+          <textarea id="rep-note" placeholder="Signal delay? Event crowd? Anything unusual…" style="width:100%;background:var(--card);border:1px solid var(--brd);border-radius:12px;padding:12px;color:var(--txt);font-size:12px;resize:none;height:72px;margin-top:8px;box-sizing:border-box"></textarea>
+        </details>
 
-        <button class="btn-y" id="rep-btn" onclick="UI.submitReport()" disabled>📣 Submit Report</button>
+        <button class="btn-y" id="rep-btn" onclick="UI.submitReport()" disabled style="margin-bottom:14px">Submit Report</button>
 
-        <div class="rep-success" id="rep-ok">
-          <div class="rs-icon">✅</div>
-          <div class="rs-title">Report submitted!</div>
-          <div class="rs-sub">Your data helps other commuters</div>
-          <div class="rs-karma2">+1 🏅 Karma · Total: <span id="rs-karma">0</span></div>
+        <!-- Success state -->
+        <div id="rep-ok" style="display:none;text-align:center;padding:20px;background:rgba(74,222,128,.08);
+          border:1px solid rgba(74,222,128,.2);border-radius:16px;margin-bottom:14px">
+          <div style="font-size:32px;margin-bottom:8px">✅</div>
+          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--txt)">Report submitted!</div>
+          <div style="font-size:11px;color:var(--sub);margin-top:4px">Your data helps other commuters</div>
+          <div style="font-size:11px;color:var(--y);margin-top:6px;font-weight:700">+1 🏅 Karma · Total: <span id="rs-karma">0</span></div>
         </div>
 
         <!-- Community feed -->
-        <div style="margin-top:14px">
-          <div class="sec-head"><span class="sec-t">Recent Reports</span></div>
-          <div class="rep-feed" id="rep-feed"></div>
-        </div>
+        <div style="font-size:10px;color:var(--sub);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">Recent Network Reports</div>
+        <div id="rep-feed"></div>
+
       </div>
     </div>
 
