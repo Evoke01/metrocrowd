@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MetroCrowd — Legal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#080808;--card:#111;--brd:#1f1f1f;--txt:#efefef;--sub:#7a7a7a;--y:#FFD000;--dim:#444}
+  body{background:var(--bg);color:var(--txt);font-family:'DM Sans',sans-serif;line-height:1.7;min-height:100vh}
+  a{color:var(--y);text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  /* NAV */
+  .topbar{position:sticky;top:0;z-index:100;background:rgba(8,8,8,.92);backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--brd);padding:0 20px;height:52px;
+    display:flex;align-items:center;justify-content:space-between;max-width:720px;margin:0 auto;width:100%}
+  .topbar-inner{width:100%;max-width:720px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+  .brand{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--txt)}
+  .brand span{color:var(--y)}
+  .back-link{font-size:12px;color:var(--sub);display:flex;align-items:center;gap:5px}
+  .back-link svg{flex-shrink:0}
+
+  /* TABS */
+  .tabs{display:flex;gap:0;border-bottom:1px solid var(--brd);position:sticky;top:52px;z-index:99;
+    background:rgba(8,8,8,.95);backdrop-filter:blur(10px);padding:0 20px;overflow-x:auto;
+    scrollbar-width:none;max-width:720px;margin:0 auto;width:100%}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{padding:14px 16px;font-size:12px;font-weight:700;color:var(--sub);cursor:pointer;
+    white-space:nowrap;border-bottom:2px solid transparent;letter-spacing:.04em;
+    text-transform:uppercase;transition:all .15s}
+  .tab.active{color:var(--y);border-bottom-color:var(--y)}
+
+  /* CONTENT */
+  .page-wrap{max-width:720px;margin:0 auto;padding:0 20px}
+  .section{display:none;padding:28px 0 60px}
+  .section.active{display:block}
+  h1{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--txt);margin-bottom:6px}
+  .subtitle{font-size:12px;color:var(--sub);margin-bottom:28px;padding-bottom:20px;
+    border-bottom:1px solid var(--brd)}
+  h2{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--txt);
+    margin:28px 0 10px;letter-spacing:.03em}
+  h3{font-size:12px;font-weight:700;color:var(--sub);margin:20px 0 8px;
+    letter-spacing:.06em;text-transform:uppercase}
+  p{font-size:13px;color:#c0c0c0;margin-bottom:12px}
+  ul,ol{padding-left:20px;margin-bottom:12px}
+  li{font-size:13px;color:#c0c0c0;margin-bottom:6px}
+  strong{color:var(--txt);font-weight:600}
+
+  .box{background:var(--card);border:1px solid var(--brd);border-radius:14px;
+    padding:16px 18px;margin:16px 0;font-size:12px;line-height:1.7}
+  .box.warn{border-color:rgba(249,115,22,.3);background:rgba(249,115,22,.05)}
+  .box.info{border-color:rgba(245,208,0,.2);background:rgba(245,208,0,.04)}
+  .box.green{border-color:rgba(74,222,128,.25);background:rgba(74,222,128,.04)}
+
+  .box-label{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+    margin-bottom:8px;display:flex;align-items:center;gap:6px}
+  .box-label.warn{color:#f97316}
+  .box-label.info{color:var(--y)}
+  .box-label.green{color:#4ade80}
+
+  table{width:100%;border-collapse:collapse;font-size:12px;margin:12px 0}
+  th{text-align:left;padding:10px 12px;background:var(--card);color:var(--sub);
+    font-weight:600;border-bottom:1px solid var(--brd);letter-spacing:.04em;font-size:11px}
+  td{padding:10px 12px;border-bottom:1px solid var(--brd);color:#c0c0c0;vertical-align:top}
+  tr:last-child td{border-bottom:none}
+
+  .tag{display:inline-block;font-size:9px;font-weight:700;padding:2px 7px;
+    border-radius:6px;letter-spacing:.06em;text-transform:uppercase;margin-left:6px;vertical-align:middle}
+  .tag.req{background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.25)}
+  .tag.opt{background:rgba(74,222,128,.1);color:#4ade80;border:1px solid rgba(74,222,128,.2)}
+
+  .consent-block{background:var(--card);border:1px solid var(--brd);border-radius:14px;
+    padding:16px 18px;margin:12px 0}
+  .consent-title{font-size:12px;font-weight:700;color:var(--txt);margin-bottom:8px;
+    display:flex;align-items:center;gap:8px}
+  .consent-body{font-size:12px;color:#c0c0c0;line-height:1.65;font-style:italic;
+    border-left:2px solid var(--y);padding-left:12px;margin:10px 0}
+
+  .eff-date{font-size:11px;color:var(--dim);margin-top:40px;padding-top:16px;
+    border-top:1px solid var(--brd);text-align:center}
+</style>
+</head>
+<body>
+
+<div style="position:sticky;top:0;z-index:100;background:rgba(8,8,8,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--brd)">
+  <div style="max-width:720px;margin:0 auto;padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between">
+    <div class="brand">Metro<span>Crowd</span></div>
+    <a href="/" class="back-link">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      Back to app
+    </a>
+  </div>
+</div>
+
+<div style="max-width:720px;margin:0 auto;padding:0 20px;position:sticky;top:52px;z-index:99;background:rgba(8,8,8,.95);backdrop-filter:blur(10px)">
+  <div class="tabs" style="padding:0;max-width:none">
+    <div class="tab active" onclick="showTab('privacy')">Privacy Policy</div>
+    <div class="tab" onclick="showTab('terms')">Terms of Service</div>
+    <div class="tab" onclick="showTab('disclaimer')">Data Disclaimer</div>
+    <div class="tab" onclick="showTab('consent')">Consent</div>
+  </div>
+</div>
+
+<div class="page-wrap">
+
+  <!-- ── PRIVACY POLICY ──────────────────────────────────────── -->
+  <div id="tab-privacy" class="section active">
+    <h1>Privacy Policy</h1>
+    <div class="subtitle">Effective: 11 March 2026 &nbsp;·&nbsp; Version 1.0 &nbsp;·&nbsp; Governed by DPDP Act 2023 (India)</div>
+
+    <p>MetroCrowd ("we", "our", "the Service") is a crowd intelligence platform for the Delhi Metro, operated as a personal civic technology project at metrocrowd.vercel.app. This Privacy Policy explains what personal data we collect, why we collect it, how we use and protect it, and your rights.</p>
+
+    <h2>1. Who This Policy Applies To</h2>
+    <p>This policy applies to all users who access MetroCrowd via the web application at metrocrowd.vercel.app, whether or not you create an account. By using the Service you agree to the collection and use of information described here.</p>
+
+    <h2>2. Data We Collect</h2>
+    <h3>2.1 Data You Provide Directly</h3>
+    <ul>
+      <li><strong>Account information:</strong> name and email address provided via Google or GitHub OAuth login</li>
+      <li><strong>Home station preference</strong> set during onboarding</li>
+      <li><strong>Saved routes and favourite stations</strong></li>
+      <li><strong>Community crowd reports:</strong> station ID, crowd level (empty / moderate / crowded / packed), and optional text note</li>
+    </ul>
+    <h3>2.2 Data Collected Automatically</h3>
+    <ul>
+      <li>Browser type, device type, and operating system</li>
+      <li>IP address (used for abuse prevention, not stored permanently)</li>
+      <li>Pages visited within the Service and time spent</li>
+      <li>Push notification subscription token (if you opt in to alerts)</li>
+    </ul>
+    <h3>2.3 Location Data</h3>
+    <ul>
+      <li>If you use "Find my nearest station", we request your device GPS coordinates</li>
+      <li>We convert GPS to a station name immediately and <strong>do not store raw coordinates</strong></li>
+      <li>We do not track your location continuously or in the background</li>
+    </ul>
+    <h3>2.4 Data We Do Not Collect</h3>
+    <ul>
+      <li>Aadhaar number, PAN, or any government-issued ID</li>
+      <li>Financial or payment information</li>
+      <li>Biometric data</li>
+      <li>Data from children under 18 — the Service is not directed at minors</li>
+    </ul>
+
+    <h2>3. How We Use Your Data</h2>
+    <table>
+      <tr><th>Purpose</th><th>Legal Basis (DPDP Act 2023)</th></tr>
+      <tr><td>Provide crowd monitoring and route planning</td><td>Performance of contract / consent</td></tr>
+      <tr><td>Display your community reports in the live feed</td><td>Consent (given at report submission)</td></tr>
+      <tr><td>Calculate and improve crowd prediction accuracy</td><td>Legitimate interest</td></tr>
+      <tr><td>Send push notifications for crowd alerts you subscribed to</td><td>Explicit consent (opt-in)</td></tr>
+      <tr><td>Prevent abuse of the community reporting system</td><td>Legitimate interest (fraud prevention)</td></tr>
+      <tr><td>Comply with legal obligations</td><td>Legal obligation</td></tr>
+    </table>
+
+    <h2>4. Data Sharing</h2>
+    <p>We <strong>do not sell your personal data</strong>. We do not share your data with advertisers. We share data only in these limited circumstances:</p>
+    <ul>
+      <li><strong>Service providers:</strong> Supabase (database &amp; auth), Vercel (hosting), Render (backend). Each is bound by a Data Processing Agreement.</li>
+      <li><strong>Google / GitHub OAuth:</strong> they provide your name and email to us. We do not share your data back beyond the authentication flow.</li>
+      <li><strong>Legal requirements:</strong> if required by a court order or Indian law enforcement authority with valid jurisdiction.</li>
+      <li><strong>Community feed:</strong> your reports show your first name and last initial only. Your full name and email are never displayed publicly.</li>
+    </ul>
+
+    <h2>5. Data Retention</h2>
+    <table>
+      <tr><th>Data Type</th><th>Retention Period</th></tr>
+      <tr><td>Community crowd reports</td><td>Raw reports: 90 days, then anonymised (user_id set to NULL) and retained for model training indefinitely</td></tr>
+      <tr><td>Account data (name, email, home station, saved routes)</td><td>Until account deletion</td></tr>
+      <tr><td>Push notification tokens</td><td>Until you revoke notification permission or delete your account</td></tr>
+      <tr><td>Server access logs (IP address)</td><td>Maximum 30 days, then permanently deleted</td></tr>
+      <tr><td>GPS coordinates</td><td>Not retained — converted to station name in real time and discarded</td></tr>
+    </table>
+
+    <h2>6. Your Rights under the DPDP Act 2023</h2>
+    <ol>
+      <li><strong>Right to access:</strong> request a summary of personal data we hold about you</li>
+      <li><strong>Right to correction:</strong> request correction of inaccurate data</li>
+      <li><strong>Right to erasure:</strong> request deletion of your account and all associated data. We action erasure requests within 72 hours.</li>
+      <li><strong>Right to grievance redressal:</strong> raise a complaint with us or with the Data Protection Board of India</li>
+      <li><strong>Right to nominate:</strong> nominate another individual to exercise your rights in the event of death or incapacity</li>
+    </ol>
+    <p>To exercise any right: email <a href="mailto:legal@metrocrowd.in">legal@metrocrowd.in</a> with subject line "DPDP Rights Request". We respond within 7 business days.</p>
+
+    <h2>7. Data Security</h2>
+    <ul>
+      <li>All data in transit encrypted using TLS 1.2 or higher</li>
+      <li>Database access protected by Row Level Security (RLS) — users can only access their own records</li>
+      <li>Authentication tokens stored as HTTP-only cookies where possible, not in localStorage</li>
+      <li>Periodic security reviews of authentication and data access controls</li>
+      <li>Data breach notification to affected users and the Data Protection Board within 72 hours</li>
+    </ul>
+
+    <h2>8. Third-Party Services</h2>
+    <table>
+      <tr><th>Service</th><th>Purpose</th></tr>
+      <tr><td>Google OAuth</td><td>Authentication — <a href="https://policies.google.com/privacy" target="_blank">policies.google.com/privacy</a></td></tr>
+      <tr><td>GitHub OAuth</td><td>Authentication — <a href="https://docs.github.com/site-policy/privacy-policies" target="_blank">docs.github.com</a></td></tr>
+      <tr><td>Supabase</td><td>Database and real-time — <a href="https://supabase.com/privacy" target="_blank">supabase.com/privacy</a></td></tr>
+      <tr><td>Vercel</td><td>Web hosting — <a href="https://vercel.com/legal/privacy-policy" target="_blank">vercel.com/legal/privacy-policy</a></td></tr>
+      <tr><td>Render</td><td>Backend API hosting — <a href="https://render.com/privacy" target="_blank">render.com/privacy</a></td></tr>
+      <tr><td>GNews API</td><td>Live news feed — <a href="https://gnews.io/privacy-policy" target="_blank">gnews.io/privacy-policy</a></td></tr>
+      <tr><td>Web Push (FCM/Mozilla)</td><td>Push notification delivery</td></tr>
+    </table>
+
+    <h2>9. Contact &amp; Grievance Officer</h2>
+    <div class="box info">
+      <div class="box-label info">Contact</div>
+      Email: <a href="mailto:legal@metrocrowd.in">legal@metrocrowd.in</a><br>
+      Website: metrocrowd.vercel.app<br>
+      Response: within 7 business days
+    </div>
+
+    <h2>10. Changes to This Policy</h2>
+    <p>We will notify you of material changes by displaying a prominent in-app notice and, where we have your email, sending an email at least 7 days before changes take effect.</p>
+
+    <div class="eff-date">MetroCrowd · metrocrowd.vercel.app · Last updated: 11 March 2026</div>
+  </div>
+
+  <!-- ── TERMS OF SERVICE ─────────────────────────────────────── -->
+  <div id="tab-terms" class="section">
+    <h1>Terms of Service</h1>
+    <div class="subtitle">Version 1.0 &nbsp;·&nbsp; 11 March 2026 &nbsp;·&nbsp; Governed by the laws of India</div>
+
+    <h2>1. Service Description</h2>
+    <p>MetroCrowd provides crowd level estimates for Delhi Metro stations using a combination of machine learning predictions based on historical patterns and real-time community reports submitted by users. The Service is <strong>informational only</strong>.</p>
+
+    <h2>2. Eligibility</h2>
+    <ul>
+      <li>You must be at least <strong>18 years of age</strong> to create an account</li>
+      <li>You must have the legal capacity to enter into a binding agreement</li>
+      <li>The Service is currently available only within India</li>
+    </ul>
+
+    <h2>3. Community Reports — User Obligations</h2>
+    <p>When submitting a crowd report, you agree that:</p>
+    <ol>
+      <li>Your report reflects your genuine, first-hand observation of conditions at the stated station at the time of submission</li>
+      <li>You will not submit false, misleading, or artificially inflated or deflated crowd reports</li>
+      <li>You will not use automated tools, scripts, or multiple accounts to submit reports</li>
+      <li>You will not submit reports for stations you are not physically at or near</li>
+    </ol>
+    <div class="box warn">
+      <div class="box-label warn">⚠ Enforcement</div>
+      Violation of these obligations may result in account suspension, removal of affected reports, and reversal of karma points. Systematic manipulation of crowd data that causes harm to users may be subject to legal action.
+    </div>
+
+    <h2>4. Intellectual Property</h2>
+    <ul>
+      <li>MetroCrowd and its logo are the property of the Service operator</li>
+      <li>Delhi Metro station data is sourced from DMRC GTFS feeds under the OTD Delhi data licence. Attribution: Delhi Metro Rail Corporation (DMRC) / Open Transit Delhi (OTD)</li>
+      <li>Community reports submitted by users are licensed to MetroCrowd under a perpetual, royalty-free, non-exclusive licence for the purpose of operating and improving the Service</li>
+    </ul>
+
+    <h2>5. Account Termination</h2>
+    <p>We reserve the right to suspend or terminate accounts that violate these Terms, submit fraudulent crowd reports, abuse the karma system, or engage in conduct that degrades data quality for other users. You may delete your account at any time from <strong>Settings → Account → Delete Account</strong>.</p>
+
+    <h2>6. Modifications to the Service</h2>
+    <p>We may modify, suspend, or discontinue the Service or any feature at any time. We will provide reasonable notice of significant changes via in-app notification or email where practicable.</p>
+
+    <h2>7. Governing Law and Disputes</h2>
+    <p>These Terms are governed by the laws of India. Disputes shall first be attempted to be resolved through good-faith negotiation. If unresolved within 30 days, disputes shall be submitted to arbitration in Delhi under the Arbitration and Conciliation Act, 1996.</p>
+
+    <div class="eff-date">MetroCrowd · metrocrowd.vercel.app · Version 1.0 · 11 March 2026</div>
+  </div>
+
+  <!-- ── DATA DISCLAIMER ──────────────────────────────────────── -->
+  <div id="tab-disclaimer" class="section">
+    <h1>Crowd Data &amp; Recommendations Disclaimer</h1>
+    <div class="subtitle">Effective: 11 March 2026</div>
+
+    <div class="box warn">
+      <div class="box-label warn">⚠ Important — Please Read Before Relying on MetroCrowd Data</div>
+      MetroCrowd crowd levels, coach recommendations, and route suggestions are <strong>estimates only</strong>. They are not guaranteed to be accurate. Always make your own assessment of safety and conditions when travelling on the Delhi Metro.
+    </div>
+
+    <h2>1. Nature of Crowd Data</h2>
+    <p>MetroCrowd generates crowd level estimates using two sources:</p>
+    <ol>
+      <li><strong>Machine learning predictions:</strong> statistical models trained on historical Delhi Metro ridership patterns. These predict likely crowd levels based on time of day, day of week, station tier, and historical trends. They <strong>do not reflect real-time conditions</strong>.</li>
+      <li><strong>Community reports:</strong> crowd level observations submitted voluntarily by MetroCrowd users. These reflect a single user's subjective assessment at a specific time and may not represent current conditions.</li>
+    </ol>
+    <p>The crowd percentage displayed is a weighted blend of these two sources, updated approximately every 60 seconds during operating hours. It is inherently a <strong>lagging indicator</strong>.</p>
+
+    <h2>2. Accuracy Limitations</h2>
+    <ul>
+      <li>Crowd levels can change significantly within minutes, particularly at high-traffic interchange stations during peak hours</li>
+      <li>Community reports depend on user participation. At stations or times with few reports, predictions rely more heavily on historical models</li>
+      <li>Crowd data is <strong>not sourced from DMRC's internal passenger counting systems</strong>. MetroCrowd has no access to real-time passenger data from DMRC</li>
+      <li>Special events, service disruptions, protests, public holidays, and weather events can cause conditions to deviate significantly from predictions</li>
+      <li>Data older than 10 minutes should be treated as <strong>indicative only</strong></li>
+    </ul>
+
+    <h2>3. Coach and Gate Recommendations</h2>
+    <p>Coach recommendations (e.g., "Board Coach 4") are generated from historical crowd distribution models and gate-to-coach proximity data. They <strong>do not account for:</strong></p>
+    <ul>
+      <li>Real-time platform conditions at your specific station</li>
+      <li>Emergency situations, security incidents, or DMRC operational changes</li>
+      <li>Train cancellations, short-terminations, or altered consist configurations</li>
+      <li>Platform edge safety zones and DMRC staff instructions</li>
+      <li>Your specific physical needs, mobility requirements, or personal safety considerations</li>
+    </ul>
+
+    <h2>4. Your Responsibility</h2>
+    <p>By using MetroCrowd, you acknowledge that:</p>
+    <ul>
+      <li>You will exercise your own independent judgement regarding your safety and comfort</li>
+      <li>You will comply with all DMRC rules, regulations, and instructions from DMRC staff at all times, regardless of what MetroCrowd displays</li>
+      <li>You will not rely solely on MetroCrowd data when making time-critical travel decisions</li>
+    </ul>
+
+    <h2>5. Limitation of Liability</h2>
+    <p>To the fullest extent permitted by applicable law, MetroCrowd is provided "as is" without warranties of any kind. MetroCrowd shall not be liable for any direct, indirect, incidental, special, or consequential damages arising from reliance on crowd data, coach recommendations, or route suggestions. The total liability shall not exceed the amount you have paid to use the Service in the preceding 12 months (which, as the Service is currently free, is zero).</p>
+
+    <h2>6. No Endorsement by DMRC</h2>
+    <div class="box info">
+      <div class="box-label info">Independence Notice</div>
+      MetroCrowd is an independent civic technology project. It is <strong>not affiliated with, endorsed by, sponsored by, or officially connected to Delhi Metro Rail Corporation (DMRC)</strong> or any government authority. All DMRC trademarks, station names, and route information are used under applicable fair use provisions for informational purposes only.
+    </div>
+
+    <h2>7. Data Source Attribution</h2>
+    <p>Station topology and route data is derived from DMRC GTFS feeds made available through Open Transit Delhi (OTD). Ridership pattern data is derived from publicly available DMRC Annual Reports. Community reports are user-generated content.</p>
+
+    <h2>Condensed Disclaimer</h2>
+    <div class="box green">
+      <div class="box-label green">In-App Display Text</div>
+      Crowd levels are estimates based on historical patterns and community reports. Not real-time DMRC data. Conditions may differ. Always use your own judgement. MetroCrowd is not affiliated with DMRC.
+    </div>
+
+    <div class="eff-date">MetroCrowd · metrocrowd.vercel.app · 11 March 2026</div>
+  </div>
+
+  <!-- ── CONSENT ───────────────────────────────────────────────── -->
+  <div id="tab-consent" class="section">
+    <h1>User Consent &amp; Onboarding</h1>
+    <div class="subtitle">Version 1.0 &nbsp;·&nbsp; 11 March 2026 &nbsp;·&nbsp; DPDP Act 2023 compliant</div>
+
+    <p>The following consents are presented during account creation. Consent 1 is required to use the Service. Consents 2 and 3 are optional and can be changed at any time from Settings.</p>
+
+    <h2>Consent 1 — Required <span class="tag req">Required</span></h2>
+    <div class="consent-block">
+      <div class="consent-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--y)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Privacy Policy &amp; Terms of Service
+      </div>
+      <div class="consent-body">I have read and agree to MetroCrowd's Privacy Policy and Terms of Service. I understand that MetroCrowd will collect and process my name, email address, home station, saved routes, and crowd reports to provide the Service. I am 18 years of age or older.</div>
+      <div style="margin-top:10px;font-size:11px;color:var(--sub)">This consent covers: account creation &amp; authentication, storage of home station and saved routes, display of first name and last initial in the community feed, anonymisation of crowd reports after 90 days.</div>
+    </div>
+
+    <h2>Consent 2 — Push Notifications <span class="tag opt">Optional</span></h2>
+    <div class="consent-block">
+      <div class="consent-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        Push Notifications
+      </div>
+      <div class="consent-body">I agree to receive push notifications from MetroCrowd, including crowd alerts for my saved routes and service updates. I understand I can withdraw this consent at any time in Settings → Notifications. Notifications will only be sent between 6:00 AM and 9:00 PM.</div>
+    </div>
+
+    <h2>Consent 3 — Analytics <span class="tag opt">Optional</span></h2>
+    <div class="consent-block">
+      <div class="consent-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Anonymous Analytics
+      </div>
+      <div class="consent-body">I agree to share anonymous usage data (pages visited, features used, session duration) to help MetroCrowd improve the Service. No personally identifiable information is shared. No advertising profiles are created.</div>
+    </div>
+
+    <h2>Withdrawing Consent</h2>
+    <table>
+      <tr><th>Consent</th><th>How to Withdraw</th></tr>
+      <tr><td>Privacy Policy / Terms (Consent 1)</td><td>Delete your account at Settings → Account → Delete Account</td></tr>
+      <tr><td>Push Notifications (Consent 2)</td><td>Settings → Notifications → Disable, or revoke in browser settings</td></tr>
+      <tr><td>Anonymous Analytics (Consent 3)</td><td>Settings → Privacy → Disable Usage Analytics</td></tr>
+      <tr><td>Community report participation</td><td>Stop submitting reports. Previously submitted anonymised reports cannot be deleted.</td></tr>
+    </table>
+
+    <div class="eff-date">MetroCrowd · metrocrowd.vercel.app · Version 1.0 · 11 March 2026</div>
+  </div>
+
+</div><!-- /page-wrap -->
+
+<script>
+function showTab(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  const tabs=['privacy','terms','disclaimer','consent'];
+  document.querySelectorAll('.tab')[tabs.indexOf(id)]?.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+// Handle hash navigation
+const hash=location.hash.replace('#','');
+if(['privacy','terms','disclaimer','consent'].includes(hash)) showTab(hash);
+</script>
+</body>
+</html>
