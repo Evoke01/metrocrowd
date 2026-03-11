@@ -295,12 +295,34 @@ window.AUTH = (function(){
     const el=document.getElementById(id); if(el) el.textContent=val;
   }
 
+  // ── Intercept sign-in buttons with LEGAL consent check ────────
+  // Called once after LEGAL.js loads (from ui-proxy.js DOMContentLoaded)
+  function wrapSignInWithConsent(){
+    if(typeof LEGAL === 'undefined') return;
+    const _origGoogle = signInGoogle;
+    const _origGitHub  = signInGitHub;
+    window._authSignInGoogle = LEGAL.interceptSignIn(_origGoogle.bind(this));
+    window._authSignInGitHub  = LEGAL.interceptSignIn(_origGitHub.bind(this));
+    // Patch onclick handlers
+    const gg = document.getElementById('lg-google');
+    const gh = document.getElementById('lg-github');
+    if(gg) gg.onclick = window._authSignInGoogle;
+    if(gh) gh.onclick = window._authSignInGitHub;
+  }
+
+  // After signing in, sync consent to Supabase
+  const _origOnSignedIn = onSignedIn;
+  async function onSignedInWithConsent(user, event){
+    await _origOnSignedIn(user, event);
+    if(typeof LEGAL !== 'undefined') LEGAL.syncConsentToSupabase(user.id);
+  }
+
   // ── Public API ─────────────────────────────────────────────────
   return {
     init, openModal, closeModal,
     signInGoogle, signInGitHub, signOut,
     showGate, hideGate,
-    setStatus,
+    setStatus, wrapSignInWithConsent,
     get currentUser(){ return currentUser; },
     get isSignedIn(){ return !!currentUser; },
   };
