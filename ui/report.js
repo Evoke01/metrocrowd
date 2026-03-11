@@ -43,7 +43,7 @@ window.REPORT_UI = (function(){
   }
 
   function submit(){
-    if(!_station || !_level){ NAV.showToast('⚠','Pick a station and crowd level first'); return; }
+    if(!_station || !_level){ NAV.showToast('warn','Pick a station and crowd level first'); return; }
 
     // Optimistic local update
     CROWD.state.userReports[_station] = _level;
@@ -106,7 +106,7 @@ window.REPORT_UI = (function(){
     el.className = 'fi';
     const lv = row.level;
     const c  = lv==='empty'?'var(--low)':lv==='moderate'?'var(--y)':'#f87171';
-    const icon = lv==='empty'?'🟢':lv==='moderate'?'🟡':'🔴';
+    const icon = '';
     const emoji2 = lv==='empty'?'😌':lv==='moderate'?'🙂':lv==='crowded'?'😰':'😱';
     el.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--card);border:1px solid var(--brd);border-radius:12px;margin-bottom:7px';
     el.innerHTML = `<div style="font-size:18px">${emoji2}</div>
