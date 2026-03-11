@@ -45,6 +45,8 @@ window.HOME_UI = (function(){
   }
 
   async function _render(){
+    // If commute is active, let commute.js own the hero card
+    if(typeof COMMUTE !== 'undefined' && COMMUTE.getDirection()) return;
     if(!_station) return;
     const s = METRO.STATIONS[_station]; if(!s) return;
 
