@@ -1,4 +1,11 @@
 window.APP=(function(){
+  // Register service worker on load
+  if("serviceWorker" in navigator){
+    window.addEventListener("load",function(){
+      navigator.serviceWorker.register("/sw.js",{scope:"/"}).then(function(r){console.log("[SW] registered");}).catch(function(e){console.warn("[SW] failed",e);});
+    });
+  }
+
   let liveTimer=null;
 
   async function init(){
