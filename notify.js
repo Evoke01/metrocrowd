@@ -194,10 +194,21 @@ window.NOTIFY = (function(){
   //  PUSH NOTIFICATION DELIVERY
   // ══════════════════════════════════════════════════════════════
 
+  // VAPID public key for Web Push
+  const VAPID_PUBLIC_KEY = 'BItVbDlM60tfdXRCsBUV6ZHH7mSPER7K0x9GuCpIEJEibNhyW6-xFNFcL-57SzzQOglhT1ptTF-jvcoBZTpbJPU';
+
+  function urlBase64ToUint8Array(base64String){
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding).replace(/-/g,'+').replace(/_/g,'/');
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    for(let i=0;i<rawData.length;++i) outputArray[i]=rawData.charCodeAt(i);
+    return outputArray;
+  }
+
   async function initPush(){
     if(!('serviceWorker' in navigator) || !('Notification' in window)) return false;
 
-    // Register service worker
     try{
       const reg = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
       state.swReady = true;
@@ -210,11 +221,44 @@ window.NOTIFY = (function(){
         }
       });
 
+      // Create Web Push subscription if permission granted
+      if(Notification.permission === 'granted'){
+        await registerPushSubscription(reg);
+      }
+
       console.log('[NOTIFY] Service worker registered');
       return reg;
     }catch(err){
       console.warn('[NOTIFY] SW registration failed:', err.message);
       return false;
+    }
+  }
+
+  async function registerPushSubscription(reg){
+    try{
+      // Check existing subscription first
+      let sub = await reg.pushManager.getSubscription();
+      if(!sub){
+        sub = await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+        });
+      }
+      state.pushSubscription = sub;
+      // Send subscription to Render backend
+      await fetch('https://metrocrowd.onrender.com/push/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          subscription: sub.toJSON(),
+          user_id: AUTH?.currentUser?.id || 'anon',
+        }),
+      });
+      console.log('[NOTIFY] Push subscription registered');
+      return sub;
+    }catch(err){
+      console.warn('[NOTIFY] Push subscription failed:', err.message);
+      return null;
     }
   }
 
@@ -225,6 +269,10 @@ window.NOTIFY = (function(){
 
     const result = await Notification.requestPermission();
     state.pushEnabled = result === 'granted';
+    if(result === 'granted'){
+      const reg = await navigator.serviceWorker.ready;
+      await registerPushSubscription(reg);
+    }
     return result;
   }
 
