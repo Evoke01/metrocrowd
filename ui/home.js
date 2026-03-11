@@ -14,6 +14,9 @@ window.HOME_UI = (function(){
   function init(){
     _buildGreeting();
     setInterval(_buildGreeting, 60000);
+    // Load service alerts (non-blocking, show only if alerts exist)
+    setTimeout(_loadAlerts, 2000);
+    setInterval(_loadAlerts, 5 * 60 * 1000); // refresh every 5 min
 
     // Default to Rajiv Chowk
     if(!_station){
@@ -124,6 +127,20 @@ window.HOME_UI = (function(){
         </div>
       </div>`;
     }).join('');
+  }
+
+  async function _loadAlerts(){
+    if(typeof REALTIME === 'undefined') return;
+    const alerts = await REALTIME.getAlerts();
+    const wrap    = document.getElementById('home-alerts');
+    const content = document.getElementById('home-alerts-content');
+    if(!wrap || !content) return;
+    if(alerts && alerts.length){
+      wrap.style.display = 'block';
+      REALTIME.renderAlerts(content);
+    } else {
+      wrap.style.display = 'none';
+    }
   }
 
   return { init, refresh, setStation, get station(){ return _station; } };

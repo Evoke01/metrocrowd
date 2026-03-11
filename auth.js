@@ -69,7 +69,7 @@ window.AUTH = (function(){
     // If user just signed in (not a restore), show welcome toast
     if(event === 'SIGNED_IN'){
       const name = displayName(user);
-      SB.showToast(`✓ Welcome${name ? ', '+name : ''}! Reports now sync across devices.`);
+      SB.showToast(`Welcome${name ? ', '+name : ''}! Reports now sync across devices.`);
     }
 
     // Load report count for profile
@@ -185,7 +185,7 @@ window.AUTH = (function(){
       btn.style.borderColor = 'rgba(0,230,118,.35)';
       btn.title = `Signed in via ${provider}`;
     } else {
-      avatar.textContent = '👤';
+      avatar.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
       avatar.style.background = 'var(--border)';
       label.textContent = 'Sign in';
       label.style.color = 'var(--muted)';
@@ -205,9 +205,7 @@ window.AUTH = (function(){
     const email     = user.email || '';
     const avatarUrl = user.user_metadata?.avatar_url || '';
     const provider  = (user.app_metadata?.provider||'email').toLowerCase();
-    const provLabel = provider==='google'  ? '🔵 Google'
-                    : provider==='github'  ? '⚫ GitHub'
-                    : '✉ Email';
+    const provLabel = provider==='google' ? 'Google' : provider==='github' ? 'GitHub' : 'Email';
     const since = user.created_at
       ? new Date(user.created_at).toLocaleDateString('en-IN',{month:'short',year:'numeric'})
       : '—';

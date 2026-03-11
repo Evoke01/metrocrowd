@@ -377,12 +377,12 @@ window.COMMUTE = (function () {
           <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#fff">Smart Commute</div>
           <button onclick="document.getElementById('commute-modal').remove()"
             style="background:#1e1e1e;border:1px solid #333;color:#666;width:30px;height:30px;
-            border-radius:50%;font-size:14px;cursor:pointer">✕</button>
+            border-radius:50%;font-size:14px;cursor:pointer"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         </div>
 
         <!-- Home station -->
         <div style="margin-bottom:12px">
-          <div style="font-size:10px;color:var(--sub);margin-bottom:6px;letter-spacing:.05em">🏠 HOME STATION</div>
+          <div style="font-size:10px;color:var(--sub);margin-bottom:6px;letter-spacing:.05em;display:flex;align-items:center;gap:5px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>HOME STATION</div>
           <div id="cm-home-row" onclick="COMMUTE._pickStation('home')"
             style="background:#1a1a1a;border:1px solid #333;border-radius:12px;
             padding:12px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between">
@@ -395,7 +395,7 @@ window.COMMUTE = (function () {
 
         <!-- Work station -->
         <div style="margin-bottom:20px">
-          <div style="font-size:10px;color:var(--sub);margin-bottom:6px;letter-spacing:.05em">🏢 WORK / DESTINATION</div>
+          <div style="font-size:10px;color:var(--sub);margin-bottom:6px;letter-spacing:.05em;display:flex;align-items:center;gap:5px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="1"/><rect x="8" y="6" width="2" height="2"/><rect x="14" y="6" width="2" height="2"/><rect x="8" y="11" width="2" height="2"/><rect x="14" y="11" width="2" height="2"/></svg>WORK / DESTINATION</div>
           <div id="cm-work-row" onclick="COMMUTE._pickStation('work')"
             style="background:#1a1a1a;border:1px solid #333;border-radius:12px;
             padding:12px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between">
@@ -409,13 +409,18 @@ window.COMMUTE = (function () {
         <!-- Features list -->
         <div style="background:#1a1a1a;border-radius:12px;padding:12px 14px;margin-bottom:20px">
           ${[
-            ['🕐','Auto direction','Morning = home→work, Evening = work→home'],
-            ['🚃','Coach pick',    'Best coach for your exact journey'],
-            ['📊','Live crowd',    'Real-time % at your departure station'],
-            ['⚡','One tap go',    '"Leaving Now" pre-fills the Route planner'],
+            ['clock','Auto direction','Morning = home→work, Evening = work→home'],
+            ['train','Coach pick',    'Best coach for your exact journey'],
+            ['chart','Live crowd',    'Real-time % at your departure station'],
+            ['lightning','One tap go',    '"Leaving Now" pre-fills the Route planner'],
           ].map(([ico,t,d]) => `
             <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:10px">
-              <div style="font-size:14px;flex-shrink:0">${ico}</div>
+              <div style="flex-shrink:0;color:var(--sub)">${
+              ico==='clock'     ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' :
+              ico==='train'     ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="11" rx="2"/><line x1="7" y1="12" x2="17" y2="12"/></svg>' :
+              ico==='chart'     ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>' :
+              '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>'
+            }</div>
               <div>
                 <div style="font-size:11px;font-weight:700;color:#ccc">${t}</div>
                 <div style="font-size:10px;color:#555;margin-top:1px">${d}</div>

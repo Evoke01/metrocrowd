@@ -59,7 +59,7 @@
     </div>
 
     <!-- Illustration -->
-    <div style="font-size:52px;margin-bottom:20px;opacity:.85">🚇</div>
+    <div style="margin-bottom:20px;color:var(--y);opacity:.85"><svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="11" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><line x1="7" y1="12" x2="17" y2="12"/><path d="M7 18l-2 3M17 18l2 3"/></svg></div>
 
     <!-- Headline -->
     <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#EFEFEF;text-align:center;margin-bottom:8px;line-height:1.2">
@@ -120,7 +120,7 @@
     <div id="sbar-brand">Metro<em>Crowd</em></div>
     <div id="sbar-right">
       <span id="sbar-clock"></span>
-      <div id="auth-btn" title="Account" onclick="AUTH.openModal()">😊</div>
+      <div id="auth-btn" title="Account" onclick="AUTH.openModal()" style="color:var(--sub)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
     </div>
   </div>
 
@@ -144,6 +144,16 @@
 
         <!-- Smart Commute card -->
         <div id="commute-card"></div>
+
+        <!-- Service Alerts (GTFS-RT) -->
+        <div id="home-alerts" style="display:none;background:var(--card);border:1px solid var(--brd);
+          border-radius:16px;overflow:hidden;margin-bottom:12px">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--brd)">
+            <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--txt)">Service Alerts</div>
+            <div style="font-size:9px;color:var(--sub)">Live</div>
+          </div>
+          <div id="home-alerts-content"></div>
+        </div>
 
         <!-- Hero route card -->
         <div class="hero-card" onclick="UI.navTo('s-route')" id="hero-card">
@@ -205,7 +215,7 @@
 
         <!-- Empty state when no station selected -->
         <div id="stn-empty" style="text-align:center;padding:48px 20px">
-          <div style="font-size:40px;margin-bottom:12px">🚇</div>
+          <div style="margin-bottom:12px;color:var(--sub)"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="11" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><line x1="7" y1="12" x2="17" y2="12"/><path d="M7 18l-2 3M17 18l2 3"/></svg></div>
           <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--txt);margin-bottom:6px">Instant Crowd Lookup</div>
           <div style="font-size:12px;color:var(--sub);line-height:1.6">Search any Delhi Metro station above<br>or tap the GPS button to auto-detect</div>
         </div>
@@ -255,6 +265,16 @@
           <div id="mf-card" style="display:none;background:var(--card);border:1px solid var(--brd);border-radius:16px;padding:14px;margin-bottom:12px">
             <div style="font-size:10px;color:var(--sub);letter-spacing:.08em;text-transform:uppercase;font-family:'Syne',sans-serif;margin-bottom:10px">Next 4 Hours</div>
             <div id="mf-rows"></div>
+          </div>
+
+          <!-- Live ETAs (GTFS-RT) -->
+          <div id="stn-etas" style="display:none;background:var(--card);border:1px solid var(--brd);
+            border-radius:16px;overflow:hidden;margin-bottom:12px">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--brd)">
+              <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--txt)">Next Arrivals</div>
+              <div style="display:flex;align-items:center;gap:4px"><div class="ldot"></div><span style="font-size:9px;color:var(--sub)">GTFS-RT</span></div>
+            </div>
+            <div id="stn-etas-content" style="padding:0 14px"></div>
           </div>
 
           <!-- Go to Coach + Route buttons -->
@@ -321,7 +341,7 @@
         <!-- Dynamic coach content -->
         <div id="coach-content">
           <div class="empty-state">
-            <div class="es-icon">🚇</div>
+            <div class="es-icon" style="color:var(--sub)"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="11" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><line x1="7" y1="12" x2="17" y2="12"/><path d="M7 18l-2 3M17 18l2 3"/></svg></div>
             <div class="es-title">Pick a station & line</div>
             <div class="es-sub">We'll show which coach to board based on real gate positions and crowd patterns</div>
           </div>
@@ -390,7 +410,7 @@
         <div style="background:linear-gradient(135deg,rgba(245,168,0,.12),rgba(245,168,0,.04));
           border:1px solid rgba(245,168,0,.25);border-radius:16px;padding:14px 16px;
           display:flex;align-items:center;gap:12px;margin-bottom:16px">
-          <div style="font-size:28px">🏅</div>
+          <div style="color:var(--y)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="15" r="7"/><polyline points="8.56 2.9 7 6 2 6 5.5 9 4 13"/><polyline points="15.44 2.9 17 6 22 6 18.5 9 20 13"/><line x1="12" y1="12" x2="12" y2="15"/></svg></div>
           <div style="flex:1">
             <div style="font-size:11px;font-weight:700;color:var(--txt)">Your impact this week</div>
             <div style="font-size:10px;color:var(--sub);margin-top:1px">Reports submitted</div>
@@ -414,25 +434,25 @@
         <div style="font-size:10px;color:var(--sub);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">Crowd level</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
           <div class="cp" onclick="UI.pickLevel(this)" data-v="empty" style="background:var(--card);border:1.5px solid var(--brd);border-radius:14px;padding:14px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden">
-            <div class="cp-check" style="display:none;position:absolute;top:8px;right:8px;width:18px;height:18px;background:rgba(74,222,128,.2);border-radius:50%;font-size:10px;color:#4ade80;align-items:center;justify-content:center">✓</div>
+            <div class="cp-check" style="display:none;position:absolute;top:8px;right:8px;width:18px;height:18px;background:rgba(74,222,128,.2);border-radius:50%;align-items:center;justify-content:center;color:#4ade80"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
             <div style="font-size:22px;margin-bottom:6px">😌</div>
             <div style="font-size:13px;font-weight:700;color:var(--txt)">Empty</div>
             <div style="font-size:10px;color:var(--sub);margin-top:2px">Seats available</div>
           </div>
           <div class="cp" onclick="UI.pickLevel(this)" data-v="moderate" style="background:var(--card);border:1.5px solid var(--brd);border-radius:14px;padding:14px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden">
-            <div class="cp-check" style="display:none;position:absolute;top:8px;right:8px;width:18px;height:18px;background:rgba(251,191,36,.2);border-radius:50%;font-size:10px;color:#fbbf24;align-items:center;justify-content:center">✓</div>
+            <div class="cp-check" style="display:none;position:absolute;top:8px;right:8px;width:18px;height:18px;background:rgba(251,191,36,.2);border-radius:50%;align-items:center;justify-content:center;color:#fbbf24"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
             <div style="font-size:22px;margin-bottom:6px">🙂</div>
             <div style="font-size:13px;font-weight:700;color:var(--txt)">Moderate</div>
             <div style="font-size:10px;color:var(--sub);margin-top:2px">Some people, comfortable</div>
           </div>
           <div class="cp" onclick="UI.pickLevel(this)" data-v="crowded" style="background:var(--card);border:1.5px solid var(--brd);border-radius:14px;padding:14px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden">
-            <div class="cp-check" style="display:none;position:absolute;top:8px;right:8px;width:18px;height:18px;background:rgba(249,115,22,.2);border-radius:50%;font-size:10px;color:#f97316;align-items:center;justify-content:center">✓</div>
+            <div class="cp-check" style="display:none;position:absolute;top:8px;right:8px;width:18px;height:18px;background:rgba(249,115,22,.2);border-radius:50%;align-items:center;justify-content:center;color:#f97316"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
             <div style="font-size:22px;margin-bottom:6px">😰</div>
             <div style="font-size:13px;font-weight:700;color:var(--txt)">Crowded</div>
             <div style="font-size:10px;color:var(--sub);margin-top:2px">Standing room only</div>
           </div>
           <div class="cp" onclick="UI.pickLevel(this)" data-v="packed" style="background:var(--card);border:1.5px solid var(--brd);border-radius:14px;padding:14px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden">
-            <div class="cp-check" style="display:none;position:absolute;top:8px;right:8px;width:18px;height:18px;background:rgba(239,68,68,.2);border-radius:50%;font-size:10px;color:#ef4444;align-items:center;justify-content:center">✓</div>
+            <div class="cp-check" style="display:none;position:absolute;top:8px;right:8px;width:18px;height:18px;background:rgba(239,68,68,.2);border-radius:50%;align-items:center;justify-content:center;color:#ef4444"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
             <div style="font-size:22px;margin-bottom:6px">😱</div>
             <div style="font-size:13px;font-weight:700;color:var(--txt)">Packed</div>
             <div style="font-size:10px;color:var(--sub);margin-top:2px">Skip — next train</div>
@@ -453,10 +473,10 @@
         <!-- Success state -->
         <div id="rep-ok" style="display:none;text-align:center;padding:20px;background:rgba(74,222,128,.08);
           border:1px solid rgba(74,222,128,.2);border-radius:16px;margin-bottom:14px">
-          <div style="font-size:32px;margin-bottom:8px">✅</div>
+          <div style="margin-bottom:8px;color:#4ade80"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
           <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--txt)">Report submitted!</div>
           <div style="font-size:11px;color:var(--sub);margin-top:4px">Your data helps other commuters</div>
-          <div style="font-size:11px;color:var(--y);margin-top:6px;font-weight:700">+1 🏅 Karma · Total: <span id="rs-karma">0</span></div>
+          <div style="font-size:11px;color:var(--y);margin-top:6px;font-weight:700">+1 ★ Karma · Total: <span id="rs-karma">0</span></div>
         </div>
 
         <!-- Community feed -->
@@ -508,9 +528,9 @@
 
   <!-- ═══ TOAST ════════════════════════════════════════════════ -->
   <div id="toast">
-    <span class="t-ico" id="t-ico">🚇</span>
-    <span class="t-txt" id="t-txt"></span>
-    <span class="t-x" onclick="UI.hideToast()">✕</span>
+    <span class="t-ico" id="tIco" style="display:flex;align-items:center;color:var(--y)"></span>
+    <span class="t-txt" id="tTxt"></span>
+    <span class="t-x" onclick="UI.hideToast()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
   </div>
 
   <!-- ═══ HIDDEN SVG FOR ROUTE DRAW (route.js) ════════════════ -->
@@ -539,8 +559,10 @@
 <script src="ui/station.js" defer></script>
 <script src="ui/route.js" defer></script>
 <script src="ui/report.js" defer></script>
+<script src="icons.js" defer></script>
 <script src="coach.js" defer></script>
 <script src="commute.js" defer></script>
+<script src="realtime.js" defer></script>
 <script src="ui.js" defer></script>
 <!-- entry point -->
 <script src="app.js" defer></script>
@@ -591,7 +613,7 @@
 
       <!-- Loading view -->
       <div id="auth-loading-view" style="display:none;text-align:center;padding:30px 0">
-        <div style="font-size:24px;margin-bottom:10px">⏳</div>
+        <div style="font-size:24px;margin-bottom:10px"></div>
         <div id="auth-loading-msg" style="font-size:12px;color:var(--sub)">Please wait…</div>
       </div>
     </div>

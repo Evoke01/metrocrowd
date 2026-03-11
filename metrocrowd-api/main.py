@@ -15,6 +15,7 @@ from routers.predict  import router as predict_router
 from routers.stations import router as stations_router
 from routers.push     import router as push_router
 from routers.reports  import router as reports_router
+from routers.realtime import router as realtime_router
 
 app = FastAPI(title="MetroCrowd API", version="1.0.0")
 
@@ -32,6 +33,7 @@ app.include_router(predict_router,  prefix="/predict",  tags=["ML"])
 app.include_router(stations_router, prefix="/stations", tags=["Stations"])
 app.include_router(push_router,     prefix="/push",     tags=["Push"])
 app.include_router(reports_router,  prefix="/reports",  tags=["Reports"])
+app.include_router(realtime_router, prefix="/realtime", tags=["Realtime"])
 
 @app.get("/health")
 def health():

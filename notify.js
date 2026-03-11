@@ -116,7 +116,7 @@ window.NOTIFY = (function(){
       direction,
       severity,
       label: `${absDelta}% ${direction} than predicted`,
-      icon:  severity === 'high' ? '⚡' : '⚠️',
+      icon:  severity === 'high' ? 'urgent' : 'warning',
       color: severity === 'high' ? '#FF1744' : '#FF6D00',
       detected: Date.now(),
     };
@@ -283,7 +283,7 @@ window.NOTIFY = (function(){
     try{
       const n = new Notification(title, {
         body,
-        icon:    icon || '🚇',
+        icon: icon || '🚇',
         tag:     tag  || 'metro-alert',
         requireInteraction: urgency === 'high',
         data: { stationId, url: url || window.location.href },
@@ -307,7 +307,7 @@ window.NOTIFY = (function(){
     if(!state.pushEnabled){
       const perm = await requestPermission();
       if(perm === 'denied'){
-        SB.showToast('🔕 Notifications blocked. Enable in browser settings.');
+        SB.showToast('Notifications blocked. Enable in browser settings.');
         return false;
       }
     }
@@ -321,7 +321,7 @@ window.NOTIFY = (function(){
     }
 
     const s = METRO.STATIONS[stationId];
-    SB.showToast(`🔔 Subscribed to ${s?.n || stationId}`);
+    SB.showToast(`Subscribed to ${s?.n || stationId}`);
     updateSubButtons(stationId, true);
 
     // Run initial checks immediately
@@ -336,7 +336,7 @@ window.NOTIFY = (function(){
       saveSubscriptionToDB(stationId, false);
     }
     const s = METRO.STATIONS[stationId];
-    SB.showToast(`🔕 Unsubscribed from ${s?.n || stationId}`);
+    SB.showToast(`Unsubscribed from ${s?.n || stationId}`);
     updateSubButtons(stationId, false);
   }
 
@@ -399,7 +399,7 @@ window.NOTIFY = (function(){
   function updateSubButtons(stationId, isSub){
     const btn = document.getElementById('sp-sub-btn');
     if(!btn || btn.dataset.id !== stationId) return;
-    btn.textContent  = isSub ? '🔔 Subscribed' : '🔕 Subscribe';
+    btn.innerHTML = isSub ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg> Subscribed' : '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg> Subscribe';
     btn.dataset.sub  = isSub ? '1' : '0';
     btn.style.background = isSub ? 'rgba(0,230,118,.12)' : '';
     btn.style.borderColor = isSub ? 'rgba(0,230,118,.4)' : '';
