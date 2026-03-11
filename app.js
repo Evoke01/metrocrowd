@@ -20,6 +20,7 @@ window.APP=(function(){
     }
 
     UI.init();
+    if(typeof COMMUTE !== 'undefined') COMMUTE.init();
 
     window.addEventListener('resize',()=>{
       if(typeof MAP!=='undefined'&&MAP.resize) MAP.resize();
