@@ -145,6 +145,16 @@
         <!-- Smart Commute card -->
         <div id="commute-card"></div>
 
+        <!-- Service Alerts (GTFS-RT) -->
+        <div id="home-alerts" style="display:none;background:var(--card);border:1px solid var(--brd);
+          border-radius:16px;overflow:hidden;margin-bottom:12px">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--brd)">
+            <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--txt)">Service Alerts</div>
+            <div style="font-size:9px;color:var(--sub)">Live</div>
+          </div>
+          <div id="home-alerts-content"></div>
+        </div>
+
         <!-- Hero route card -->
         <div class="hero-card" onclick="UI.navTo('s-route')" id="hero-card">
           <div class="hero-badge"><div class="ldot"></div>YOUR ROUTE · LIVE CROWD</div>
@@ -255,6 +265,16 @@
           <div id="mf-card" style="display:none;background:var(--card);border:1px solid var(--brd);border-radius:16px;padding:14px;margin-bottom:12px">
             <div style="font-size:10px;color:var(--sub);letter-spacing:.08em;text-transform:uppercase;font-family:'Syne',sans-serif;margin-bottom:10px">Next 4 Hours</div>
             <div id="mf-rows"></div>
+          </div>
+
+          <!-- Live ETAs (GTFS-RT) -->
+          <div id="stn-etas" style="display:none;background:var(--card);border:1px solid var(--brd);
+            border-radius:16px;overflow:hidden;margin-bottom:12px">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--brd)">
+              <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--txt)">Next Arrivals</div>
+              <div style="display:flex;align-items:center;gap:4px"><div class="ldot"></div><span style="font-size:9px;color:var(--sub)">GTFS-RT</span></div>
+            </div>
+            <div id="stn-etas-content" style="padding:0 14px"></div>
           </div>
 
           <!-- Go to Coach + Route buttons -->
@@ -542,6 +562,7 @@
 <script src="icons.js" defer></script>
 <script src="coach.js" defer></script>
 <script src="commute.js" defer></script>
+<script src="realtime.js" defer></script>
 <script src="ui.js" defer></script>
 <!-- entry point -->
 <script src="app.js" defer></script>
