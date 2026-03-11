@@ -20,10 +20,11 @@
 <script defer src="/_app/static/js/analytics.js" onerror="void 0"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
 <script>
-// Android Chrome 100vh fix — runs before paint
+// Android Chrome height fix — runs before paint
 (function(){
   function fix(){
     var h = window.innerHeight+'px';
+    document.body.style.height = h;
     var app = document.getElementById('app');
     if(app){ app.style.height = h; }
     var gate = document.getElementById('login-gate');
@@ -32,7 +33,6 @@
   fix();
   window.addEventListener('resize', fix, {passive:true});
   window.addEventListener('orientationchange', function(){ setTimeout(fix,200); }, {passive:true});
-  // Also fix after any visual viewport change (Android keyboard etc)
   if(window.visualViewport){
     window.visualViewport.addEventListener('resize', fix, {passive:true});
   }
@@ -451,18 +451,28 @@
 
 </div><!-- /app -->
 
-<script src="anon.js" defer></script>
+<!-- core data + engines (no DOM deps) -->
+<script src="data.js" defer></script>
+<script src="crowd.js" defer></script>
+<script src="route.js" defer></script>
+<script src="gps.js" defer></script>
+<script src="news.js" defer></script>
+<script src="notify.js" defer></script>
+<!-- backend bridge -->
+<script src="api.js" defer></script>
+<!-- auth + db -->
 <script src="supabase.js" defer></script>
 <script src="auth.js" defer></script>
-<script src="data.js" defer></script>
+<!-- ui modules (load order matters — nav first, ui.js last) -->
+<script src="ui/nav.js" defer></script>
+<script src="ui/search.js" defer></script>
+<script src="ui/home.js" defer></script>
+<script src="ui/station.js" defer></script>
+<script src="ui/route.js" defer></script>
+<script src="ui/report.js" defer></script>
 <script src="coach.js" defer></script>
-<script src="crowd.js" defer></script>
-<script src="map.js" defer></script>
-<script src="news.js" defer></script>
-<script src="gps.js" defer></script>
-<script src="route.js" defer></script>
 <script src="ui.js" defer></script>
-<script src="notify.js" defer></script>
+<!-- entry point -->
 <script src="app.js" defer></script>
 
   <!-- ── AUTH MODAL ──────────────────────────────────────────────── -->
