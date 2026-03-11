@@ -106,10 +106,78 @@
       <div style="font-size:13px;color:rgba(255,255,255,.4)" id="lg-loading-msg">Redirecting…</div>
     </div>
 
-    <!-- Footer -->
-    <div style="font-size:11px;color:rgba(255,255,255,.2);text-align:center;margin-top:16px;line-height:1.7">
+    <!-- Consent step (shown after clicking sign-in, before OAuth) -->
+    <div id="lg-consent" style="display:none;width:100%;max-width:360px">
+      <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:#efefef;
+        text-align:center;margin-bottom:4px">Before you continue</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.35);text-align:center;margin-bottom:20px">
+        Please review and accept to proceed</div>
+
+      <!-- Consent 1 - Required -->
+      <label id="lg-c1-label" style="display:flex;align-items:flex-start;gap:12px;padding:14px;
+        background:#141414;border:1.5px solid #ef444433;border-radius:14px;cursor:pointer;margin-bottom:10px">
+        <div style="position:relative;flex-shrink:0;margin-top:1px">
+          <input type="checkbox" id="lg-c1" style="width:18px;height:18px;cursor:pointer;accent-color:#FFD000">
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.6);line-height:1.6">
+          I have read and agree to MetroCrowd's
+          <a href="/legal.html#privacy" target="_blank" style="color:#FFD000">Privacy Policy</a> and
+          <a href="/legal.html#terms" target="_blank" style="color:#FFD000">Terms of Service</a>.
+          I understand MetroCrowd will process my name, email, and crowd reports to provide the Service.
+          <strong style="color:#fff">I am 18 years of age or older.</strong>
+          <span style="display:inline-block;margin-left:4px;font-size:9px;padding:1px 5px;
+            border-radius:5px;background:rgba(239,68,68,.2);color:#ef4444;
+            vertical-align:middle;font-weight:700">REQUIRED</span>
+        </div>
+      </label>
+
+      <!-- Consent 2 - Optional -->
+      <label style="display:flex;align-items:flex-start;gap:12px;padding:14px;
+        background:#141414;border:1px solid #222;border-radius:14px;cursor:pointer;margin-bottom:10px">
+        <div style="position:relative;flex-shrink:0;margin-top:1px">
+          <input type="checkbox" id="lg-c2" style="width:18px;height:18px;cursor:pointer;accent-color:#FFD000">
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.5);line-height:1.6">
+          I agree to receive push notifications for crowd alerts and service updates.
+          I can withdraw at any time in Settings.
+          <span style="display:inline-block;margin-left:4px;font-size:9px;padding:1px 5px;
+            border-radius:5px;background:rgba(74,222,128,.1);color:#4ade80;
+            vertical-align:middle;font-weight:700">OPTIONAL</span>
+        </div>
+      </label>
+
+      <!-- Consent 3 - Optional -->
+      <label style="display:flex;align-items:flex-start;gap:12px;padding:14px;
+        background:#141414;border:1px solid #222;border-radius:14px;cursor:pointer;margin-bottom:20px">
+        <div style="position:relative;flex-shrink:0;margin-top:1px">
+          <input type="checkbox" id="lg-c3" style="width:18px;height:18px;cursor:pointer;accent-color:#FFD000">
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.5);line-height:1.6">
+          I agree to share anonymous usage data to help improve MetroCrowd.
+          No personal data shared. No ad profiles created.
+          <span style="display:inline-block;margin-left:4px;font-size:9px;padding:1px 5px;
+            border-radius:5px;background:rgba(74,222,128,.1);color:#4ade80;
+            vertical-align:middle;font-weight:700">OPTIONAL</span>
+        </div>
+      </label>
+
+      <button id="lg-consent-btn" onclick="LEGAL.proceedAfterConsent()" disabled
+        style="width:100%;height:48px;background:#333;color:#666;border:none;border-radius:14px;
+        font-family:'Syne',sans-serif;font-size:14px;font-weight:800;cursor:not-allowed;
+        margin-bottom:12px;transition:all .2s" id="lg-consent-btn">
+        Continue
+      </button>
+      <div onclick="LEGAL.cancelConsent()"
+        style="font-size:11px;color:rgba(255,255,255,.25);text-align:center;cursor:pointer;padding:8px">
+        ← Go back
+      </div>
+    </div>
+
+    <!-- Footer (shown in initial sign-in step) -->
+    <div id="lg-footer" style="font-size:11px;color:rgba(255,255,255,.2);text-align:center;margin-top:16px;line-height:1.7">
       Your reports help 3M+ daily commuters<br>
-      No spam · No ads · Open data
+      No spam · No ads ·
+      <a href="/legal.html" target="_blank" style="color:rgba(255,255,255,.3)">Legal</a>
     </div>
   </div>
 
@@ -616,6 +684,7 @@
       </div>
     </div>
   </div>
+<script src="legal.js" defer></script>
 <script src="ui-proxy.js" defer></script>
 </body>
 </html>
