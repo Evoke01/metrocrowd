@@ -262,9 +262,9 @@ window.COMMUTE = (function () {
   function openSetup() {
     document.getElementById('commute-modal')?.remove();
 
-    // Reset temp state to current saved values each time modal opens
-    _tmpHome = state.homeId;
-    _tmpWork = state.workId;
+    // Only seed from saved state on FIRST open — preserve any in-progress picks
+    if (_tmpHome === null) _tmpHome = state.homeId;
+    if (_tmpWork === null) _tmpWork = state.workId;
 
     const modal = document.createElement('div');
     modal.id = 'commute-modal';
@@ -278,7 +278,7 @@ window.COMMUTE = (function () {
 
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
           <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#fff">Smart Commute</div>
-          <button onclick="document.getElementById('commute-modal').remove()"
+          <button onclick="COMMUTE._cancelSetup()"
             style="background:#1e1e1e;border:1px solid #333;color:#888;width:30px;height:30px;
             border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
@@ -335,7 +335,7 @@ window.COMMUTE = (function () {
       </div>`;
 
     document.body.appendChild(modal);
-    modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+    modal.addEventListener('click', e => { if (e.target === modal) COMMUTE._cancelSetup(); });
   }
 
   // Station picker — opens search overlay, re-opens modal on pick
@@ -364,16 +364,21 @@ window.COMMUTE = (function () {
     document.getElementById('commute-modal')?.remove();
   }
 
+  function _cancelSetup() {
+    // Reset tmp so next open re-seeds from saved state
+    _tmpHome = null;
+    _tmpWork = null;
+    document.getElementById('commute-modal')?.remove();
+  }
+
   // ── Init ──────────────────────────────────────────────────────────────────
   function init() {
-    _tmpHome = state.homeId;
-    _tmpWork = state.workId;
     renderCard();
     setInterval(renderCard, 3 * 60 * 1000);
   }
 
   return {
-    init, renderCard, setup, disable, leaveNow, openSetup,
+    init, renderCard, setup, disable, leaveNow, openSetup, _cancelSetup,
     getTrip, getDirection,
     _pickStation, _onSearchPick, _saveFromModal,
     get state() { return state; },

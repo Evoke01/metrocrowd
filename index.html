@@ -142,26 +142,34 @@
           </div>
         </div>
 
-        <!-- Smart Commute card -->
-        <div id="commute-card"></div>
-
-        <!-- Hero route card -->
-        <div class="hero-card" onclick="UI.navTo('s-route')" id="hero-card">
-          <div class="hero-badge"><div class="ldot"></div>YOUR ROUTE · LIVE CROWD</div>
-          <div class="hero-route">
-            <div class="hero-stn"><div class="hero-stn-name" id="h-from">Rajiv Chowk</div><div class="hero-stn-type">Origin</div></div>
-            <div class="hero-arrow">→</div>
-            <div class="hero-stn" style="text-align:right"><div class="hero-stn-name" id="h-to">Hauz Khas</div><div class="hero-stn-type">Destination</div></div>
-          </div>
-          <div class="hero-crowd">
-            <div class="hero-num" id="h-num">—<sup>%</sup></div>
-            <div class="hero-info">
-              <div class="hero-lbl" id="h-lbl">Loading…</div>
-              <div class="hero-sub" id="h-sub">Yellow Line</div>
-              <div class="hero-bar"><div class="hero-bar-fill" id="h-bar" style="width:0%"></div></div>
+        <!-- Unified hero card — commute.js takes this over when set up, else shows standard route -->
+        <div id="hero-card" class="hero-card" style="cursor:pointer">
+          <!-- Default: standard route view (commute.js replaces innerHTML when active) -->
+          <div id="hero-default">
+            <div class="hero-badge" style="display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;align-items:center;gap:6px"><div class="ldot"></div>YOUR ROUTE · LIVE CROWD</div>
+              <div id="hero-commute-setup" onclick="event.stopPropagation();COMMUTE.openSetup()"
+                style="font-size:9px;color:var(--sub);padding:3px 8px;border:1px solid var(--brd);
+                border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:4px">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                Set commute
+              </div>
             </div>
+            <div class="hero-route">
+              <div class="hero-stn"><div class="hero-stn-name" id="h-from">Rajiv Chowk</div><div class="hero-stn-type">Origin</div></div>
+              <div class="hero-arrow">→</div>
+              <div class="hero-stn" style="text-align:right"><div class="hero-stn-name" id="h-to">Hauz Khas</div><div class="hero-stn-type">Destination</div></div>
+            </div>
+            <div class="hero-crowd">
+              <div class="hero-num" id="h-num">—<sup>%</sup></div>
+              <div class="hero-info">
+                <div class="hero-lbl" id="h-lbl">Loading…</div>
+                <div class="hero-sub" id="h-sub">Yellow Line</div>
+                <div class="hero-bar"><div class="hero-bar-fill" id="h-bar" style="width:0%"></div></div>
+              </div>
+            </div>
+            <div class="hero-tag" id="h-tag">Tap to plan route</div>
           </div>
-          <div class="hero-tag" id="h-tag">Tap to plan route</div>
         </div>
 
         <!-- Forecast strip -->
@@ -608,6 +616,7 @@
       </div>
     </div>
   </div>
+<script src="ui-proxy.js" defer></script>
 </body>
 </html>
 
