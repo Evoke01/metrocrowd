@@ -150,12 +150,31 @@ window.AUTH = (function(){
   async function fetchReportCount(userId){
     if(!client||!userId) return 0;
     try{
-      const { count } = await client
-        .from('crowd_reports')
-        .select('*', { count:'exact', head:true })
-        .eq('user_id', userId);
-      return count || 0;
-    }catch{ return 0; }
+      // Read from profiles.karma — auto-incremented by DB trigger on every report insert
+      const { data, error } = await client
+        .from('profiles')
+        .select('karma')
+        .eq('id', userId)
+        .single();
+      if(error) throw error;
+      const karma = data?.karma || 0;
+      // Keep local karma in sync with DB
+      localStorage.setItem('v3_karma', karma);
+      return karma;
+    }catch(e){
+      console.warn('[AUTH] fetchReportCount error:', e.message);
+      // Fallback: count directly from crowd_reports
+      try{
+        const { count } = await client
+          .from('crowd_reports')
+          .select('*', { count:'exact', head:true })
+          .eq('user_id', userId);
+        if(count > 0) localStorage.setItem('v3_karma', count);
+        return count || 0;
+      }catch{
+        return parseInt(localStorage.getItem('v3_karma') || '0', 10);
+      }
+    }
   }
 
   // ── Update the small avatar button in the data-bar ─────────────
@@ -214,6 +233,8 @@ window.AUTH = (function(){
     _s('auth-user-email', email);
     _s('auth-user-provider', provLabel);
     _s('auth-stat-reports', String(reports));
+    _s('karma-num', String(reports));
+    _s('rs-karma', String(reports));
     _s('auth-stat-session', since);
 
     const img = document.getElementById('auth-user-avatar');
@@ -242,6 +263,13 @@ window.AUTH = (function(){
     // Show correct inner view
     if(currentUser){
       updateProfileUI(currentUser, reportCount);
+      // Refresh count from DB every time modal opens (keeps it live)
+      fetchReportCount(currentUser.id).then(count => {
+        reportCount = count;
+        _s('auth-stat-reports', String(count));
+        _s('karma-num', String(count));
+        _s('rs-karma', String(count));
+      });
     } else {
       showSignedOutView();
     }
