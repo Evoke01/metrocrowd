@@ -38,6 +38,8 @@ document.addEventListener('DOMContentLoaded', function () {
     UI.submitReport= ()   => REPORT_UI.submit();
 
     console.log('[UI-PROXY] All UI.* delegates wired');
+    if(typeof AUTH !== 'undefined') AUTH.wrapSignInWithConsent();
+    if(typeof LEGAL !== 'undefined') LEGAL.init();
 
   }, 0);
 });
