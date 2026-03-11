@@ -32,12 +32,12 @@
               ${isDesktop ? 'Use as a desktop app — no browser bar' : 'Add to home screen for best experience'}
             </div>
           </div>
-          <button id="ib-x" style="background:none;border:none;color:#666;font-size:20px;cursor:pointer;padding:4px;line-height:1">✕</button>
+          <button id="ib-x" style="background:none;border:none;color:#666;font-size:20px;cursor:pointer;padding:4px;line-height:1"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         </div>
         <div style="display:flex;gap:8px">
           <button id="ib-install" style="flex:1;height:44px;background:#F5A800;border:none;border-radius:12px;
             font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:#000;cursor:pointer">
-            ${isDesktop ? '⊕ Install App' : '📲 Add to Home Screen'}
+            ${isDesktop ? 'Install App' : 'Add to Home Screen'}
           </button>
           <button id="ib-how" style="height:44px;padding:0 14px;background:rgba(255,255,255,.06);
             border:1px solid rgba(255,255,255,.1);border-radius:12px;
@@ -54,7 +54,7 @@
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
           <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#fff">How to install</div>
           <button id="im-x" style="background:#1e1e1e;border:1px solid #333;color:#666;
-            width:30px;height:30px;border-radius:50%;font-size:14px;cursor:pointer">✕</button>
+            width:30px;height:30px;border-radius:50%;font-size:14px;cursor:pointer"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         </div>
         <div id="im-steps"></div>
         <button id="im-install" style="width:100%;height:48px;background:#F5A800;border:none;
