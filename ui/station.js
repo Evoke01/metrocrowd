@@ -65,17 +65,17 @@ window.STATION_UI = (function(){
       const sub  = document.getElementById('sc-sub');
       if(v < 40){
         sc.className = 'safe-card yes';
-        if(icon) icon.textContent = '✓';
+        if(icon) icon.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
         if(ans)  ans.textContent  = 'Good to board now';
         if(sub)  sub.textContent  = 'Low crowd — you should get a seat';
       } else if(v < 70){
         sc.className = 'safe-card';
-        if(icon) icon.textContent = '⚠';
+        if(icon) icon.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
         if(ans)  ans.textContent  = 'Moderate crowd';
         if(sub)  sub.textContent  = 'Standing room — wait may help';
       } else {
         sc.className = 'safe-card no';
-        if(icon) icon.textContent = '✕';
+        if(icon) icon.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
         if(ans)  ans.textContent  = 'Very crowded — try next train';
         if(sub)  sub.textContent  = 'All seats occupied, packed aisles';
       }
@@ -110,8 +110,8 @@ window.STATION_UI = (function(){
   }
 
   function gpsLookup(){
-    if(!navigator.geolocation){ NAV.showToast('📡','GPS not available'); return; }
-    NAV.showToast('📡','Finding nearest station…');
+    if(!navigator.geolocation){ NAV.showToast('gps','GPS not available'); return; }
+    NAV.showToast('gps','Finding nearest station…');
     navigator.geolocation.getCurrentPosition(pos => {
       const {latitude:lat, longitude:lng} = pos.coords;
       let best = null, bestD = Infinity;
@@ -120,8 +120,8 @@ window.STATION_UI = (function(){
         if(st.gps){ const d = Math.hypot(st.gps[0]-lat, st.gps[1]-lng); if(d < bestD){ bestD=d; best=id; } }
       });
       if(best) show(best);
-      else NAV.showToast('📡','No station found nearby');
-    }, () => NAV.showToast('📡','Location access denied'));
+      else NAV.showToast('gps','No station found nearby');
+    }, () => NAV.showToast('gps','Location access denied'));
   }
 
   function goCoachFromHere(){
@@ -132,12 +132,12 @@ window.STATION_UI = (function(){
   function quickReport(el, level){
     document.querySelectorAll('.ir-opt').forEach(o => o.classList.remove('active'));
     el.classList.add('active');
-    if(!_currentId){ NAV.showToast('⚠','No station selected'); return; }
+    if(!_currentId){ NAV.showToast('warn','No station selected'); return; }
     CROWD.state.userReports[_currentId] = level;
     CROWD.recomputeAll();
     show(_currentId);
     if(typeof SB !== 'undefined' && SB.isReady) SB.submitReport(_currentId, level);
-    NAV.showToast('✅','Report submitted — thanks!');
+    NAV.showToast('check','Report submitted — thanks!');
     setTimeout(() => el.classList.remove('active'), 2500);
   }
 
