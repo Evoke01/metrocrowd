@@ -127,11 +127,12 @@ window.COACH = (function () {
   }
 
   function timeTag(h) {
-    if (h>=8&&h<=10)  return '🔴 Morning Peak';
-    if (h>=17&&h<=20) return '🔴 Evening Peak';
-    if (h>=11&&h<=16) return '🟢 Off-Peak';
-    if (h>=21||h<=6)  return '🟢 Late Night';
-    return '🟡 Shoulder';
+    const dot = (col) => `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${col};margin-right:4px;vertical-align:middle"></span>`;
+    if (h>=8&&h<=10)  return dot('#ef4444')+'Morning Peak';
+    if (h>=17&&h<=20) return dot('#ef4444')+'Evening Peak';
+    if (h>=11&&h<=16) return dot('#4ade80')+'Off-Peak';
+    if (h>=21||h<=6)  return dot('#4ade80')+'Late Night';
+    return dot('#fbbf24')+'Shoulder';
   }
 
   function bar(idx, col) {
@@ -164,17 +165,17 @@ window.COACH = (function () {
             ${coaches[1]?`<div style="font-size:11px;color:var(--sub);margin-top:3px">or Coach ${coaches[1].num} as backup</div>`:''}
           </div>
           <div style="text-align:right">
-            <div style="font-size:26px">🚇</div>
+            <div style="color:var(--y)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="11" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><line x1="7" y1="12" x2="17" y2="12"/><path d="M7 18l-2 3M17 18l2 3"/></svg></div>
             <div style="font-size:10px;font-weight:700;color:${lc.col};margin-top:2px">${lc.text}</div>
             <div style="font-size:9px;color:var(--sub)">${n}-coach</div>
           </div>
         </div>
         <div style="display:flex;gap:5px;flex-wrap:wrap">
-          ${best.exitFriendly?`<span style="font-size:9px;padding:3px 8px;border-radius:20px;background:rgba(245,168,0,.12);color:var(--y);border:1px solid rgba(245,168,0,.25)">📍 Near exit</span>`:''}
-          ${best.destExitFriendly&&destName?`<span style="font-size:9px;padding:3px 8px;border-radius:20px;background:rgba(74,222,128,.1);color:#4ade80;border:1px solid rgba(74,222,128,.25)">🎯 Near ${destName} exit</span>`:''}
-          ${best.hasLift?`<span style="font-size:9px;padding:3px 8px;border-radius:20px;background:rgba(129,140,248,.12);color:#818cf8;border:1px solid rgba(129,140,248,.25)">♿ Lift here</span>`:''}
+          ${best.exitFriendly?`<span style="font-size:9px;padding:3px 8px;border-radius:20px;background:rgba(245,168,0,.12);color:var(--y);border:1px solid rgba(245,168,0,.25);display:inline-flex;align-items:center;gap:3px"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Near exit</span>`:''}
+          ${best.destExitFriendly&&destName?`<span style="font-size:9px;padding:3px 8px;border-radius:20px;background:rgba(74,222,128,.1);color:#4ade80;border:1px solid rgba(74,222,128,.25);display:inline-flex;align-items:center;gap:3px"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Near ${destName} exit</span>`:''}
+          ${best.hasLift?`<span style="font-size:9px;padding:3px 8px;border-radius:20px;background:rgba(129,140,248,.12);color:#818cf8;border:1px solid rgba(129,140,248,.25);display:inline-flex;align-items:center;gap:3px"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><path d="M6 9h12l-2 9H8L6 9z"/></svg>Lift</span>`:''}
           <span style="font-size:9px;padding:3px 8px;border-radius:20px;background:rgba(255,255,255,.05);color:var(--sub);border:1px solid var(--brd)">${timeTag(h)}</span>
-          <span style="font-size:9px;padding:3px 8px;border-radius:20px;background:rgba(255,255,255,.05);color:var(--sub);border:1px solid var(--brd)">${platformType==='U'?'🔽 Underground':'🔼 Elevated'}</span>
+          <span style="font-size:9px;padding:3px 8px;border-radius:20px;background:rgba(255,255,255,.05);color:var(--sub);border:1px solid var(--brd)">${platformType==='U'?'↓ Underground':'↑ Elevated'}</span>
         </div>
       </div>`;
 
@@ -183,7 +184,7 @@ window.COACH = (function () {
       <div onclick="COACH_UI.openDestPicker()"
         style="background:var(--card2);border:1px dashed var(--brd);border-radius:12px;
           padding:10px 14px;margin-bottom:12px;cursor:pointer;display:flex;align-items:center;gap:10px">
-        <div style="font-size:18px">🎯</div>
+        <div style="color:var(--sub)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
         <div style="flex:1">
           <div style="font-size:11px;font-weight:700;color:var(--txt)">Add destination</div>
           <div style="font-size:10px;color:var(--sub);margin-top:1px">Get exit-optimised coach for where you're going</div>
@@ -192,7 +193,7 @@ window.COACH = (function () {
       </div>` : `
       <div style="background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.2);
         border-radius:12px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px">
-        <div style="font-size:16px">🎯</div>
+        <div style="color:#4ade80"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
         <div style="flex:1">
           <div style="font-size:9px;color:var(--sub)">Destination</div>
           <div style="font-size:12px;font-weight:700;color:#4ade80">${destName}</div>
@@ -218,11 +219,11 @@ window.COACH = (function () {
           font-size:6px;background:var(--y);color:#000;padding:1px 5px;border-radius:4px;
           font-weight:800;white-space:nowrap">BEST</div>`:''}
         <div style="font-size:13px;font-weight:900;font-family:'Syne',sans-serif;color:${nc};line-height:1">${c.num}</div>
-        ${isL?`<div style="font-size:10px;color:#f9a8d4;margin-top:3px">♀</div>`:
+        ${isL?`<div style="color:#f9a8d4;margin-top:3px"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M12 13v8M9 18h6"/></svg></div>`:
           `<div style="height:3px;width:80%;border-radius:2px;background:${cl2.col};opacity:.7;margin-top:4px"></div>`}
         ${c.exitFriendly&&!isL?`<div style="font-size:6px;color:var(--y);margin-top:2px">exit</div>`:''}
         ${c.destExitFriendly&&destId&&!isL?`<div style="font-size:6px;color:#4ade80;margin-top:1px">dest</div>`:''}
-        ${c.hasLift&&!isL?`<div style="font-size:6px;color:#818cf8;margin-top:1px">♿</div>`:''}
+        ${c.hasLift&&!isL?`<div style="color:#818cf8;margin-top:1px"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><path d="M6 9h12l-2 9H8L6 9z"/></svg></div>`:''}
       </div>`;
     }).join('');
 
@@ -238,7 +239,7 @@ window.COACH = (function () {
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
           <div style="font-size:9px;color:var(--sub);display:flex;align-items:center;gap:3px"><div style="width:10px;height:3px;background:var(--y);border-radius:2px"></div>Best</div>
           <div style="font-size:9px;color:var(--sub);display:flex;align-items:center;gap:3px"><div style="width:10px;height:3px;background:#4ade80;border-radius:2px"></div>Good</div>
-          <div style="font-size:9px;color:#f9a8d4">♀ Ladies only</div>
+          <div style="font-size:9px;color:#f9a8d4;display:flex;align-items:center;gap:3px"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M12 13v8M9 18h6"/></svg>Ladies only</div>
         </div>
       </div>`;
 
@@ -254,12 +255,12 @@ window.COACH = (function () {
           <div style="display:flex;align-items:center;gap:5px;margin-bottom:2px">
             <span style="font-size:11px;font-weight:700;color:${cl2.col}">${cl2.text}</span>
             ${c.exitFriendly?`<span style="font-size:9px;color:var(--y);background:rgba(245,168,0,.1);padding:1px 6px;border-radius:8px">near exit</span>`:''}
-            ${c.destExitFriendly&&destId?`<span style="font-size:9px;color:#4ade80;background:rgba(74,222,128,.08);padding:1px 6px;border-radius:8px">🎯 dest exit</span>`:''}
-            ${c.hasLift?`<span style="font-size:9px;color:#818cf8;background:rgba(129,140,248,.08);padding:1px 6px;border-radius:8px">♿</span>`:''}
+            ${c.destExitFriendly&&destId?`<span style="font-size:9px;color:#4ade80;background:rgba(74,222,128,.08);padding:1px 6px;border-radius:8px;display:inline-flex;align-items:center;gap:2px"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="2"/></svg>dest exit</span>`:''}
+            ${c.hasLift?`<span style="font-size:9px;color:#818cf8;background:rgba(129,140,248,.08);padding:1px 6px;border-radius:8px;display:inline-flex;align-items:center"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><path d="M6 9h12l-2 9H8L6 9z"/></svg></span>`:''}
           </div>
           ${bar(c.crowd,cl2.col)}
         </div>
-        ${i===0?`<div style="font-size:16px">⭐</div>`:''}
+        ${i===0?`<div style="color:var(--y)"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>`:''}
       </div>`;
     }).join('');
 
@@ -281,7 +282,7 @@ window.COACH = (function () {
     const ladiesNote = `
       <div style="background:rgba(236,72,153,.06);border:1px solid rgba(236,72,153,.2);
         border-radius:10px;padding:10px 12px;margin-top:8px;display:flex;align-items:center;gap:10px">
-        <div style="font-size:14px">♀</div>
+        <div style="color:#f9a8d4"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M12 13v8M9 18h6"/></svg></div>
         <div style="font-size:10px;color:var(--sub);line-height:1.5">
           <b style="color:#f9a8d4">Coach 1</b> always reserved for women.
           ${isTerm?`<b style="color:#f9a8d4">Coach ${n}</b> also reserved at this terminal.`:''}
