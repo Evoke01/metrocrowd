@@ -78,6 +78,7 @@ window.SEARCH = (function(){
     else if(_mode === 'station')                  STATION_UI.show(id);
     else if(_mode === 'coach-station')            COACH_UI.setStation(id);
     else if(_mode === 'coach-dest')               COACH_UI.setDest(id);
+    else if(_mode === 'commute-pick')             COMMUTE._onSearchPick(id);
     else if(_mode === 'r-from')                   ROUTE_UI.setStation('from', id);
     else if(_mode === 'r-to')                     ROUTE_UI.setStation('to', id);
     else if(_mode === 'report')                   REPORT_UI.setStation(id);
