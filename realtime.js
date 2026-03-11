@@ -1,177 +1,118 @@
 // ─────────────────────────────────────────────────────────────────────────────
-//  REALTIME.js — Live train ETAs + service alerts via OTD GTFS-RT
-//  All OTD API calls go through the Render backend (API key is server-side)
+//  REALTIME.js — OTD live bus positions
+//  OTD only publishes VehiclePositions.pb (Delhi cluster buses + DTC)
+//  No TripUpdates, no Alerts feed exists on OTD.
 //
 //  Public API:
-//    REALTIME.getStation(stopId)  → { arrivals, alerts }
-//    REALTIME.getAlerts()         → alerts array
-//    REALTIME.renderETAs(el, stopId)  → injects ETA cards into el
-//    REALTIME.renderAlerts(el)    → injects alert cards into el
+//    REALTIME.getNearby(lat, lng, radius)  → vehicles near a point
+//    REALTIME.renderNearby(el, lat, lng)   → renders nearby buses into el
+//    REALTIME.getStatus()                  → feed health check
 // ─────────────────────────────────────────────────────────────────────────────
 window.REALTIME = (function () {
   'use strict';
 
-  const BASE = 'https://metrocrowd.onrender.com/realtime';
-  const TTL  = 30_000; // 30 s client-side cache
+  const BASE  = 'https://metrocrowd.onrender.com/realtime';
+  const TTL   = 30_000;
   const _cache = {};
 
   async function _get(path) {
     const now = Date.now();
     if (_cache[path] && now - _cache[path].ts < TTL) return _cache[path].data;
     try {
-      const r = await fetch(BASE + path, { signal: AbortSignal.timeout(8000) });
+      const r = await fetch(BASE + path, { signal: AbortSignal.timeout(9000) });
       if (!r.ok) throw new Error(r.status);
       const data = await r.json();
       _cache[path] = { data, ts: now };
       return data;
-    } catch (e) {
-      // Return stale cache on error
+    } catch {
       return _cache[path]?.data || null;
     }
   }
 
-  // ── PUBLIC ───────────────────────────────────────────────────────────────
-
-  async function getStation(stopId) {
-    return _get(`/station/${encodeURIComponent(stopId)}`);
+  async function getStatus()            { return _get('/status'); }
+  async function getVehicles(routeId)   { return _get('/vehicles' + (routeId ? `?route_id=${routeId}` : '')); }
+  async function getNearby(lat, lng, radius = 1.0) {
+    return _get(`/vehicles/near?lat=${lat}&lng=${lng}&radius=${radius}`);
   }
 
-  async function getAlerts() {
-    const d = await _get('/alerts');
-    return d?.alerts || [];
-  }
+  // ── renderNearby: show buses within ~1km of a station ────────────────────
+  async function renderNearby(container, lat, lng, stationName) {
+    if (!container) return;
+    container.innerHTML = _loading();
 
-  async function getTrips(stopId, limit = 5) {
-    const d = await _get(`/trips/${encodeURIComponent(stopId)}?limit=${limit}`);
-    return d?.arrivals || [];
-  }
+    const data = await getNearby(lat, lng, 1.2);
 
-  // ── RENDER: ETA strip ────────────────────────────────────────────────────
-  async function renderETAs(container, stopId) {
-    if (!container || !stopId) return;
-    container.innerHTML = _loadingHTML('Loading live ETAs…');
-
-    const data = await getStation(stopId);
-
-    if (!data || !data.arrivals?.length) {
-      container.innerHTML = _emptyHTML('No live ETA data for this stop yet.');
+    if (!data) {
+      container.innerHTML = _empty('Could not reach live feed.');
+      return;
+    }
+    if (data.source === 'unavailable') {
+      container.innerHTML = _empty('Live bus data temporarily unavailable.');
+      return;
+    }
+    if (!data.vehicles?.length) {
+      container.innerHTML = _empty('No buses near this station right now.');
       return;
     }
 
-    const { arrivals, alerts, feed_ts } = data;
-    const feedAge = feed_ts ? Math.round((Date.now() / 1000 - feed_ts) / 60) : null;
+    const feedAge = data.feed_ts
+      ? Math.round((Date.now() / 1000 - data.feed_ts) / 60)
+      : null;
+
+    const rows = data.vehicles.slice(0, 6).map(v => {
+      const distStr = v.dist_km < 0.1
+        ? `${Math.round(v.dist_km * 1000)}m away`
+        : `${v.dist_km.toFixed(2)}km away`;
+
+      const statusLabel = v.status === 1 ? 'Stopped' : v.status === 2 ? 'In Transit' : 'Moving';
+      const statusCol   = v.status === 1 ? '#fbbf24' : '#4ade80';
+      const speedStr    = v.speed_kmh ? `${v.speed_kmh} km/h` : '';
+
+      return `
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--brd)">
+          <div style="width:44px;height:44px;border-radius:12px;flex-shrink:0;
+            background:rgba(245,168,0,.08);border:1px solid rgba(245,168,0,.2);
+            display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F5A800" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+              <circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+            </svg>
+            <div style="font-size:7px;color:#F5A800;font-weight:700">${v.route_id ? v.route_id.slice(0,5) : 'BUS'}</div>
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:12px;font-weight:700;color:var(--txt);margin-bottom:2px">
+              ${v.route_id ? `Route ${v.route_id}` : 'Bus'}
+              ${v.trip_id ? `<span style="font-size:9px;color:var(--dim)">·${v.trip_id.slice(-5)}</span>` : ''}
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+              <span style="font-size:9px;padding:1px 6px;border-radius:8px;
+                background:${statusCol}18;color:${statusCol};border:1px solid ${statusCol}33">${statusLabel}</span>
+              ${speedStr ? `<span style="font-size:9px;color:var(--sub)">${speedStr}</span>` : ''}
+            </div>
+          </div>
+          <div style="font-size:10px;color:var(--sub);text-align:right;flex-shrink:0">${distStr}</div>
+        </div>`;
+    }).join('');
 
     container.innerHTML = `
-      <div style="margin-bottom:8px">
-        <div style="font-size:9px;color:var(--sub);letter-spacing:.08em;text-transform:uppercase;
-          font-family:'Syne',sans-serif;display:flex;align-items:center;gap:6px;margin-bottom:10px">
-          <div class="ldot"></div>LIVE ETAs
-          ${feedAge !== null ? `<span style="color:var(--dim)">(feed ${feedAge}m old)</span>` : ''}
+      <div style="padding:0 14px">
+        <div style="font-size:9px;color:var(--sub);display:flex;align-items:center;
+          gap:5px;padding:10px 0;border-bottom:1px solid var(--brd);margin-bottom:2px">
+          <div class="ldot"></div>
+          ${data.vehicles.length} bus${data.vehicles.length !== 1 ? 'es' : ''} within 1.2km
+          ${feedAge !== null ? `<span style="color:var(--dim)">· feed ${feedAge}m old</span>` : ''}
         </div>
-        ${arrivals.slice(0, 4).map(_etaRow).join('')}
-      </div>
-      ${alerts?.length ? _alertBanner(alerts[0]) : ''}`;
-  }
-
-  function _etaRow(a) {
-    const mins = Math.round(a.arr_in_sec / 60);
-    const sec  = a.arr_in_sec % 60;
-    const timeStr = mins === 0 ? 'Arriving' : mins === 1 ? '1 min' : `${mins} min`;
-    const delayStr = a.delay_sec > 60
-      ? `<span style="color:#f97316;font-size:9px">+${Math.round(a.delay_sec/60)}m late</span>`
-      : a.delay_sec < -30
-      ? `<span style="color:#4ade80;font-size:9px">Early</span>`
-      : `<span style="color:var(--sub);font-size:9px">On time</span>`;
-
-    const urgency = mins === 0 ? '#ef4444' : mins <= 2 ? '#f97316' : mins <= 5 ? '#fbbf24' : '#4ade80';
-    const dirLabel = a.direction === 0 ? 'Up' : a.direction === 1 ? 'Down' : '';
-
-    return `
-      <div style="display:flex;align-items:center;gap:10px;padding:10px 0;
-        border-bottom:1px solid var(--brd)">
-        <div style="width:52px;height:52px;border-radius:14px;flex-shrink:0;
-          background:${urgency}18;border:1.5px solid ${urgency}44;
-          display:flex;flex-direction:column;align-items:center;justify-content:center">
-          <div style="font-family:'Syne',sans-serif;font-size:${mins>=10?'14':'16'}px;
-            font-weight:900;color:${urgency};line-height:1">${mins===0?'NOW':mins}</div>
-          ${mins>0?`<div style="font-size:8px;color:${urgency};opacity:.7">min</div>`:''}
-        </div>
-        <div style="flex:1;min-width:0">
-          <div style="font-size:11px;font-weight:700;color:var(--txt);margin-bottom:2px">
-            ${a.route_id ? `Route ${a.route_id}` : 'Service'}
-            ${dirLabel ? `<span style="font-size:9px;color:var(--sub);margin-left:4px">${dirLabel}</span>` : ''}
-          </div>
-          <div style="display:flex;align-items:center;gap:6px">
-            ${delayStr}
-            ${a.trip_id ? `<span style="font-size:9px;color:var(--dim)">· ${a.trip_id.slice(-6)}</span>` : ''}
-          </div>
-        </div>
-        <div style="font-size:10px;font-weight:700;color:${urgency};flex-shrink:0">${timeStr}</div>
+        ${rows}
       </div>`;
   }
 
-  // ── RENDER: Alert banner ─────────────────────────────────────────────────
-  function _alertBanner(alert) {
-    const effectColors = {
-      NO_SERVICE:         '#ef4444',
-      REDUCED_SERVICE:    '#f97316',
-      SIGNIFICANT_DELAYS: '#f97316',
-      DETOUR:             '#fbbf24',
-      MODIFIED_SERVICE:   '#fbbf24',
-      ADDITIONAL_SERVICE: '#4ade80',
-    };
-    const col = effectColors[alert.effect] || '#fbbf24';
-
-    return `
-      <div style="background:${col}10;border:1px solid ${col}33;border-radius:12px;
-        padding:10px 12px;margin-top:8px;display:flex;align-items:flex-start;gap:10px">
-        <div style="color:${col};flex-shrink:0;margin-top:1px">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
-            <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
-          </svg>
-        </div>
-        <div style="flex:1;min-width:0">
-          <div style="font-size:11px;font-weight:700;color:${col};margin-bottom:2px">${alert.header}</div>
-          ${alert.desc ? `<div style="font-size:10px;color:var(--sub);line-height:1.4">${alert.desc.slice(0,120)}${alert.desc.length>120?'…':''}</div>` : ''}
-        </div>
-      </div>`;
+  function _loading() {
+    return `<div style="padding:14px;display:flex;align-items:center;gap:8px;color:var(--sub)">
+      <div class="ldot"></div><span style="font-size:11px">Loading nearby buses…</span></div>`;
+  }
+  function _empty(msg) {
+    return `<div style="padding:12px 14px;font-size:11px;color:var(--sub)">${msg}</div>`;
   }
 
-  // ── RENDER: Full alerts list ─────────────────────────────────────────────
-  async function renderAlerts(container) {
-    if (!container) return;
-    container.innerHTML = _loadingHTML('Checking for service alerts…');
-    const alerts = await getAlerts();
-
-    if (!alerts.length) {
-      container.innerHTML = `
-        <div style="display:flex;align-items:center;gap:10px;padding:14px">
-          <div style="color:#4ade80">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
-              <polyline points="22 4 12 14.01 9 11.01"/>
-            </svg>
-          </div>
-          <div style="font-size:12px;color:var(--sub)">No service disruptions right now</div>
-        </div>`;
-      return;
-    }
-
-    container.innerHTML = alerts.slice(0, 5).map(a => _alertBanner(a)).join('');
-  }
-
-  // ── Helpers ──────────────────────────────────────────────────────────────
-  function _loadingHTML(msg) {
-    return `<div style="padding:14px;display:flex;align-items:center;gap:10px;color:var(--sub)">
-      <div class="ldot"></div>
-      <div style="font-size:11px">${msg}</div>
-    </div>`;
-  }
-
-  function _emptyHTML(msg) {
-    return `<div style="padding:14px;font-size:11px;color:var(--sub)">${msg}</div>`;
-  }
-
-  return { getStation, getAlerts, getTrips, renderETAs, renderAlerts };
+  return { getStatus, getVehicles, getNearby, renderNearby };
 })();
