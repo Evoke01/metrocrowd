@@ -15,3 +15,5 @@ services:
         sync: false
       - key: OTD_API_KEY
         sync: false
+      - key: OOTD_API_KEY
+        sync: false
