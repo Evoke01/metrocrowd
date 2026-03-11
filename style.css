@@ -23,15 +23,14 @@
   --border:rgba(255,255,255,0.07); --text:#EFEFEF; --muted:rgba(255,255,255,0.38); --a2:#FFD000;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-html,body{height:100%;font-family:'DM Sans',sans-serif;background:#0a0a0a;color:var(--txt);overscroll-behavior:none;}
+html{height:100%;height:100dvh;}
+body{height:100%;height:100dvh;overflow:hidden;font-family:'DM Sans',sans-serif;background:#0a0a0a;color:var(--txt);overscroll-behavior:none;}
 #app{
-  width:100vw;
+  width:100%;
   height:100%;
   background:var(--blk);
   display:flex;
   flex-direction:column;
-  position:fixed;
-  top:0;left:0;right:0;bottom:0;
   overflow:hidden;
   max-width:480px;
   margin:0 auto;
