@@ -205,7 +205,7 @@
           </div>
           <div style="display:flex;align-items:center;gap:6px">
             <div class="ldot"></div>
-            <span style="font-size:10px;color:var(--sub);font-weight:700;letter-spacing:.6px">LIVE</span>
+            <span style="font-size:10px;color:var(--sub);font-weight:700;letter-spacing:.6px" data-i18n="live">LIVE</span>
           </div>
         </div>
 
@@ -223,9 +223,9 @@
               </div>
             </div>
             <div class="hero-route">
-              <div class="hero-stn"><div class="hero-stn-name" id="h-from">Rajiv Chowk</div><div class="hero-stn-type">Origin</div></div>
+              <div class="hero-stn"><div class="hero-stn-name" id="h-from">Rajiv Chowk</div><div class="hero-stn-type" data-i18n="origin">Origin</div></div>
               <div class="hero-arrow">→</div>
-              <div class="hero-stn" style="text-align:right"><div class="hero-stn-name" id="h-to">Hauz Khas</div><div class="hero-stn-type">Destination</div></div>
+              <div class="hero-stn" style="text-align:right"><div class="hero-stn-name" id="h-to">Hauz Khas</div><div class="hero-stn-type" data-i18n="destination">Destination</div></div>
             </div>
             <div class="hero-crowd">
               <div class="hero-num" id="h-num">—<sup>%</sup></div>
@@ -235,13 +235,13 @@
                 <div class="hero-bar"><div class="hero-bar-fill" id="h-bar" style="width:0%"></div></div>
               </div>
             </div>
-            <div class="hero-tag" id="h-tag">Tap to plan route</div>
+            <div class="hero-tag" id="h-tag"><span data-i18n="tap_to_plan">Tap to plan route</span></div>
           </div>
         </div>
 
         <!-- Forecast strip -->
         <div class="forecast-card">
-          <div class="fc-title">Network Crowd — Next 4 Hours</div>
+          <div class="fc-title" data-i18n="network_crowd">Network Crowd — Next 4 Hours</div>
           <div class="fc-strip" id="fc-strip"></div>
         </div>
 
@@ -374,19 +374,19 @@
     <!-- ── COACH ──────────────────────────────────────────────── -->
     <div class="screen" id="s-coach">
       <div class="sv">
-        <div class="pg-title">Coach Finder</div>
-        <div class="pg-sub">Least crowded coach · fastest exit</div>
+        <div class="pg-title" data-i18n="coach_finder">Coach Finder</div>
+        <div class="pg-sub" data-i18n="coach_sub">Least crowded coach · fastest exit</div>
 
         <!-- Station + Line selector -->
         <div class="sel-group">
           <div class="sel-row" onclick="UI.openSearch('coach-station')">
             <div class="sel-lbl">Station</div>
-            <div class="sel-val ph" id="c-stn-val">Select station</div>
+            <div class="sel-val ph" id="c-stn-val" data-i18n="coach_select_station">Select station</div>
             <div class="sel-arr">›</div>
           </div>
           <div class="sel-row" id="c-line-row" onclick="UI.openCoachLineSelect()" style="opacity:.38;pointer-events:none">
             <div class="sel-lbl">Line</div>
-            <div class="sel-val ph" id="c-line-val">Select line</div>
+            <div class="sel-val ph" id="c-line-val" data-i18n="coach_select_line">Select line</div>
             <div class="sel-arr">›</div>
           </div>
         </div>
@@ -417,8 +417,8 @@
     <!-- ── ROUTE ──────────────────────────────────────────────── -->
     <div class="screen" id="s-route">
       <div class="sv">
-        <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:900;color:var(--txt);margin-bottom:4px">Route Planner</div>
-        <div style="font-size:11px;color:var(--sub);margin-bottom:18px">Crowd-aware · least-packed path</div>
+        <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:900;color:var(--txt);margin-bottom:4px" data-i18n="route_planner_title">Route Planner</div>
+        <div style="font-size:11px;color:var(--sub);margin-bottom:18px" data-i18n="route_planner_sub">Crowd-aware · least-packed path</div>
 
         <!-- Input card -->
         <div style="background:var(--card);border:1px solid var(--brd);border-radius:18px;overflow:hidden;margin-bottom:12px;position:relative">
@@ -427,7 +427,7 @@
             <div style="width:10px;height:10px;border-radius:50%;background:var(--txt);border:2px solid var(--txt);flex-shrink:0"></div>
             <div style="flex:1">
               <div style="font-size:9px;color:var(--sub);letter-spacing:.06em;text-transform:uppercase;margin-bottom:2px">From</div>
-              <div class="ri-val ph" id="rFrom" style="font-size:14px;font-weight:700">Select origin</div>
+              <div class="ri-val ph" id="rFrom" style="font-size:14px;font-weight:700" data-i18n="select_origin">Select origin</div>
               <div id="rFromC" style="font-size:10px;margin-top:1px;display:none"></div>
             </div>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -443,7 +443,7 @@
             <div style="width:10px;height:10px;border-radius:50%;background:var(--y);border:2px solid var(--y);flex-shrink:0"></div>
             <div style="flex:1">
               <div style="font-size:9px;color:var(--sub);letter-spacing:.06em;text-transform:uppercase;margin-bottom:2px">To</div>
-              <div class="ri-val ph" id="rTo" style="font-size:14px;font-weight:700">Select destination</div>
+              <div class="ri-val ph" id="rTo" style="font-size:14px;font-weight:700" data-i18n="select_destination">Select destination</div>
               <div id="rToC" style="font-size:10px;margin-top:1px;display:none"></div>
             </div>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -452,9 +452,9 @@
 
         <!-- Options -->
         <div style="display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap">
-          <div class="chip on" id="opt-avoid" onclick="this.classList.toggle('on')">Avoid packed</div>
-          <div class="chip" id="opt-fastest" onclick="this.classList.toggle('on')">Fastest</div>
-          <div class="chip" id="opt-fewest" onclick="this.classList.toggle('on')">Fewest stops</div>
+          <div class="chip on" id="opt-avoid" onclick="this.classList.toggle('on')" data-i18n="avoid_packed">Avoid packed</div>
+          <div class="chip" id="opt-fastest" onclick="this.classList.toggle('on')" data-i18n="fastest">Fastest</div>
+          <div class="chip" id="opt-fewest" onclick="this.classList.toggle('on')" data-i18n="fewest_stops">Fewest stops</div>
         </div>
 
         <button class="btn-y" id="go-route" onclick="UI.doRoute()" style="margin-bottom:16px">
@@ -469,7 +469,7 @@
     <div class="screen" id="s-report">
       <div class="sv">
         <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:900;color:var(--txt);margin-bottom:4px">Report Crowd</div>
-        <div style="font-size:11px;color:var(--sub);margin-bottom:16px">Your reports power the AI for 3M+ commuters</div>
+        <div style="font-size:11px;color:var(--sub);margin-bottom:16px" data-i18n="report_sub">Your reports power the AI for 3M+ commuters</div>
 
         <!-- Karma banner -->
         <div style="background:linear-gradient(135deg,rgba(245,168,0,.12),rgba(245,168,0,.04));
@@ -477,8 +477,8 @@
           display:flex;align-items:center;gap:12px;margin-bottom:16px">
           <div style="color:var(--y)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="15" r="7"/><polyline points="8.56 2.9 7 6 2 6 5.5 9 4 13"/><polyline points="15.44 2.9 17 6 22 6 18.5 9 20 13"/><line x1="12" y1="12" x2="12" y2="15"/></svg></div>
           <div style="flex:1">
-            <div style="font-size:11px;font-weight:700;color:var(--txt)">Your impact this week</div>
-            <div style="font-size:10px;color:var(--sub);margin-top:1px">Reports submitted</div>
+            <div style="font-size:11px;font-weight:700;color:var(--txt)" data-i18n="your_impact">Your impact this week</div>
+            <div style="font-size:10px;color:var(--sub);margin-top:1px" data-i18n="reports_submitted">Reports submitted</div>
           </div>
           <div style="font-family:'Syne',sans-serif;font-size:32px;font-weight:900;color:var(--y)" id="karma-num">0</div>
         </div>
@@ -490,37 +490,37 @@
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
           <div style="flex:1">
             <div style="font-size:9px;color:var(--sub);letter-spacing:.06em;text-transform:uppercase;margin-bottom:2px">Station</div>
-            <div class="ph" id="rep-stn" style="font-size:14px;font-weight:700;color:var(--txt)">Select your station</div>
+            <div class="ph" id="rep-stn" style="font-size:14px;font-weight:700;color:var(--txt)" data-i18n="select_your_station">Select your station</div>
           </div>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
 
         <!-- Crowd level picker -->
-        <div style="font-size:10px;color:var(--sub);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">Crowd level</div>
+        <div style="font-size:10px;color:var(--sub);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px" data-i18n="crowd_level_lbl">Crowd level</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
           <div class="cp" onclick="UI.pickLevel(this)" data-v="empty" style="background:var(--card);border:1.5px solid var(--brd);border-radius:14px;padding:14px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden">
             <div class="cp-check" style="display:none;position:absolute;top:8px;right:8px;width:18px;height:18px;background:rgba(74,222,128,.2);border-radius:50%;align-items:center;justify-content:center;color:#4ade80"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
             <div style="font-size:22px;margin-bottom:6px">😌</div>
-            <div style="font-size:13px;font-weight:700;color:var(--txt)">Empty</div>
-            <div style="font-size:10px;color:var(--sub);margin-top:2px">Seats available</div>
+            <div style="font-size:13px;font-weight:700;color:var(--txt)" data-i18n="empty_label">Empty</div>
+            <div style="font-size:10px;color:var(--sub);margin-top:2px" data-i18n="seats_available">Seats available</div>
           </div>
           <div class="cp" onclick="UI.pickLevel(this)" data-v="moderate" style="background:var(--card);border:1.5px solid var(--brd);border-radius:14px;padding:14px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden">
             <div class="cp-check" style="display:none;position:absolute;top:8px;right:8px;width:18px;height:18px;background:rgba(251,191,36,.2);border-radius:50%;align-items:center;justify-content:center;color:#fbbf24"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
             <div style="font-size:22px;margin-bottom:6px">🙂</div>
-            <div style="font-size:13px;font-weight:700;color:var(--txt)">Moderate</div>
-            <div style="font-size:10px;color:var(--sub);margin-top:2px">Some people, comfortable</div>
+            <div style="font-size:13px;font-weight:700;color:var(--txt)" data-i18n="moderate_label">Moderate</div>
+            <div style="font-size:10px;color:var(--sub);margin-top:2px" data-i18n="some_people">Some people, comfortable</div>
           </div>
           <div class="cp" onclick="UI.pickLevel(this)" data-v="crowded" style="background:var(--card);border:1.5px solid var(--brd);border-radius:14px;padding:14px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden">
             <div class="cp-check" style="display:none;position:absolute;top:8px;right:8px;width:18px;height:18px;background:rgba(249,115,22,.2);border-radius:50%;align-items:center;justify-content:center;color:#f97316"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
             <div style="font-size:22px;margin-bottom:6px">😰</div>
-            <div style="font-size:13px;font-weight:700;color:var(--txt)">Crowded</div>
-            <div style="font-size:10px;color:var(--sub);margin-top:2px">Standing room only</div>
+            <div style="font-size:13px;font-weight:700;color:var(--txt)" data-i18n="crowded_label">Crowded</div>
+            <div style="font-size:10px;color:var(--sub);margin-top:2px" data-i18n="standing_room">Standing room only</div>
           </div>
           <div class="cp" onclick="UI.pickLevel(this)" data-v="packed" style="background:var(--card);border:1.5px solid var(--brd);border-radius:14px;padding:14px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden">
             <div class="cp-check" style="display:none;position:absolute;top:8px;right:8px;width:18px;height:18px;background:rgba(239,68,68,.2);border-radius:50%;align-items:center;justify-content:center;color:#ef4444"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
             <div style="font-size:22px;margin-bottom:6px">😱</div>
-            <div style="font-size:13px;font-weight:700;color:var(--txt)">Packed</div>
-            <div style="font-size:10px;color:var(--sub);margin-top:2px">Skip — next train</div>
+            <div style="font-size:13px;font-weight:700;color:var(--txt)" data-i18n="packed_label">Packed</div>
+            <div style="font-size:10px;color:var(--sub);margin-top:2px" data-i18n="skip_next">Skip — next train</div>
           </div>
         </div>
 
@@ -533,19 +533,19 @@
           <textarea id="rep-note" placeholder="Signal delay? Event crowd? Anything unusual…" style="width:100%;background:var(--card);border:1px solid var(--brd);border-radius:12px;padding:12px;color:var(--txt);font-size:12px;resize:none;height:72px;margin-top:8px;box-sizing:border-box"></textarea>
         </details>
 
-        <button class="btn-y" id="rep-btn" onclick="UI.submitReport()" disabled style="margin-bottom:14px">Submit Report</button>
+        <button class="btn-y" id="rep-btn" onclick="UI.submitReport()" disabled style="margin-bottom:14px" data-i18n="submit_report">Submit Report</button>
 
         <!-- Success state -->
         <div id="rep-ok" style="display:none;text-align:center;padding:20px;background:rgba(74,222,128,.08);
           border:1px solid rgba(74,222,128,.2);border-radius:16px;margin-bottom:14px">
           <div style="margin-bottom:8px;color:#4ade80"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
-          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--txt)">Report submitted!</div>
-          <div style="font-size:11px;color:var(--sub);margin-top:4px">Your data helps other commuters</div>
+          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--txt)" data-i18n="report_success">Report submitted!</div>
+          <div style="font-size:11px;color:var(--sub);margin-top:4px" data-i18n="report_success_sub">Your data helps other commuters</div>
           <div style="font-size:11px;color:var(--y);margin-top:6px;font-weight:700">+1 ★ Karma · Total: <span id="rs-karma">0</span></div>
         </div>
 
         <!-- Community feed -->
-        <div style="font-size:10px;color:var(--sub);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">Recent Network Reports</div>
+        <div style="font-size:10px;color:var(--sub);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px" data-i18n="recent_reports">Recent Network Reports</div>
         <div id="rep-feed"></div>
 
       </div>
@@ -556,19 +556,19 @@
   <!-- ═══ BOTTOM NAV ══════════════════════════════════════════ -->
   <nav id="bnav">
     <div class="bni on" data-tab="s-home" onclick="UI.navTo('s-home')">
-      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><div class="lbl">Home</div>
+      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><div class="lbl" data-i18n="nav_home">Home</div>
     </div>
     <div class="bni" data-tab="s-station" onclick="UI.navTo('s-station')">
-      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><div class="lbl">Station</div>
+      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><div class="lbl" data-i18n="nav_station">Station</div>
     </div>
     <div class="bni" data-tab="s-coach" onclick="UI.navTo('s-coach')">
-      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="11" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><line x1="12" y1="12" x2="12" y2="12"/><path d="M7 18l-2 3M17 18l2 3"/><line x1="7" y1="12" x2="17" y2="12"/></svg><div class="lbl">Coach</div>
+      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="11" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><line x1="12" y1="12" x2="12" y2="12"/><path d="M7 18l-2 3M17 18l2 3"/><line x1="7" y1="12" x2="17" y2="12"/></svg><div class="lbl" data-i18n="nav_coach">Coach</div>
     </div>
     <div class="bni" data-tab="s-route" onclick="UI.navTo('s-route')">
-      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M6 17V8a2 2 0 012-2h4"/><polyline points="14 4 18 4 18 8"/></svg><div class="lbl">Route</div>
+      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M6 17V8a2 2 0 012-2h4"/><polyline points="14 4 18 4 18 8"/></svg><div class="lbl" data-i18n="nav_route">Route</div>
     </div>
     <div class="bni" data-tab="s-report" onclick="UI.navTo('s-report')">
-      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg><div class="lbl">Report</div>
+      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg><div class="lbl" data-i18n="nav_report">Report</div>
     </div>
   </nav>
 
@@ -576,9 +576,9 @@
   <div class="overlay" id="ov-search">
     <div class="ov-hd">
       <div class="ov-back" onclick="UI.closeSearch()">←</div>
-      <input class="ov-input" id="ov-input" placeholder="Search station…" oninput="UI.filterSearch(this.value)" autocomplete="off" spellcheck="false">
+      <input class="ov-input" id="ov-input" placeholder="Search station…" data-i18n-ph="search_placeholder" oninput="UI.filterSearch(this.value)" autocomplete="off" spellcheck="false">
     </div>
-    <div class="ov-lbl" id="ov-lbl">All Stations</div>
+    <div class="ov-lbl" id="ov-lbl" data-i18n="all_stations">All Stations</div>
     <div class="ov-list" id="ov-list"></div>
   </div>
 
@@ -670,17 +670,17 @@
         <div style="display:flex;gap:10px;margin-bottom:14px">
           <div style="flex:1;background:var(--card2);border-radius:10px;padding:12px;text-align:center">
             <div id="auth-stat-reports" style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--y)">—</div>
-            <div style="font-size:9px;color:var(--sub);margin-top:2px">REPORTS</div>
+            <div style="font-size:9px;color:var(--sub);margin-top:2px" data-i18n="reports_stat">REPORTS</div>
           </div>
           <div style="flex:1;background:var(--card2);border-radius:10px;padding:12px;text-align:center">
             <div id="auth-stat-session" style="font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:var(--txt)">—</div>
-            <div style="font-size:9px;color:var(--sub);margin-top:2px">MEMBER SINCE</div>
+            <div style="font-size:9px;color:var(--sub);margin-top:2px" data-i18n="member_since">MEMBER SINCE</div>
           </div>
         </div>
 
         <!-- Quick guide -->
         <div style="background:var(--card2);border:1px solid var(--brd);border-radius:12px;padding:12px 14px;margin-bottom:14px">
-          <div style="font-size:9px;font-weight:700;color:var(--sub);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px">How to Use MetroCrowd</div>
+          <div style="font-size:9px;font-weight:700;color:var(--sub);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px" data-i18n="how_to_use">How to Use MetroCrowd</div>
           <div style="display:flex;flex-direction:column;gap:8px">
             <div style="display:flex;align-items:flex-start;gap:10px">
               <div style="width:24px;height:24px;border-radius:8px;background:rgba(245,208,0,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0">
