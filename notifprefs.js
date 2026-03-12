@@ -284,7 +284,7 @@ window.NOTIFPREFS = (function () {
     const btn = document.getElementById('notif-save-btn');
     if (btn) { btn.textContent = 'Saving…'; btn.style.opacity = '.7'; }
 
-    const homeStation = localStorage.getItem('mc_home') || null;
+    const homeStation = localStorage.getItem('v3_home_station') || null;
 
     try {
       await fetch(`${API}/notifications/prefs`, {
