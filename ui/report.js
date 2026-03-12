@@ -23,6 +23,9 @@ window.REPORT_UI = (function(){
     _updateBtn();
   }
 
+  const _LV_COL = { empty:'#4ade80', moderate:'#fbbf24', crowded:'#f97316', packed:'#ef4444' };
+  const _LV_BG  = { empty:'rgba(74,222,128,.1)', moderate:'rgba(251,191,36,.1)', crowded:'rgba(249,115,22,.1)', packed:'rgba(239,68,68,.1)' };
+
   function pickLevel(el){
     document.querySelectorAll('.cp').forEach(c => {
       c.classList.remove('sel');
@@ -32,22 +35,21 @@ window.REPORT_UI = (function(){
       if(chk) chk.style.display = 'none';
     });
     el.classList.add('sel');
-    const lv = el.dataset.v || '';
-    const col = lv==='empty'?'#4ade80':lv==='moderate'?'#fbbf24':lv==='crowded'?'#f97316':'#ef4444';
+    _level = el.dataset.v || '';
+    const col = _LV_COL[_level] || '#fbbf24';
+    const bg  = _LV_BG[_level]  || 'rgba(251,191,36,.1)';
     el.style.borderColor = col;
-    el.style.background  = col.replace(')',', .08)').replace('rgb','rgba').replace('#4ade80','rgba(74,222,128,.1)').replace('#fbbf24','rgba(251,191,36,.1)').replace('#f97316','rgba(249,115,22,.1)').replace('#ef4444','rgba(239,68,68,.1)');
+    el.style.background  = bg;
     const chk = el.querySelector('.cp-check');
     if(chk) chk.style.display = 'flex';
-    _level = lv;
     _updateBtn();
   }
 
   function submit(){
-    if(!_station || !_level){ NAV.showToast('warn','Pick a station and crowd level first'); return; }
+    if(!_station || !_level){ NAV.showToast('warn', T('pick_both')); return; }
 
     // Optimistic local update
-    CROWD.state.userReports[_station] = _level;
-    CROWD.recomputeAll();
+    try { if(CROWD?.state?.userReports) CROWD.state.userReports[_station] = _level; CROWD?.recomputeAll?.(); } catch(e){}
 
     // Persist to Supabase
     if(typeof SB !== 'undefined' && SB.isReady){
@@ -64,14 +66,20 @@ window.REPORT_UI = (function(){
 
     // Show success + bump karma
     const ok = document.getElementById('rep-ok');
-    if(ok){ ok.style.display='flex'; setTimeout(() => ok.style.display='none', 3500); }
+    if(ok){ ok.style.display='flex'; ok.style.flexDirection='column'; setTimeout(() => ok.style.display='none', 3500); }
     _bumpKarma();
 
     // Reset form
     _station = null; _level = '';
     const btn = document.getElementById('rep-stn');
-    if(btn){ btn.textContent = 'Select your station'; btn.classList.add('ph'); }
-    document.querySelectorAll('.cp').forEach(c => c.classList.remove('sel'));
+    if(btn){ btn.textContent = T('select_your_station'); btn.classList.add('ph'); }
+    document.querySelectorAll('.cp').forEach(c => {
+      c.classList.remove('sel');
+      c.style.borderColor = '';
+      c.style.background  = '';
+      const chk = c.querySelector('.cp-check');
+      if(chk) chk.style.display = 'none';
+    });
     const submitBtn = document.getElementById('rep-btn'); if(submitBtn) submitBtn.disabled = true;
     const note = document.getElementById('rep-note'); if(note) note.value = '';
   }
@@ -94,7 +102,7 @@ window.REPORT_UI = (function(){
       if(error) throw error;
       _renderFeed(data||[], listEl);
     } catch(_){
-      listEl.innerHTML = '<div class="rp-empty">Could not load reports.</div>';
+      listEl.innerHTML = '<div class="rp-empty">' + T('could_not_load') + '</div>';
     }
   }
 
@@ -105,14 +113,14 @@ window.REPORT_UI = (function(){
     const el = document.createElement('div');
     el.className = 'fi';
     const lv = row.level;
-    const c  = lv==='empty'?'var(--low)':lv==='moderate'?'var(--y)':'#f87171';
+    const c  = lv==='empty'?'#4ade80':lv==='moderate'?'#fbbf24':lv==='crowded'?'#f97316':'#ef4444';
     const icon = '';
     const emoji2 = lv==='empty'?'😌':lv==='moderate'?'🙂':lv==='crowded'?'😰':'😱';
     el.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--card);border:1px solid var(--brd);border-radius:12px;margin-bottom:7px';
     el.innerHTML = `<div style="font-size:18px">${emoji2}</div>
       <div style="flex:1">
         <div style="font-size:12px;font-weight:700;color:var(--txt)">${row.station_name}</div>
-        <div style="font-size:10px;color:${c};margin-top:1px;font-weight:600">${lv.charAt(0).toUpperCase()+lv.slice(1)} · just now</div>
+        <div style="font-size:10px;color:${c};margin-top:1px;font-weight:600">${lv.charAt(0).toUpperCase()+lv.slice(1)} · ${T('just_now')}</div>
       </div>
       <div style="width:8px;height:8px;border-radius:50%;background:${c};flex-shrink:0"></div>`;
     listEl.prepend(el);
@@ -120,7 +128,7 @@ window.REPORT_UI = (function(){
   }
 
   function _renderFeed(rows, el){
-    if(!rows.length){ el.innerHTML='<div class="rp-empty">No reports in last 2 hours.</div>'; return; }
+    if(!rows.length){ el.innerHTML='<div class="rp-empty">' + T('no_reports') + '</div>'; return; }
     el.innerHTML = rows.map(r => {
       const lv = r.level; const c = lv==='empty'?'#4ade80':lv==='moderate'?'#fbbf24':lv==='crowded'?'#f97316':'#ef4444';
       const icon = lv==='empty'?'😌':lv==='moderate'?'🙂':lv==='crowded'?'😰':'😱';
@@ -151,9 +159,9 @@ window.REPORT_UI = (function(){
 
   function _timeAgo(iso){
     const d = Date.now() - new Date(iso).getTime();
-    if(d < 60000)   return `${Math.round(d/1000)}s ago`;
-    if(d < 3600000) return `${Math.round(d/60000)} min ago`;
-    return `${Math.round(d/3600000)}h ago`;
+    if(d < 60000)   return Math.round(d/1000) + T('sec_ago');
+    if(d < 3600000) return Math.round(d/60000) + T('min_ago');
+    return Math.round(d/3600000) + T('hr_ago');
   }
 
   return {
