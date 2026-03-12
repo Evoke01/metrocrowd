@@ -15,10 +15,6 @@ window.STATS = (function () {
   const DOW_HI = ['सोम','मंगल','बुध','गुरु','शुक्र','शनि','रवि'];
   const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-  function _t(en, hi) {
-    return (typeof SETTINGS !== 'undefined' && SETTINGS.t && SETTINGS.t('lang') === 'hi') ? hi : en;
-  }
-
   async function _getMe() {
     try { const { data } = await SB.client.auth.getUser(); return data?.user || null; }
     catch { return null; }
@@ -240,16 +236,18 @@ window.STATS = (function () {
   // ── Monthly bar chart ─────────────────────────────────────────
   function _monthlyChart(monthly) {
     const maxTrips = Math.max(1, ...monthly.map(m => m.trips));
+    const BAR_MAX_PX = 56; // fixed pixel height for chart area
     const bars = monthly.slice().reverse().map(m => {
-      const date  = new Date(m.month);
-      const label = MONTHS[date.getMonth()];
-      const pct   = Math.round((m.trips / maxTrips) * 100);
+      const date   = new Date(m.month);
+      const label  = MONTHS[date.getMonth()];
+      // Use px not % — % height on flex children requires definite parent height
+      const barPx  = Math.max(4, Math.round((m.trips / maxTrips) * BAR_MAX_PX));
       return `
         <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
           <div style="font-size:9px;color:var(--sub);font-weight:600">${m.trips}</div>
-          <div style="flex:1;width:100%;display:flex;align-items:flex-end">
-            <div style="width:100%;height:${Math.max(4,pct)}%;background:var(--y);
-              border-radius:3px 3px 0 0;opacity:.85;min-height:4px;transition:height .6s ease">
+          <div style="height:${BAR_MAX_PX}px;width:100%;display:flex;align-items:flex-end">
+            <div style="width:100%;height:${barPx}px;background:var(--y);
+              border-radius:3px 3px 0 0;opacity:.85;transition:height .4s ease">
             </div>
           </div>
           <div style="font-size:9px;color:var(--sub)">${label}</div>
@@ -353,16 +351,29 @@ window.STATS = (function () {
   // ── Streak calculator ─────────────────────────────────────────
   function _calcStreak(trips) {
     if (!trips.length) return 0;
-    const days = [...new Set(
-      trips.map(t => new Date(t.started_at).toDateString())
-    )];
+    // Use YYYY-MM-DD strings in IST to avoid DST millisecond drift
+    function _toISTDate(ts) {
+      const d = new Date(ts);
+      // IST = UTC+5:30 → add 330 min
+      const ist = new Date(d.getTime() + 330 * 60000);
+      return ist.toISOString().slice(0, 10); // "YYYY-MM-DD"
+    }
+    function _addDays(dateStr, n) {
+      const d = new Date(dateStr + 'T00:00:00Z');
+      d.setUTCDate(d.getUTCDate() + n);
+      return d.toISOString().slice(0, 10);
+    }
+
+    const days = [...new Set(trips.map(t => _toISTDate(t.started_at)))];
+    // days[0] is most recent (trips ordered desc). Check it's today or yesterday IST.
+    const todayIST = _toISTDate(new Date().toISOString());
+    const yestIST  = _addDays(todayIST, -1);
+    if (days[0] !== todayIST && days[0] !== yestIST) return 0;
+
     let streak = 1;
-    const today = new Date().toDateString();
-    if (days[0] !== today && days[0] !== new Date(Date.now()-86400000).toDateString()) return 0;
     for (let i = 0; i < days.length - 1; i++) {
-      const d1 = new Date(days[i]).getTime();
-      const d2 = new Date(days[i+1]).getTime();
-      if (d1 - d2 === 86400000) streak++;
+      // Each next day in the sorted-desc array should be exactly 1 day earlier
+      if (days[i + 1] === _addDays(days[i], -1)) streak++;
       else break;
     }
     return streak;
