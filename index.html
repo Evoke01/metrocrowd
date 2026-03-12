@@ -656,17 +656,21 @@
 
       <!-- Signed-in view -->
       <div id="auth-signin-view" style="display:none">
-        <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
+
+        <!-- Avatar + name row -->
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
           <img id="auth-user-avatar" src="" style="width:48px;height:48px;border-radius:50%;object-fit:cover;display:none">
-          <div>
+          <div style="min-width:0">
             <div id="auth-user-name" style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--txt)"></div>
-            <div id="auth-user-email" style="font-size:10px;color:var(--sub);margin-top:1px"></div>
+            <div id="auth-user-email" style="font-size:10px;color:var(--sub);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
             <div id="auth-user-provider" style="font-size:10px;color:var(--y);margin-top:2px"></div>
           </div>
         </div>
-        <div style="display:flex;gap:10px;margin-bottom:20px">
+
+        <!-- Stats row -->
+        <div style="display:flex;gap:10px;margin-bottom:14px">
           <div style="flex:1;background:var(--card2);border-radius:10px;padding:12px;text-align:center">
-            <div id="auth-stat-reports" style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--y)">0</div>
+            <div id="auth-stat-reports" style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--y)">—</div>
             <div style="font-size:9px;color:var(--sub);margin-top:2px">REPORTS</div>
           </div>
           <div style="flex:1;background:var(--card2);border-radius:10px;padding:12px;text-align:center">
@@ -674,7 +678,62 @@
             <div style="font-size:9px;color:var(--sub);margin-top:2px">MEMBER SINCE</div>
           </div>
         </div>
-        <button onclick="AUTH.signOut()" style="width:100%;background:var(--card2);color:var(--sub);border:1px solid var(--brd);border-radius:12px;padding:12px;font-size:12px;font-weight:700;cursor:pointer">Sign Out</button>
+
+        <!-- Quick guide -->
+        <div style="background:var(--card2);border:1px solid var(--brd);border-radius:12px;padding:12px 14px;margin-bottom:14px">
+          <div style="font-size:9px;font-weight:700;color:var(--sub);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px">How to Use MetroCrowd</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:flex-start;gap:10px">
+              <div style="width:24px;height:24px;border-radius:8px;background:rgba(245,208,0,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FFD000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              </div>
+              <div><div style="font-size:11px;font-weight:700;color:var(--txt)">Check a Station</div><div style="font-size:10px;color:var(--sub);margin-top:1px">Tap Station tab → search any Delhi Metro station to see crowd level, coach tips, and nearby buses</div></div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:10px">
+              <div style="width:24px;height:24px;border-radius:8px;background:rgba(245,208,0,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FFD000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+              </div>
+              <div><div style="font-size:11px;font-weight:700;color:var(--txt)">Report Crowd</div><div style="font-size:10px;color:var(--sub);margin-top:1px">Tap Report tab → pick your station → submit a crowd level in 2 taps. Earns you karma points</div></div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:10px">
+              <div style="width:24px;height:24px;border-radius:8px;background:rgba(245,208,0,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FFD000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              </div>
+              <div><div style="font-size:11px;font-weight:700;color:var(--txt)">Smart Commute</div><div style="font-size:10px;color:var(--sub);margin-top:1px">On Home screen tap Edit on your route card → set home + work stations for live commute tracking</div></div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:10px">
+              <div style="width:24px;height:24px;border-radius:8px;background:rgba(245,208,0,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FFD000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              </div>
+              <div><div style="font-size:11px;font-weight:700;color:var(--txt)">Plan a Route</div><div style="font-size:10px;color:var(--sub);margin-top:1px">Tap Route tab → pick origin and destination → get stop-by-stop journey with crowd forecast and fares</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Legal + Privacy row -->
+        <div style="display:flex;gap:8px;margin-bottom:14px">
+          <a href="/legal.html#privacy" target="_blank" style="flex:1;background:var(--card2);border:1px solid var(--brd);border-radius:10px;padding:10px;text-align:center;text-decoration:none;display:block">
+            <div style="font-size:16px;margin-bottom:3px">🔒</div>
+            <div style="font-size:9px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.05em">Privacy Policy</div>
+          </a>
+          <a href="/legal.html#terms" target="_blank" style="flex:1;background:var(--card2);border:1px solid var(--brd);border-radius:10px;padding:10px;text-align:center;text-decoration:none;display:block">
+            <div style="font-size:16px;margin-bottom:3px">📄</div>
+            <div style="font-size:9px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.05em">Terms</div>
+          </a>
+          <a href="/legal.html#disclaimer" target="_blank" style="flex:1;background:var(--card2);border:1px solid var(--brd);border-radius:10px;padding:10px;text-align:center;text-decoration:none;display:block">
+            <div style="font-size:16px;margin-bottom:3px">⚠️</div>
+            <div style="font-size:9px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.05em">Disclaimer</div>
+          </a>
+        </div>
+
+        <!-- Sign out -->
+        <button onclick="AUTH.signOut()" style="width:100%;background:var(--card2);color:var(--sub);border:1px solid var(--brd);border-radius:12px;padding:12px;font-size:12px;font-weight:700;cursor:pointer;margin-bottom:10px">Sign Out</button>
+
+        <!-- Delete account -->
+        <button onclick="AUTH.deleteAccount()" style="width:100%;background:transparent;color:#ef4444;border:1px solid rgba(239,68,68,.25);border-radius:12px;padding:11px;font-size:11px;font-weight:700;cursor:pointer">
+          Delete Account &amp; All Data
+        </button>
+
       </div>
 
       <!-- Loading view -->
