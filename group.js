@@ -397,7 +397,7 @@ window.GROUP = (function () {
 
   return {
     create, join, leave, updatePosition,
-    showJoinModal,
+    showJoinModal, highlightOnRoute,
     _copyCode, _submitJoin,
     get active() { return _active; },
     get code()   { return _code; },
