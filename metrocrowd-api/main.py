@@ -12,6 +12,7 @@ from routers.stations import router as stations_router
 from routers.push     import router as push_router
 from routers.reports  import router as reports_router
 from routers.realtime import router as realtime_router
+from routers.trips    import router as trips_router
 
 logger = logging.getLogger(__name__)
 
@@ -52,6 +53,7 @@ app.include_router(stations_router, prefix="/stations", tags=["Stations"])
 app.include_router(push_router,     prefix="/push",     tags=["Push"])
 app.include_router(reports_router,  prefix="/reports",  tags=["Reports"])
 app.include_router(realtime_router, prefix="/realtime", tags=["Realtime"])
+app.include_router(trips_router,    prefix="/trips",    tags=["Trips"])
 
 @app.get("/health")
 def health():
