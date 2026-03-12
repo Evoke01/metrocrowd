@@ -142,16 +142,16 @@ window.COACH = (function () {
   }
 
   // ── 9. RENDER ─────────────────────────────────────────────────────────────
-  function renderCoachStrip(sid, lineCode, crowdScore, destId) {
+  function renderCoachStrip(sid, lineCode, crowdScore, destId, h) {
     const s = METRO.STATIONS[sid];
     if (!s) return '';
     const line = lineCode && LINE_CFG[lineCode] ? lineCode : s.l[0];
-    const res  = recommend(sid, line, crowdScore||0, destId);
+    const res  = recommend(sid, line, crowdScore||0, destId, h);
     if (!res) return '';
 
     const {coaches,cfg,n,isTerm,destName,best,top3,platformType,isPeak} = res;
     const byNum = [...coaches].sort((a,b)=>a.num-b.num);
-    const h     = new Date().getHours();
+    const effectiveH = h !== undefined ? h : new Date().getHours();
     const lc    = crowdLabel(best.crowd);
 
     // HERO CARD
@@ -174,7 +174,7 @@ window.COACH = (function () {
           ${best.exitFriendly?`<span style="font-size:9px;padding:3px 8px;border-radius:20px;background:rgba(245,168,0,.12);color:var(--y);border:1px solid rgba(245,168,0,.25);display:inline-flex;align-items:center;gap:3px"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Near exit</span>`:''}
           ${best.destExitFriendly&&destName?`<span style="font-size:9px;padding:3px 8px;border-radius:20px;background:rgba(74,222,128,.1);color:#4ade80;border:1px solid rgba(74,222,128,.25);display:inline-flex;align-items:center;gap:3px"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Near ${destName} exit</span>`:''}
           ${best.hasLift?`<span style="font-size:9px;padding:3px 8px;border-radius:20px;background:rgba(129,140,248,.12);color:#818cf8;border:1px solid rgba(129,140,248,.25);display:inline-flex;align-items:center;gap:3px"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><path d="M6 9h12l-2 9H8L6 9z"/></svg>Lift</span>`:''}
-          <span style="font-size:9px;padding:3px 8px;border-radius:20px;background:rgba(255,255,255,.05);color:var(--sub);border:1px solid var(--brd)">${timeTag(h)}</span>
+          <span style="font-size:9px;padding:3px 8px;border-radius:20px;background:rgba(255,255,255,.05);color:var(--sub);border:1px solid var(--brd)">${timeTag(effectiveH)}</span>
           <span style="font-size:9px;padding:3px 8px;border-radius:20px;background:rgba(255,255,255,.05);color:var(--sub);border:1px solid var(--brd)">${platformType==='U'?'↓ Underground':'↑ Elevated'}</span>
         </div>
       </div>`;
@@ -298,13 +298,85 @@ window.COACH = (function () {
 
   // ── 10. COACH_UI — screen controller ─────────────────────────────────────
   const COACH_UI = (function(){
-    let _sid=null, _line=null, _dest=null;
+    let _sid=null, _line=null, _dest=null, _timeH=null; // null = now
+
+    // DMRC service hours: ~05:30–23:30
+    function _isOpen(h) { return h >= 6 && h <= 23; }
+
+    function _effectiveHour() {
+      return _timeH !== null ? _timeH : new Date().getHours();
+    }
 
     function _refresh(){
       const el=document.getElementById('coach-content');
       if(!el||!_sid||!_line) return;
+      const h = _effectiveHour();
+
+      if(!_isOpen(h)){
+        // Show closed state instead of coach data
+        const openAt = h < 6 ? '6:00 AM' : '—';
+        el.innerHTML=`<div style="background:var(--card);border:1px solid var(--brd);border-radius:16px;
+          padding:28px 20px;text-align:center;margin-top:8px">
+          <div style="font-size:32px;margin-bottom:12px">🚇</div>
+          <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--txt);margin-bottom:6px">
+            Metro Closed
+          </div>
+          <div style="font-size:12px;color:var(--sub);line-height:1.6">
+            DMRC service runs approximately<br>
+            <strong style="color:var(--txt)">6:00 AM – 11:30 PM</strong><br>
+            ${h < 6 ? `First service from <strong style="color:var(--y)">${openAt}</strong>` : 'Last service has departed'}
+          </div>
+        </div>`;
+        return;
+      }
+
       const crowd=window.CROWD?.state?.crowdMap?.[_sid]||0;
-      el.innerHTML=renderCoachStrip(_sid,_line,crowd,_dest);
+      // Scale crowd by time-of-day factor relative to now
+      const nowH = new Date().getHours();
+      const crowdForTime = _timeH !== null ? _scaleCrowdForHour(crowd, nowH, h) : crowd;
+      el.innerHTML=renderCoachStrip(_sid,_line,crowdForTime,_dest,h);
+    }
+
+    // Scale crowd estimate for a different hour using the crowd curve
+    function _scaleCrowdForHour(nowCrowd, nowH, targetH) {
+      // Simple pattern: peak hours 8-10 and 17-20 → high, midnight-5 → 0, other → medium
+      function _factor(h) {
+        if(h<6||h>23) return 0;
+        if((h>=8&&h<=10)||(h>=17&&h<=20)) return 1.0;
+        if((h>=7&&h<8)||(h>10&&h<=11)||(h>=16&&h<17)||(h>20&&h<=21)) return 0.72;
+        if(h>=11&&h<=16) return 0.52;
+        return 0.28; // early morning / late night
+      }
+      const nf = _factor(nowH) || 0.01;
+      const tf = _factor(targetH);
+      return Math.min(100, Math.round(nowCrowd * tf / nf));
+    }
+
+    function buildTimeChips(){
+      const tc = document.getElementById('c-time-chips');
+      if(!tc) return;
+      const now = new Date().getHours();
+      const slots = [
+        {l:'Now',  h:null},
+        {l:'+1h',  h:(now+1)%24},
+        {l:'+2h',  h:(now+2)%24},
+        {l:'8 AM', h:8},
+        {l:'1 PM', h:13},
+        {l:'6 PM', h:18},
+      ];
+      tc.innerHTML = slots.map((s,i)=>`
+        <div class="chip${i===0?' on':''}"
+          onclick="COACH_UI.setTimeH(${s.h===null?'null':s.h},this)"
+          style="${!_isOpen(s.h!==null?s.h:now)?'opacity:.4':''}"
+        >${s.l}${s.h!==null&&!_isOpen(s.h)?'<span style="font-size:8px;margin-left:3px;opacity:.6">✕</span>':''}</div>
+      `).join('');
+    }
+
+    function setTimeH(h, el){
+      _timeH = h; // null = now
+      document.querySelectorAll('#c-time-chips .chip').forEach(c=>c.classList.remove('on'));
+      if(el) el.classList.add('on');
+      _refresh();
     }
 
     function setStation(id){
@@ -358,7 +430,7 @@ window.COACH = (function () {
     function setDest(id){ _dest=id; _refresh(); }
     function clearDest(){ _dest=null; _refresh(); }
 
-    return {setStation,openLinePicker,pickLine,openDestPicker,setDest,clearDest};
+    return {setStation,openLinePicker,pickLine,openDestPicker,setDest,clearDest,setTimeH,buildTimeChips};
   })();
 
   window.COACH_UI=COACH_UI;
