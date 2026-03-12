@@ -130,7 +130,7 @@ window.LEGAL = (function () {
   }
 
   function cancelConsent() {
-    _pendingSignIn = null;
+    _pendingProvider = null;
     const google  = document.getElementById('lg-google');
     const github  = document.getElementById('lg-github');
     const consent = document.getElementById('lg-consent');
@@ -204,7 +204,7 @@ window.LEGAL = (function () {
 
   return {
     init, dismissDisclaimer,
-    interceptSignIn, proceedAfterConsent, cancelConsent,
+    trySignIn, proceedAfterConsent, cancelConsent,
     syncConsentToSupabase, hasConsent,
   };
 })();
