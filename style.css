@@ -547,3 +547,9 @@ button, [onclick], .bni, .chip, .ir-opt, .cp, .qa-btn,
   padding-top: env(safe-area-inset-top);
   height: calc(48px + env(safe-area-inset-top));
 }
+
+/* GPS spin animation */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
