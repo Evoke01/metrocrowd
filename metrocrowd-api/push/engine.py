@@ -303,8 +303,11 @@ class NotificationEngine:
 
             total       = len(trips)
             completed   = sum(1 for t in trips if t.get("completed"))
-            act_mins    = [t["actual_duration_sec"]/60 for t in trips if t.get("actual_duration_sec")]
-            est_mins    = [t["est_duration_sec"]/60    for t in trips if t.get("est_duration_sec")]
+            # Only include trips that have BOTH durations to avoid zip length mismatch
+            paired      = [(t["actual_duration_sec"]/60, t["est_duration_sec"]/60)
+                           for t in trips if t.get("actual_duration_sec") and t.get("est_duration_sec")]
+            act_mins    = [p[0] for p in paired]
+            est_mins    = [p[1] for p in paired]
             avg_min     = round(sum(act_mins)/len(act_mins)) if act_mins else 0
             saved_min   = sum(max(0, e-a) for e,a in zip(est_mins, act_mins))
             saved_str   = f"{round(saved_min/60,1)}h" if saved_min>=60 else f"{round(saved_min)}m"
