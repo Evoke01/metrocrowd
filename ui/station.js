@@ -110,18 +110,120 @@ window.STATION_UI = (function(){
   }
 
   function gpsLookup(){
-    if(!navigator.geolocation){ NAV.showToast('gps','GPS not available'); return; }
-    NAV.showToast('gps','Finding nearest station…');
-    navigator.geolocation.getCurrentPosition(pos => {
-      const {latitude:lat, longitude:lng} = pos.coords;
-      let best = null, bestD = Infinity;
-      Object.keys(METRO.STATIONS).forEach(id => {
-        const st = METRO.STATIONS[id];
-        if(st.gps){ const d = Math.hypot(st.gps[0]-lat, st.gps[1]-lng); if(d < bestD){ bestD=d; best=id; } }
+    if(!navigator.geolocation){
+      NAV.showToast('warn','Location not supported on this device');
+      return;
+    }
+
+    // ── Animate GPS button ──────────────────────────────────────
+    const btn = document.getElementById('stn-gps-btn');
+    function setBtnState(state) {
+      if (!btn) return;
+      if (state === 'loading') {
+        btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--y)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="animation:spin .8s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>';
+        btn.style.borderColor = 'rgba(255,208,0,.4)';
+        btn.style.background  = 'rgba(255,208,0,.08)';
+      } else if (state === 'found') {
+        btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+        btn.style.borderColor = 'rgba(74,222,128,.4)';
+        btn.style.background  = 'rgba(74,222,128,.08)';
+        setTimeout(() => setBtnState('idle'), 2000);
+      } else if (state === 'error') {
+        btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--pk)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+        btn.style.borderColor = 'rgba(239,68,68,.3)';
+        btn.style.background  = 'rgba(239,68,68,.06)';
+        setTimeout(() => setBtnState('idle'), 2500);
+      } else {
+        btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="8" stroke-dasharray="2 2" opacity=".4"/></svg>';
+        btn.style.borderColor = 'var(--brd)';
+        btn.style.background  = 'var(--card)';
+      }
+    }
+
+    // ── Haversine in metres ─────────────────────────────────────
+    function haversine(lat1, lng1, lat2, lng2) {
+      const R = 6371000, toR = Math.PI/180;
+      const dLat = (lat2-lat1)*toR, dLng = (lng2-lng1)*toR;
+      const a = Math.sin(dLat/2)**2
+              + Math.cos(lat1*toR)*Math.cos(lat2*toR)*Math.sin(dLng/2)**2;
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    }
+
+    // ── Find nearest using METRO.GPS (correct data source) ──────
+    function findNearest(lat, lng) {
+      const gps = window.METRO && METRO.GPS;
+      if (!gps) return null;
+      let best = null, bestDist = Infinity;
+      Object.entries(gps).forEach(([id, coord]) => {
+        const d = haversine(lat, lng, coord[0], coord[1]);
+        if (d < bestDist) { bestDist = d; best = id; }
       });
-      if(best) show(best);
-      else NAV.showToast('gps','No station found nearby');
-    }, () => NAV.showToast('gps','Location access denied'));
+      return best ? { id: best, dist: bestDist } : null;
+    }
+
+    // ── Update search bar text to give live feedback ─────────────
+    function setSearchHint(text) {
+      const el = document.getElementById('sp-val');
+      if (el) { el.textContent = text; el.className = 'sp-val ph'; }
+    }
+
+    setBtnState('loading');
+    setSearchHint('📡 Finding your location…');
+
+    // Try high-accuracy first, fallback to low-accuracy
+    function tryLocate(highAccuracy, attempt) {
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          const { latitude: lat, longitude: lng, accuracy: acc } = pos.coords;
+
+          // If accuracy is very poor and we haven't tried low-accuracy yet, retry
+          if (acc > 200 && attempt === 1) {
+            setSearchHint(`📡 Improving accuracy (±${Math.round(acc)}m)…`);
+            tryLocate(false, 2);
+            return;
+          }
+
+          const result = findNearest(lat, lng);
+          if (!result) {
+            setBtnState('error');
+            setSearchHint('Search a station…');
+            NAV.showToast('warn', 'Could not find nearby station');
+            return;
+          }
+
+          const stn  = METRO.STATIONS[result.id];
+          const name = stn ? stn.n : result.id;
+          const dist = result.dist < 1000
+            ? `${Math.round(result.dist)}m away`
+            : `${(result.dist/1000).toFixed(1)}km away`;
+
+          setBtnState('found');
+          show(result.id);
+
+          // Show accuracy badge in toast
+          const accLabel = acc <= 20  ? '🎯 High accuracy'
+                         : acc <= 60  ? '📍 Good accuracy'
+                         : acc <= 150 ? '📡 Moderate accuracy'
+                         : '⚠️ Low accuracy';
+          NAV.showToast('ok', `${name} · ${dist} · ${accLabel}`);
+        },
+        err => {
+          setBtnState('error');
+          setSearchHint('Search a station…');
+          const msg = err.code === 1 ? 'Location access denied — check browser settings'
+                    : err.code === 2 ? 'Location unavailable. Move to open area'
+                    : 'Location timed out. Try again';
+          NAV.showToast('warn', msg);
+        },
+        {
+          enableHighAccuracy: highAccuracy,
+          timeout:            highAccuracy ? 10000 : 6000,
+          maximumAge:         highAccuracy ? 0     : 30000,
+        }
+      );
+    }
+
+    tryLocate(true, 1);
   }
 
   function goCoachFromHere(){
