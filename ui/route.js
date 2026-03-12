@@ -18,13 +18,13 @@ window.ROUTE_UI = (function(){
       const el = document.getElementById('rFrom');
       if(el){ el.textContent = s.n; el.classList.remove('ph'); }
       const ce = document.getElementById('rFromC');
-      if(ce){ ce.textContent = 'Crowd: '+v+'%'; ce.style.color = _c(v); ce.style.display='block'; }
+      if(ce){ ce.textContent = T('crowd_colon')+' '+v+'%'; ce.style.color = _c(v); ce.style.display='block'; }
     } else {
       _to = id;
       const el = document.getElementById('rTo');
       if(el){ el.textContent = s.n; el.classList.remove('ph'); }
       const ce = document.getElementById('rToC');
-      if(ce){ ce.textContent = 'Crowd: '+v+'%'; ce.style.color = _c(v); ce.style.display='block'; }
+      if(ce){ ce.textContent = T('crowd_colon')+' '+v+'%'; ce.style.color = _c(v); ce.style.display='block'; }
     }
   }
 
@@ -49,7 +49,7 @@ window.ROUTE_UI = (function(){
   }
 
   function compute(){
-    if(!_from || !_to){ NAV.showToast('warn','Pick both stations first'); return; }
+    if(!_from || !_to){ NAV.showToast('warn', T('pick_both')); return; }
     if(typeof ROUTE === 'undefined'){
       const el = document.getElementById('rres');
       if(el) el.innerHTML = '<div class="route-error">Route module loading… try again.</div>';
