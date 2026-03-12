@@ -27,8 +27,6 @@ window.GROUP = (function () {
   let _routePath   = [];
 
   // ── Helpers ──────────────────────────────────────────────────
-  function _userId()   { try { return SB.client.auth.getUser ? SB.client.auth.getUser().then?.(r=>r?.data?.user?.id) : null; } catch { return null; } }
-  function _me()       { try { return SB.client.auth.currentUser; } catch { return null; } }
   async function _getMe() {
     try {
       const { data } = await SB.client.auth.getUser();
