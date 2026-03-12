@@ -135,7 +135,7 @@ window.COMMUTE = (function () {
   }
 
   function _commuteLoading(trip) {
-    const tag = trip.dir === 'toWork' ? 'MORNING COMMUTE' : 'EVENING COMMUTE';
+    const tag = trip.dir === 'toWork' ? T('morning_commute') : T('evening_commute');
     return `<div style="padding:16px">
       <div style="font-size:9px;color:var(--y);letter-spacing:.1em;font-family:'Syne',sans-serif;
         display:flex;align-items:center;gap:5px;margin-bottom:10px">
@@ -152,7 +152,7 @@ window.COMMUTE = (function () {
   function _commuteActive(trip, fromPct, bestCoach, lc, mins) {
     const cc  = _crowdColor(fromPct);
     const cw  = _crowdWord(fromPct);
-    const tag = trip.dir === 'toWork' ? 'MORNING COMMUTE' : 'EVENING COMMUTE';
+    const tag = trip.dir === 'toWork' ? T('morning_commute') : T('evening_commute');
     const lineColor = lc.color || '#F5A800';
     const lineName  = lc.name  || '';
 
@@ -180,13 +180,13 @@ window.COMMUTE = (function () {
       <!-- route -->
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
         <div style="flex:1;min-width:0">
-          <div style="font-size:9px;color:var(--sub);margin-bottom:1px">From</div>
+          <div style="font-size:9px;color:var(--sub);margin-bottom:1px">${T('from')}</div>
           <div style="font-size:15px;font-weight:900;font-family:'Syne',sans-serif;color:var(--txt);
             white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${trip.fromName}</div>
         </div>
         <div style="color:var(--y);font-size:20px;font-weight:900;flex-shrink:0">→</div>
         <div style="flex:1;min-width:0;text-align:right">
-          <div style="font-size:9px;color:var(--sub);margin-bottom:1px">To</div>
+          <div style="font-size:9px;color:var(--sub);margin-bottom:1px">${T('to')}</div>
           <div style="font-size:15px;font-weight:900;font-family:'Syne',sans-serif;color:var(--txt);
             white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${trip.toName}</div>
         </div>
