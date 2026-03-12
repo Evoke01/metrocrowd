@@ -134,7 +134,42 @@ window.AUTH = (function(){
     }
   }
 
-  async function signOut(){
+  async function deleteAccount(){
+    const confirmed = window.confirm(
+      'Delete your account and all data?\n\n' +
+      '• Your saved routes and preferences will be deleted\n' +
+      '• Your crowd reports will be anonymised (not deleted)\n' +
+      '• This cannot be undone\n\n' +
+      'Tap OK to confirm.'
+    );
+    if(!confirmed) return;
+
+    showLoading('Deleting account…');
+    try{
+      // 1. Delete saved_routes and push_tokens (RLS ensures own rows only)
+      if(client && currentUser){
+        await client.from('saved_routes').delete().eq('user_id', currentUser.id);
+        await client.from('push_tokens').delete().eq('user_id', currentUser.id);
+        // Anonymise crowd reports (set user_id to null)
+        await client.from('crowd_reports')
+          .update({ user_id: null })
+          .eq('user_id', currentUser.id);
+      }
+      // 2. Sign out and clear local state
+      localStorage.clear();
+      sessionStorage.clear();
+      await client.auth.signOut();
+      hideLoading();
+      // Reload to login gate
+      window.location.reload();
+    }catch(err){
+      hideLoading();
+      SB.showToast('Delete failed: '+err.message);
+      console.error('[AUTH] deleteAccount:', err);
+    }
+  }
+
+
     if(!client) return;
     showLoading('Signing out…');
     await client.auth.signOut();
@@ -348,7 +383,7 @@ window.AUTH = (function(){
   // ── Public API ─────────────────────────────────────────────────
   return {
     init, openModal, closeModal,
-    signInGoogle, signInGitHub, signOut,
+    signInGoogle, signInGitHub, signOut, deleteAccount,
     showGate, hideGate,
     setStatus, wrapSignInWithConsent,
     get currentUser(){ return currentUser; },
