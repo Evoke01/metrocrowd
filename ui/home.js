@@ -9,7 +9,7 @@ window.HOME_UI = (function(){
 
   const _c = p => p===0?'var(--dim)':p<40?'#4ade80':p<70?'var(--y)':'#f87171';
   const _f = p => p===0?'rgba(255,255,255,.06)':p<40?'#4ade80':p<70?'var(--y)':'#f87171';
-  const _l = p => p===0?'Station Closed':p<40?'Low Crowd':p<70?'Moderate Crowd':p<85?'High Crowd':'Packed';
+  const _l = p => p===0?T('crowd_closed'):p<40?T('crowd_low'):p<70?T('crowd_moderate'):p<85?T('crowd_high'):T('crowd_packed');
 
   function init(){
     _buildGreeting();
@@ -77,9 +77,9 @@ window.HOME_UI = (function(){
     if(subEl) subEl.textContent = s.l.map(l => METRO.LINE_NAMES[l]).join(' · ') + (s.ix ? ' · Interchange' : '');
     const tagEl = document.getElementById('h-tag');
     if(tagEl){
-      if(v < 40){ tagEl.className='hero-tag safe'; tagEl.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Good time to board now'; }
-      else if(v < 70){ tagEl.className='hero-tag'; tagEl.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Moderate — wait may help'; }
-      else { tagEl.className='hero-tag'; tagEl.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Very packed — try next train'; }
+      if(v < 40){ tagEl.className='hero-tag safe'; tagEl.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> '+T('board_now'); }
+      else if(v < 70){ tagEl.className='hero-tag'; tagEl.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> '+T('moderate_wait'); }
+      else { tagEl.className='hero-tag'; tagEl.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> '+T('very_packed'); }
     }
 
     _buildForecast(forecast);
@@ -122,9 +122,9 @@ window.HOME_UI = (function(){
       return `<div class="line-row" onclick="SEARCH.open('station')">
         <div class="lr-dot" style="background:${color||'#888'};opacity:${isOpen?1:.4}"></div>
         <div class="lr-name" style="opacity:${isOpen?1:.55}">${name}</div>
-        <div class="lr-st" style="opacity:${isOpen?1:.4}">${count} st</div>
+        <div class="lr-st" style="opacity:${isOpen?1:.4}">${count} ${T('stations_suffix')}</div>
         <div class="lr-right">
-          <div class="lr-pct" style="color:${c}">${isOpen ? avg+'%' : 'Closed'}</div>
+          <div class="lr-pct" style="color:${c}">${isOpen ? avg+'%' : T('closed')}</div>
           ${isOpen ? `<div class="lr-bar-bg"><div class="lr-bar-fill" style="width:${avg}%;background:${c}"></div></div>` : ''}
         </div>
       </div>`;
