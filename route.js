@@ -15,7 +15,7 @@ window.ROUTE=(function(){
     RW:'R',RE:'R',
     GA:'G',GB:'G',GC:'G',
     // Pink paths — ALL must map to 'P', not confused with Magenta
-    PNW:'P',PW:'P',PE:'P',PNE:'P',PTR:'P',PWEL:'P',PAZ:'P',
+    PNW:'P',PW:'P',PE:'P',PNE:'P',PTR:'P',PWEL:'P',PIE:'P',
     // Magenta — single key, no prefix clash
     M:'M',
     VN:'V',VITO:'V',VS:'V',
@@ -420,7 +420,14 @@ window.ROUTE=(function(){
     }).join('');
 
     res.style.display='block';
-    res.innerHTML=summaryHTML+`<div class="rh-list">${hopsHTML}</div>`;
+    res.innerHTML=`<div style="background:var(--card);border:1px solid var(--brd);border-radius:16px;padding:14px 14px 6px;margin-top:4px">
+      ${summaryHTML}
+    </div>
+    <div style="background:var(--card);border:1px solid var(--brd);border-radius:16px;padding:14px;margin-top:8px">
+      <div style="font-size:9px;color:var(--sub);letter-spacing:.08em;text-transform:uppercase;
+        font-family:'Syne',sans-serif;margin-bottom:10px">Station by Station</div>
+      <div class="rh-list">${hopsHTML}</div>
+    </div>`;
   }
 
   // ── GPS — delegated to gps.js module ─────────────────────────
