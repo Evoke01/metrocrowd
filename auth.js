@@ -170,6 +170,7 @@ window.AUTH = (function(){
   }
 
 
+  async function signOut(){
     if(!client) return;
     showLoading('Signing out…');
     await client.auth.signOut();
