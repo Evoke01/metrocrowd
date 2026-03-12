@@ -17,7 +17,7 @@ window.LEGAL = (function () {
 
   const DISCLAIMER_KEY  = 'mc_disclaimer_v1';
   const CONSENT_KEY     = 'mc_consent_v1';
-  let   _pendingSignIn  = null;  // fn to call after consent
+  let   _pendingProvider = null; // 'google' or 'github'
 
   // ── First-launch disclaimer modal ─────────────────────────────────────────
   function _showDisclaimerModal() {
@@ -84,17 +84,19 @@ window.LEGAL = (function () {
     document.getElementById('disclaimer-modal')?.remove();
   }
 
-  // ── Consent gate (intercepts OAuth buttons) ───────────────────────────────
-  // Wrap each sign-in fn so consent is shown first
-  function interceptSignIn(fn) {
-    return function () {
-      // If user already consented in this browser, go straight through
-      const existing = _loadConsent();
-      if (existing?.c1) { fn(); return; }
-      // Otherwise show consent step
-      _pendingSignIn = fn;
-      _showConsentStep();
-    };
+  // ── Consent gate ──────────────────────────────────────────────────────────
+  // Called directly by the sign-in buttons in HTML
+  function trySignIn(provider) {
+    const existing = _loadConsent();
+    if (existing?.c1) {
+      // Already consented — go straight to OAuth
+      if (provider === 'google') AUTH.signInGoogle();
+      else AUTH.signInGitHub();
+      return;
+    }
+    // First time — show consent step, remember which provider
+    _pendingProvider = provider;
+    _showConsentStep();
   }
 
   function _showConsentStep() {
@@ -141,18 +143,22 @@ window.LEGAL = (function () {
 
   function proceedAfterConsent() {
     const c1 = document.getElementById('lg-c1')?.checked;
-    if (!c1) { NAV.showToast('warn', 'Please accept the required terms first'); return; }
+    if (!c1) { if(typeof NAV!=='undefined') NAV.showToast('warn','Please accept the required terms first'); return; }
 
     const c2 = document.getElementById('lg-c2')?.checked || false;
     const c3 = document.getElementById('lg-c3')?.checked || false;
 
     _saveConsent({ c1: true, c2, c3, ts: Date.now(), version: '1.0' });
 
-    // Fire the deferred sign-in function
-    const fn = _pendingSignIn;
-    _pendingSignIn = null;
+    const provider = _pendingProvider;
+    _pendingProvider = null;
     cancelConsent();
-    if (fn) fn();
+
+    // Fire OAuth after a brief tick so UI updates first
+    setTimeout(() => {
+      if (provider === 'google') AUTH.signInGoogle();
+      else if (provider === 'github') AUTH.signInGitHub();
+    }, 50);
   }
 
   // ── Persist consent to Supabase after login ───────────────────────────────
