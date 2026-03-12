@@ -37,7 +37,7 @@ def start_scheduler():
     # Real-time vehicle positions — every 30 seconds
     scheduler.add_job(_run_realtime, IntervalTrigger(seconds=30),     id="realtime")
     # Retrain ML model — every 24 hours
-    scheduler.add_job(_run_train,    IntervalTrigger(hours=24),        id="train")
+    scheduler.add_job(_run_train,    IntervalTrigger(hours=6),         id="train")
     scheduler.start()
     print("[Scheduler] Started. Jobs: gtfs(daily) · realtime(30s) · train(24h)")
 
