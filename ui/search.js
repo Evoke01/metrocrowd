@@ -8,13 +8,13 @@ window.SEARCH = (function(){
   let _mode = '';  // 'station'|'coach-station'|'coach-dest'|'r-from'|'r-to'|'report'|'home'
 
   const LABELS = {
-    'station':       'Check Station',
-    'coach-station': 'Select Station',
-    'coach-dest':    'Select Destination',
-    'r-from':        'Select Origin',
-    'r-to':          'Select Destination',
-    'report':        'Select Station',
-    'home':          'Set Home Station',
+    'station':       ()=>T('search_label_station'),
+    'coach-station': ()=>T('search_label_coach_stn'),
+    'coach-dest':    ()=>T('search_label_coach_dest'),
+    'r-from':        ()=>T('search_label_from'),
+    'r-to':          ()=>T('search_label_to'),
+    'report':        ()=>T('search_label_report'),
+    'home':          ()=>T('search_label_home'),
   };
 
   const LINE_COL = {
@@ -26,7 +26,7 @@ window.SEARCH = (function(){
   function open(mode){
     _mode = mode;
     const lbl = document.getElementById('ov-lbl');
-    if(lbl) lbl.textContent = LABELS[mode] || 'Select Station';
+    if(lbl) lbl.textContent = (LABELS[mode] ? LABELS[mode]() : T('search_label_station'));
     const inp = document.getElementById('ov-input');
     if(inp) inp.value = '';
     _render('');
