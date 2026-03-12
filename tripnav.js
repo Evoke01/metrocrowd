@@ -195,6 +195,11 @@ window.TRIPNAV = (function () {
             }
             _render();
             if (navigator.vibrate) navigator.vibrate([60, 30, 60]);
+            // Notify group members of position change
+            if (typeof GROUP !== 'undefined' && GROUP.active) {
+              GROUP.updatePosition(_path[_currentIdx], _currentIdx);
+              GROUP.highlightOnRoute();
+            }
           }
         }
 
