@@ -40,6 +40,7 @@ document.addEventListener('DOMContentLoaded', function () {
     console.log('[UI-PROXY] All UI.* delegates wired');
     if(typeof AUTH !== 'undefined') AUTH.wrapSignInWithConsent();
     if(typeof LEGAL !== 'undefined') LEGAL.init();
+    if(typeof SETTINGS !== 'undefined') SETTINGS.init();
 
   }, 0);
 });
