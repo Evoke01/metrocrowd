@@ -306,6 +306,45 @@ body{height:100%;height:100dvh;overflow:hidden;font-family:'DM Sans',sans-serif;
 .rh-crowd{font-size:10px;font-weight:700;margin-top:1px;}
 .route-seg-hdr{font-size:9px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--sub);padding:6px 0 3px;}
 .route-error{background:var(--card);border:1px solid var(--brd);border-radius:14px;padding:16px;font-size:13px;color:var(--sub);text-align:center;}
+
+/* ── Route hop list ──────────────────────────────────────── */
+.rh-list{display:flex;flex-direction:column;}
+
+/* Segment header (line name banner) */
+.rh-segment-header{display:flex;align-items:center;gap:8px;padding:8px 0 4px;
+  border-left:3px solid var(--lc,var(--y));padding-left:10px;margin:8px 0 4px;}
+.rh-seg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.rh-seg-name{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;
+  color:var(--txt);letter-spacing:.04em;text-transform:uppercase;}
+.rh-seg-badge{font-size:9px;font-weight:700;color:var(--y);background:rgba(245,208,0,.1);
+  border:1px solid rgba(245,208,0,.25);border-radius:8px;padding:2px 7px;margin-left:4px;}
+
+/* Each hop row */
+.rhop{display:flex;align-items:stretch;gap:10px;padding:2px 0;}
+
+/* Left timeline column */
+.rhl{display:flex;flex-direction:column;align-items:center;width:16px;flex-shrink:0;padding-top:4px;}
+.hdot{flex-shrink:0;}
+.hln{width:2px;flex:1;min-height:16px;margin-top:3px;border-radius:1px;}
+
+/* Right content column */
+.hin{flex:1;min-width:0;padding:4px 0 10px;}
+.hnm{font-size:13px;font-weight:700;color:var(--txt);display:flex;align-items:center;gap:6px;
+  line-height:1.3;}
+.rix-badge{font-size:9px;color:var(--y);background:rgba(245,208,0,.1);
+  border:1px solid rgba(245,208,0,.25);border-radius:6px;padding:1px 5px;flex-shrink:0;}
+
+/* Line chips under station name */
+.hmt{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;}
+.line-dot-chip{display:inline-flex;align-items:center;padding:2px 8px;
+  border-radius:20px;font-size:9px;font-weight:700;}
+
+/* Crowd bar row */
+.hcrowd{display:flex;align-items:center;gap:5px;margin-top:5px;font-size:10px;font-weight:600;
+  position:relative;}
+.hcrowd-bar{display:inline-block;height:3px;border-radius:2px;margin-right:4px;
+  vertical-align:middle;opacity:.7;max-width:60px;}
+.hcrowd-dot{color:var(--dim);margin:0 1px;}
 /* REPORT */
 .karma-row{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--brd);border-radius:14px;padding:12px 13px;margin-bottom:13px;}
 .kr-ico{font-size:20px;}
