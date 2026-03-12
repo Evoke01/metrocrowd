@@ -39,7 +39,9 @@ window.HOME_UI = (function(){
 
   function _buildGreeting(){
     const h = new Date().getHours();
-    const gr = h < 12 ? 'Good Morning' : h < 17 ? 'Good Afternoon' : 'Good Evening';
+    const grKey = h < 12 ? 'good_morning' : h < 17 ? 'good_afternoon' : 'good_evening';
+    const gr = (typeof SETTINGS !== 'undefined') ? SETTINGS.t(grKey)
+      : (h < 12 ? 'Good Morning' : h < 17 ? 'Good Afternoon' : 'Good Evening');
     NAV._s('h-greet', gr);
     NAV._s('h-date', new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'}));
   }
