@@ -34,7 +34,7 @@ async def my_trips(user_id: str = Query(...), limit: int = Query(default=30)):
                     "started_at,ended_at,actual_duration_sec,est_duration_sec,"
                     "completed,stops_tracked,hour_of_day,day_of_week") \
             .eq("user_id", user_id) \
-            .order("created_at", desc=True) \
+            .order("started_at", desc=True) \
             .limit(limit) \
             .execute()
         return {"ok": True, "trips": r.data or []}
