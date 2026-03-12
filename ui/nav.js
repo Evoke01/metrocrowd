@@ -21,7 +21,7 @@ window.NAV = (function(){
     if(screenId === 's-report')  typeof REPORT_UI !== 'undefined' && REPORT_UI.onTabOpen();
     if(screenId === 's-home')    typeof HOME_UI !== 'undefined' && HOME_UI.refresh();
     if(screenId === 's-station') typeof STATION_UI !== 'undefined' && STATION_UI.onTabOpen();
-    if(screenId === 's-coach')   typeof COACH_UI !== 'undefined' && COACH_UI.refresh();
+    if(screenId === 's-coach')   { typeof COACH_UI !== 'undefined' && COACH_UI.refresh(); typeof COACH_UI !== 'undefined' && COACH_UI.buildTimeChips(); }
   }
 
   // Legacy alias used by supabase.js
