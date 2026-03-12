@@ -421,6 +421,8 @@ window.ROUTE=(function(){
 
     // Store result for nav access
     window._lastRouteResult = result;
+      // Show platform + gate guide below route result
+      if (typeof GUIDE !== 'undefined') GUIDE.showForRoute(result);
 
     res.style.display='block';
     res.innerHTML=`<div style="background:var(--card);border:1px solid var(--brd);border-radius:16px;padding:14px 14px 6px;margin-top:4px">
