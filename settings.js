@@ -1,132 +1,290 @@
 // ══════════════════════════════════════════════════════════════════
-//  settings.js — Theme switcher + Hindi/English language toggle
-//  Exposes: window.SETTINGS
-//  Reads/writes: localStorage keys mc_theme, mc_lang
+//  settings.js — Theme + Language (Hindi/English)
+//  window.SETTINGS exposed globally
+//  window.T(key) — short alias for SETTINGS.t(key)
 // ══════════════════════════════════════════════════════════════════
 window.SETTINGS = (function () {
   'use strict';
 
   // ── THEME ─────────────────────────────────────────────────────
-  const THEMES = ['dark', 'system', 'light'];
+  const THEMES = ['dark','system','light'];
   let _theme = localStorage.getItem('mc_theme') || 'dark';
 
-  const LIGHT_VARS = `
-    --blk:#F5F5F5; --card:#FFFFFF; --card2:#EDEDED;
-    --brd:rgba(0,0,0,0.08); --brd2:rgba(0,0,0,0.14);
-    --txt:#111111; --sub:rgba(0,0,0,0.45); --dim:rgba(0,0,0,0.18);
-    --muted:rgba(0,0,0,0.38); --border:rgba(0,0,0,0.08);
-    --text:#111111; --bg2:#FFFFFF; --bg3:#EDEDED;
-    --low:#1a9e4a; --pk:#e53935; --a2:#b8960a;
-  `;
-  const DARK_VARS = `
-    --blk:#080808; --card:#141414; --card2:#1c1c1c;
-    --brd:rgba(255,255,255,0.07); --brd2:rgba(255,255,255,0.13);
-    --txt:#EFEFEF; --sub:rgba(255,255,255,0.40); --dim:rgba(255,255,255,0.16);
-    --muted:rgba(255,255,255,0.38); --border:rgba(255,255,255,0.07);
-    --text:#EFEFEF; --bg2:#141414; --bg3:#1c1c1c;
-    --low:#FFD000; --pk:#FF5252; --a2:#FFD000;
-  `;
+  const DARK_VARS  = '--blk:#080808;--card:#141414;--card2:#1c1c1c;--brd:rgba(255,255,255,0.07);--brd2:rgba(255,255,255,0.13);--txt:#EFEFEF;--sub:rgba(255,255,255,0.40);--dim:rgba(255,255,255,0.16);--muted:rgba(255,255,255,0.38);--border:rgba(255,255,255,0.07);--text:#EFEFEF;--bg2:#141414;--bg3:#1c1c1c;--low:#FFD000;--pk:#FF5252;--a2:#FFD000;';
+  const LIGHT_VARS = '--blk:#F5F5F5;--card:#FFFFFF;--card2:#EDEDED;--brd:rgba(0,0,0,0.08);--brd2:rgba(0,0,0,0.14);--txt:#111111;--sub:rgba(0,0,0,0.45);--dim:rgba(0,0,0,0.18);--muted:rgba(0,0,0,0.38);--border:rgba(0,0,0,0.08);--text:#111111;--bg2:#FFFFFF;--bg3:#EDEDED;--low:#1a9e4a;--pk:#e53935;--a2:#b8960a;';
 
   function _applyTheme(t) {
-    const isDark = t === 'dark' || (t === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    let style = document.getElementById('_theme_vars');
-    if (!style) {
-      style = document.createElement('style');
-      style.id = '_theme_vars';
-      document.head.appendChild(style);
-    }
-    style.textContent = `:root { ${isDark ? DARK_VARS : LIGHT_VARS} }`;
-    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-    document.body.style.background = isDark ? '#0a0a0a' : '#f0f0f0';
+    const dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme:dark)').matches);
+    let s = document.getElementById('_theme_vars');
+    if (!s) { s = document.createElement('style'); s.id = '_theme_vars'; document.head.appendChild(s); }
+    s.textContent = ':root{' + (dark ? DARK_VARS : LIGHT_VARS) + '}';
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    document.body.style.background = dark ? '#0a0a0a' : '#f0f0f0';
   }
-
-  function setTheme(t) {
-    _theme = t;
-    localStorage.setItem('mc_theme', t);
-    _applyTheme(t);
-    _updateThemeBtn();
-  }
-
-  function cycleTheme() {
-    const next = THEMES[(THEMES.indexOf(_theme) + 1) % THEMES.length];
-    setTheme(next);
-  }
-
+  function setTheme(t) { _theme=t; localStorage.setItem('mc_theme',t); _applyTheme(t); _updateThemeBtn(); }
+  function cycleTheme() { setTheme(THEMES[(THEMES.indexOf(_theme)+1)%THEMES.length]); }
   function _themeIcon(t) {
-    if (t === 'light') return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
-    if (t === 'system') return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`;
-    return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>`;
+    if (t==='light') return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
+    if (t==='system') return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>';
+    return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>';
   }
-
   function _updateThemeBtn() {
-    const btn = document.getElementById('settings-theme-btn');
-    if (!btn) return;
-    btn.innerHTML = _themeIcon(_theme);
-    btn.title = { dark: 'Dark mode', system: 'System theme', light: 'Light mode' }[_theme];
+    var b = document.getElementById('settings-theme-btn'); if (!b) return;
+    b.innerHTML = _themeIcon(_theme);
+    b.title = {dark:'Dark mode',system:'System theme',light:'Light mode'}[_theme];
   }
 
-  // ── LANGUAGE ──────────────────────────────────────────────────
+  // ── LANGUAGE ─────────────────────────────────────────────────
   let _lang = localStorage.getItem('mc_lang') || 'en';
 
-  const STRINGS = {
+  const S = {
     en: {
-      good_morning: 'Good Morning', good_afternoon: 'Good Afternoon',
-      good_evening: 'Good Evening', good_night: 'Good Night',
-      live: 'LIVE', morning_commute: 'MORNING COMMUTE', evening_commute: 'EVENING COMMUTE',
-      crowd_now: 'Crowd now', leaving_now: 'Leaving Now', board: 'Board',
-      check_station: 'Check Station', instant_crowd: 'Instant crowd lookup',
-      report_crowd: 'Report Crowd', two_tap: '2-tap submit',
-      all_lines: 'All Lines', route_planner: 'Route planner →',
-      network_crowd: 'NETWORK CROWD — NEXT 4 HOURS',
-      station_closed: 'Station Closed', empty: 'Empty', light: 'Light',
-      moderate: 'Moderate', crowded: 'Crowded', packed: 'Packed',
-      add_destination: 'Add destination', exit_optimised: 'Get exit-optimised coach for where you\'re going',
-      all_coaches: 'All coaches ranked', ladies_only: 'Ladies only',
-      front: '← FRONT', rear: 'REAR →', best: 'Best', good: 'Good',
-      next_at: 'Next at', board_here: 'BOARD HERE',
-      home_station: 'HOME STATION', work_dest: 'WORK / DESTINATION',
-      save_commute: 'Save Commute', disable_commute: 'Disable Smart Commute',
-      smart_commute: 'Smart Commute', or_backup: 'or',
-      off_peak: 'Off-Peak', peak: 'Peak', near_exit: 'near exit',
-      stops: 'Stops', est_time: 'Est. Time', avg_crowd: 'Avg Crowd',
-      changes: 'Changes', token: 'Token', smart_card: 'Smart Card',
-      station_by_station: 'Station by Station',
-      sign_in: 'Sign in', sign_out: 'Sign Out', delete_account: 'Delete Account & All Data',
-      reports: 'REPORTS', member_since: 'MEMBER SINCE',
-      how_to_use: 'How to Use MetroCrowd',
+      // Greeting
+      good_morning:'Good Morning', good_afternoon:'Good Afternoon',
+      good_evening:'Good Evening', good_night:'Good Night',
+      // Bottom nav
+      nav_home:'Home', nav_station:'Station', nav_coach:'Coach',
+      nav_route:'Route', nav_report:'Report',
+      // Home screen
+      live:'LIVE',
+      your_route_live:'YOUR ROUTE · LIVE CROWD',
+      set_commute:'Set commute',
+      origin:'Origin', destination:'Destination',
+      tap_to_plan:'Tap to plan route',
+      board_now:'Good time to board now',
+      moderate_wait:'Moderate — wait may help',
+      very_packed:'Very packed — try next train',
+      network_crowd:'Network Crowd — Next 4 Hours',
+      all_lines:'All Lines', route_planner_link:'Route planner →',
+      closed:'Closed',
+      // Crowd levels
+      crowd_closed:'Station Closed', crowd_empty:'Empty',
+      crowd_low:'Low Crowd', crowd_moderate:'Moderate Crowd',
+      crowd_high:'High Crowd', crowd_packed:'Packed',
+      stations_suffix:'st',
+      // Quick actions
+      check_station:'Check Station', instant_crowd:'Instant crowd lookup',
+      report_crowd:'Report Crowd', two_tap_submit:'2-tap submit',
+      // Station screen
+      instant_lookup:'Instant Crowd Lookup',
+      search_station_desc:'Search any Delhi Metro station above\nor tap the GPS button to auto-detect',
+      next_4_hours:'Next 4 Hours',
+      nearby_buses:'Nearby Buses',
+      coach_finder_btn:'Coach Finder',
+      plan_route_btn:'Plan Route',
+      community_reports:'Community Reports',
+      last_2hrs:'Last 2 hrs',
+      // Search overlay
+      search_placeholder:'Search station…',
+      all_stations:'All Stations',
+      search_label_station:'Check Station',
+      search_label_coach_stn:'Select Station',
+      search_label_coach_dest:'Select Destination',
+      search_label_from:'Select Origin',
+      search_label_to:'Select Destination',
+      search_label_report:'Select Station',
+      search_label_home:'Set Home Station',
+      // Coach screen
+      coach_finder:'Coach Finder',
+      coach_sub:'Least crowded coach · fastest exit',
+      coach_select_station:'Select station',
+      coach_select_line:'Select line',
+      coach_time:'Time',
+      coach_empty_title:'Pick a station & line',
+      coach_empty_sub:'We\'ll show which coach to board based on real gate positions and crowd patterns',
+      coach_ladies:'Ladies only',
+      coach_front:'← FRONT', coach_rear:'REAR →',
+      coach_best:'Best', coach_good:'Good',
+      coach_board_here:'BOARD HERE',
+      coach_next_at:'Next at',
+      coach_metro_closed:'Metro Closed',
+      coach_closed_sub:'Metro is not running at this time',
+      coach_all_coaches:'All coaches ranked',
+      coach_add_dest:'Add destination',
+      coach_dest_sub:'Get exit-optimised coach for where you\'re going',
+      // Route screen
+      route_planner_title:'Route Planner',
+      route_planner_sub:'Crowd-aware · least-packed path',
+      from_label:'From', to_label:'To',
+      select_origin:'Select origin', select_destination:'Select destination',
+      avoid_packed:'Avoid packed', fastest:'Fastest', fewest_stops:'Fewest stops',
+      find_route:'Find Smartest Route',
+      crowd_colon:'Crowd:',
+      pick_both:'Pick both stations first',
+      station_by_station:'Station by Station',
+      route_summary:'Journey Summary',
+      stops:'Stops', est_time:'Est. Time', avg_crowd:'Avg Crowd',
+      changes:'Changes', token:'Token', smart_card:'Smart Card',
+      fare:'Fare',
+      // Report screen
+      report_title:'Report Crowd',
+      report_sub:'Your reports power the AI for 3M+ commuters',
+      your_impact:'Your impact this week',
+      reports_submitted:'Reports submitted',
+      select_your_station:'Select your station',
+      crowd_level_lbl:'Crowd level',
+      empty_label:'Empty', moderate_label:'Moderate',
+      crowded_label:'Crowded', packed_label:'Packed',
+      seats_available:'Seats available',
+      some_people:'Some people, comfortable',
+      standing_room:'Standing room only',
+      skip_next:'Skip — next train',
+      add_note:'Add a note (optional)',
+      note_placeholder:'Signal delay? Event crowd? Anything unusual…',
+      submit_report:'Submit Report',
+      report_success:'Report submitted!',
+      report_success_sub:'Your data helps other commuters',
+      karma_earned:'+1 ★ Karma · Total:',
+      recent_reports:'Recent Network Reports',
+      no_reports:'No reports in last 2 hours.',
+      connect_to_see:'Connect to see community reports.',
+      could_not_load:'Could not load reports.',
+      just_now:'just now',
+      sec_ago:'s ago', min_ago:' min ago', hr_ago:'h ago',
+      // Auth
+      sign_in:'Sign In', sign_out:'Sign Out',
+      delete_account:'Delete Account & All Data',
+      reports_stat:'REPORTS', member_since:'MEMBER SINCE',
+      how_to_use:'How to Use MetroCrowd',
+      // Login gate
+      login_headline:'Real-time crowd data\nfor every Delhi Metro station',
+      login_sub:'Sign in to report crowds, sync across devices, and get personalised alerts',
+      continue_google:'Continue with Google',
+      continue_github:'Continue with GitHub',
+      login_footer:'Your reports help 3M+ daily commuters\nNo spam · No ads ·',
+      // Morning/evening commute
+      morning_commute:'MORNING COMMUTE',
+      evening_commute:'EVENING COMMUTE',
+      from:'From', to:'To',
+      crowd_now:'Crowd now',
+      leaving_now:'Leaving Now',
+      board:'Board',
     },
     hi: {
-      good_morning: 'सुप्रभात', good_afternoon: 'नमस्ते', good_evening: 'शुभ संध्या',
-      good_night: 'शुभ रात्रि', live: 'लाइव', morning_commute: 'सुबह की यात्रा',
-      evening_commute: 'शाम की यात्रा', crowd_now: 'अभी भीड़',
-      leaving_now: 'अभी चलें', board: 'सवार हों',
-      check_station: 'स्टेशन जांचें', instant_crowd: 'तुरंत भीड़ जानकारी',
-      report_crowd: 'भीड़ रिपोर्ट', two_tap: '2 टैप में सबमिट',
-      all_lines: 'सभी लाइनें', route_planner: 'मार्ग योजना →',
-      network_crowd: 'नेटवर्क भीड़ — अगले 4 घंटे',
-      station_closed: 'स्टेशन बंद', empty: 'खाली', light: 'हल्की',
-      moderate: 'मध्यम', crowded: 'भीड़', packed: 'बहुत भीड़',
-      add_destination: 'गंतव्य जोड़ें', exit_optimised: 'आपके गंतव्य के लिए सही कोच',
-      all_coaches: 'सभी कोच रैंकिंग', ladies_only: 'महिला कोच',
-      front: '← आगे', rear: 'पीछे →', best: 'बेस्ट', good: 'अच्छा',
-      next_at: 'अगली बार', board_here: 'यहाँ चढ़ें',
-      home_station: 'घर का स्टेशन', work_dest: 'कार्यालय / गंतव्य',
-      save_commute: 'यात्रा सहेजें', disable_commute: 'स्मार्ट यात्रा बंद करें',
-      smart_commute: 'स्मार्ट यात्रा', or_backup: 'या',
-      off_peak: 'ऑफ-पीक', peak: 'पीक', near_exit: 'निकास के पास',
-      stops: 'स्टॉप', est_time: 'अनुमानित समय', avg_crowd: 'औसत भीड़',
-      changes: 'बदलाव', token: 'टोकन', smart_card: 'स्मार्ट कार्ड',
-      station_by_station: 'स्टेशन दर स्टेशन',
-      sign_in: 'साइन इन', sign_out: 'साइन आउट',
-      delete_account: 'अकाउंट व डेटा हटाएं',
-      reports: 'रिपोर्ट', member_since: 'सदस्यता से',
-      how_to_use: 'MetroCrowd कैसे उपयोग करें',
+      // Greeting
+      good_morning:'सुप्रभात', good_afternoon:'नमस्ते',
+      good_evening:'शुभ संध्या', good_night:'शुभ रात्रि',
+      // Bottom nav
+      nav_home:'होम', nav_station:'स्टेशन', nav_coach:'कोच',
+      nav_route:'मार्ग', nav_report:'रिपोर्ट',
+      // Home screen
+      live:'लाइव',
+      your_route_live:'आपका मार्ग · लाइव भीड़',
+      set_commute:'यात्रा सेट करें',
+      origin:'प्रस्थान', destination:'गंतव्य',
+      tap_to_plan:'मार्ग योजना बनाएं',
+      board_now:'अभी चढ़ने का सही समय',
+      moderate_wait:'मध्यम भीड़ — थोड़ा इंतज़ार करें',
+      very_packed:'बहुत भीड़ — अगली ट्रेन लें',
+      network_crowd:'नेटवर्क भीड़ — अगले 4 घंटे',
+      all_lines:'सभी लाइनें', route_planner_link:'मार्ग योजना →',
+      closed:'बंद',
+      // Crowd levels
+      crowd_closed:'स्टेशन बंद', crowd_empty:'खाली',
+      crowd_low:'कम भीड़', crowd_moderate:'मध्यम भीड़',
+      crowd_high:'अधिक भीड़', crowd_packed:'बहुत भीड़',
+      stations_suffix:'स्टे.',
+      // Quick actions
+      check_station:'स्टेशन जांचें', instant_crowd:'तुरंत भीड़ जानकारी',
+      report_crowd:'भीड़ रिपोर्ट', two_tap_submit:'2 टैप में सबमिट',
+      // Station screen
+      instant_lookup:'तुरंत भीड़ जानकारी',
+      search_station_desc:'ऊपर कोई दिल्ली मेट्रो स्टेशन खोजें\nया GPS से अपना स्टेशन पता करें',
+      next_4_hours:'अगले 4 घंटे',
+      nearby_buses:'पास की बसें',
+      coach_finder_btn:'कोच फाइंडर',
+      plan_route_btn:'मार्ग योजना',
+      community_reports:'सामुदायिक रिपोर्ट',
+      last_2hrs:'पिछले 2 घंटे',
+      // Search overlay
+      search_placeholder:'स्टेशन खोजें…',
+      all_stations:'सभी स्टेशन',
+      search_label_station:'स्टेशन जांचें',
+      search_label_coach_stn:'स्टेशन चुनें',
+      search_label_coach_dest:'गंतव्य चुनें',
+      search_label_from:'प्रस्थान चुनें',
+      search_label_to:'गंतव्य चुनें',
+      search_label_report:'स्टेशन चुनें',
+      search_label_home:'होम स्टेशन सेट करें',
+      // Coach screen
+      coach_finder:'कोच फाइंडर',
+      coach_sub:'सबसे कम भीड़ वाला कोच · तेज़ बाहर निकलें',
+      coach_select_station:'स्टेशन चुनें',
+      coach_select_line:'लाइन चुनें',
+      coach_time:'समय',
+      coach_empty_title:'स्टेशन और लाइन चुनें',
+      coach_empty_sub:'हम असली गेट पोजिशन और भीड़ के पैटर्न के आधार पर बताएंगे कि किस कोच में चढ़ें',
+      coach_ladies:'महिला कोच',
+      coach_front:'← आगे', coach_rear:'पीछे →',
+      coach_best:'बेस्ट', coach_good:'अच्छा',
+      coach_board_here:'यहाँ चढ़ें',
+      coach_next_at:'अगली बार',
+      coach_metro_closed:'मेट्रो बंद',
+      coach_closed_sub:'इस समय मेट्रो नहीं चल रही',
+      coach_all_coaches:'सभी कोच रैंकिंग',
+      coach_add_dest:'गंतव्य जोड़ें',
+      coach_dest_sub:'आप कहाँ जा रहे हैं उसके लिए सही कोच पाएं',
+      // Route screen
+      route_planner_title:'मार्ग योजनाकार',
+      route_planner_sub:'भीड़-जागरूक · कम भीड़ वाला मार्ग',
+      from_label:'से', to_label:'तक',
+      select_origin:'प्रस्थान चुनें', select_destination:'गंतव्य चुनें',
+      avoid_packed:'भीड़ से बचें', fastest:'सबसे तेज़', fewest_stops:'कम स्टॉप',
+      find_route:'स्मार्ट मार्ग खोजें',
+      crowd_colon:'भीड़:',
+      pick_both:'पहले दोनों स्टेशन चुनें',
+      station_by_station:'स्टेशन दर स्टेशन',
+      route_summary:'यात्रा सारांश',
+      stops:'स्टॉप', est_time:'अनुमानित समय', avg_crowd:'औसत भीड़',
+      changes:'बदलाव', token:'टोकन', smart_card:'स्मार्ट कार्ड',
+      fare:'किराया',
+      // Report screen
+      report_title:'भीड़ रिपोर्ट',
+      report_sub:'आपकी रिपोर्ट 30 लाख यात्रियों की मदद करती है',
+      your_impact:'इस सप्ताह आपका योगदान',
+      reports_submitted:'सबमिट की गई रिपोर्ट',
+      select_your_station:'अपना स्टेशन चुनें',
+      crowd_level_lbl:'भीड़ का स्तर',
+      empty_label:'खाली', moderate_label:'मध्यम',
+      crowded_label:'भीड़', packed_label:'बहुत भीड़',
+      seats_available:'सीटें उपलब्ध',
+      some_people:'कुछ लोग, आरामदायक',
+      standing_room:'केवल खड़े होने की जगह',
+      skip_next:'छोड़ें — अगली ट्रेन',
+      add_note:'नोट जोड़ें (वैकल्पिक)',
+      note_placeholder:'सिग्नल देरी? भीड़ का कारण? कुछ असामान्य…',
+      submit_report:'रिपोर्ट सबमिट करें',
+      report_success:'रिपोर्ट सबमिट हुई!',
+      report_success_sub:'आपका डेटा यात्रियों की मदद करता है',
+      karma_earned:'+1 ★ कर्म · कुल:',
+      recent_reports:'हाल की नेटवर्क रिपोर्ट',
+      no_reports:'पिछले 2 घंटों में कोई रिपोर्ट नहीं।',
+      connect_to_see:'सामुदायिक रिपोर्ट देखने के लिए जुड़ें।',
+      could_not_load:'रिपोर्ट लोड नहीं हो सकी।',
+      just_now:'अभी',
+      sec_ago:'सेकंड पहले', min_ago:' मिनट पहले', hr_ago:'घंटे पहले',
+      // Auth
+      sign_in:'साइन इन', sign_out:'साइन आउट',
+      delete_account:'अकाउंट व डेटा हटाएं',
+      reports_stat:'रिपोर्ट', member_since:'सदस्यता से',
+      how_to_use:'MetroCrowd कैसे उपयोग करें',
+      // Login gate
+      login_headline:'दिल्ली मेट्रो के हर स्टेशन का\nलाइव भीड़ डेटा',
+      login_sub:'भीड़ रिपोर्ट करें, डिवाइस में सिंक करें और व्यक्तिगत अलर्ट पाएं',
+      continue_google:'Google से जारी रखें',
+      continue_github:'GitHub से जारी रखें',
+      login_footer:'आपकी रिपोर्ट 30 लाख यात्रियों की मदद करती है\nकोई स्पैम नहीं · कोई विज्ञापन नहीं ·',
+      // Morning/evening commute
+      morning_commute:'सुबह की यात्रा',
+      evening_commute:'शाम की यात्रा',
+      from:'से', to:'तक',
+      crowd_now:'अभी भीड़',
+      leaving_now:'अभी चलें',
+      board:'चढ़ें',
     }
   };
 
-  function t(key) {
-    return STRINGS[_lang]?.[key] || STRINGS.en[key] || key;
-  }
+  function t(key) { return (S[_lang] && S[_lang][key]) || S.en[key] || key; }
 
   function setLang(lang) {
     _lang = lang;
@@ -134,88 +292,68 @@ window.SETTINGS = (function () {
     _applyLang();
     _updateLangBtn();
   }
-
-  function toggleLang() {
-    setLang(_lang === 'en' ? 'hi' : 'en');
-  }
+  function toggleLang() { setLang(_lang === 'en' ? 'hi' : 'en'); }
 
   function _updateLangBtn() {
-    const btn = document.getElementById('settings-lang-btn');
-    if (!btn) return;
-    btn.textContent = _lang === 'en' ? 'हिं' : 'EN';
-    btn.title = _lang === 'en' ? 'Switch to Hindi' : 'Switch to English';
+    var b = document.getElementById('settings-lang-btn'); if (!b) return;
+    b.textContent = _lang === 'en' ? 'हिं' : 'EN';
+    b.title = _lang === 'en' ? 'Switch to Hindi' : 'Switch to English';
   }
 
-  // Apply language to all data-i18n elements
+  // ── Apply language to entire app ─────────────────────────────
   function _applyLang() {
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-      const key = el.getAttribute('data-i18n');
-      const val = t(key);
+    // 1. Static data-i18n elements
+    document.querySelectorAll('[data-i18n]').forEach(function(el) {
+      var key = el.getAttribute('data-i18n');
+      var val = t(key);
       if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.placeholder = val;
       else el.textContent = val;
     });
-    // Update greeting
-    _updateGreeting();
-  }
 
-  function _updateGreeting() {
-    const el = document.getElementById('home-greeting');
-    if (!el) return;
-    const h = new Date().getHours();
-    const key = h < 12 ? 'good_morning' : h < 17 ? 'good_afternoon' : h < 21 ? 'good_evening' : 'good_night';
-    el.textContent = t(key);
-  }
-
-  // ── Init ─────────────────────────────────────────────────────
-  function init() {
-    // Apply saved theme
-    _applyTheme(_theme);
-
-    // Listen for system theme changes
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-      if (_theme === 'system') _applyTheme('system');
+    // 2. Input placeholders with data-i18n-ph
+    document.querySelectorAll('[data-i18n-ph]').forEach(function(el) {
+      el.placeholder = t(el.getAttribute('data-i18n-ph'));
     });
 
-    // Apply language
-    _applyLang();
-
-    // Build the settings pill in the sbar
-    _buildSettingsPill();
+    // 3. Trigger JS module re-renders
+    try { if (typeof HOME_UI !== 'undefined')   HOME_UI.refresh(); }   catch(e) {}
+    try { if (typeof REPORT_UI !== 'undefined') REPORT_UI.onTabOpen(); } catch(e) {}
+    try { if (typeof COACH_UI !== 'undefined')  COACH_UI.refresh(); }  catch(e) {}
+    try { if (typeof ROUTE_UI !== 'undefined')  ROUTE_UI.refresh(); }  catch(e) {}
   }
 
-  function _buildSettingsPill() {
-    // Insert before auth-btn in the sbar-right
-    const sbarRight = document.getElementById('sbar-right');
-    if (!sbarRight) return;
-
-    const pill = document.createElement('div');
-    pill.style.cssText = 'display:flex;align-items:center;gap:4px;';
-    pill.innerHTML = `
-      <button id="settings-lang-btn" onclick="SETTINGS.toggleLang()"
-        title="Switch language"
-        style="height:28px;padding:0 9px;border-radius:20px;
-          background:var(--card2);border:1px solid var(--brd2);
-          font-family:'Syne',sans-serif;font-size:11px;font-weight:800;
-          color:var(--sub);cursor:pointer;transition:all .15s;letter-spacing:.02em">
-        हिं
-      </button>
-      <button id="settings-theme-btn" onclick="SETTINGS.cycleTheme()"
-        title="Toggle theme"
-        style="width:28px;height:28px;border-radius:50%;
-          background:var(--card2);border:1px solid var(--brd2);
-          display:flex;align-items:center;justify-content:center;
-          color:var(--sub);cursor:pointer;transition:all .15s">
-      </button>
-    `;
-
-    // Insert before auth-btn
-    const authBtn = document.getElementById('auth-btn');
+  // ── Settings pill in status bar ───────────────────────────────
+  function _buildPill() {
+    var sbarRight = document.getElementById('sbar-right'); if (!sbarRight) return;
+    var pill = document.createElement('div');
+    pill.style.cssText = 'display:flex;align-items:center;gap:4px';
+    pill.innerHTML =
+      '<button id="settings-lang-btn" onclick="SETTINGS.toggleLang()" ' +
+      'style="height:28px;padding:0 9px;border-radius:20px;background:var(--card2);' +
+      'border:1px solid var(--brd2);font-family:\'Syne\',sans-serif;font-size:11px;' +
+      'font-weight:800;color:var(--sub);cursor:pointer;transition:all .15s;letter-spacing:.02em">हिं</button>' +
+      '<button id="settings-theme-btn" onclick="SETTINGS.cycleTheme()" ' +
+      'style="width:28px;height:28px;border-radius:50%;background:var(--card2);' +
+      'border:1px solid var(--brd2);display:flex;align-items:center;justify-content:center;' +
+      'color:var(--sub);cursor:pointer;transition:all .15s"></button>';
+    var authBtn = document.getElementById('auth-btn');
     if (authBtn) sbarRight.insertBefore(pill, authBtn);
     else sbarRight.appendChild(pill);
-
     _updateThemeBtn();
     _updateLangBtn();
   }
+
+  function init() {
+    _applyTheme(_theme);
+    matchMedia('(prefers-color-scheme:dark)').addEventListener('change', function() {
+      if (_theme === 'system') _applyTheme('system');
+    });
+    _applyLang();
+    _buildPill();
+  }
+
+  // Global shorthand
+  window.T = function(key) { return t(key); };
 
   return { init, setTheme, cycleTheme, setLang, toggleLang, t, applyLang: _applyLang };
 })();
