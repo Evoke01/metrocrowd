@@ -419,13 +419,25 @@ window.ROUTE=(function(){
       </div>`;
     }).join('');
 
+    // Store result for nav access
+    window._lastRouteResult = result;
+
     res.style.display='block';
     res.innerHTML=`<div style="background:var(--card);border:1px solid var(--brd);border-radius:16px;padding:14px 14px 6px;margin-top:4px">
       ${summaryHTML}
+      <button id="trip-start-btn" onclick="TRIPNAV.active ? TRIPNAV.stop() : TRIPNAV.start(window._lastRouteResult)"
+        style="width:100%;margin-top:10px;margin-bottom:6px;height:44px;
+          background:var(--y);color:#000;border:none;border-radius:12px;
+          font-family:'Syne',sans-serif;font-size:13px;font-weight:800;
+          cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+          transition:all .2s">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="8" stroke-dasharray="2 2" opacity=".5"/></svg>
+        ${T ? T('start_navigation') || 'Start Live Navigation' : 'Start Live Navigation'}
+      </button>
     </div>
     <div style="background:var(--card);border:1px solid var(--brd);border-radius:16px;padding:14px;margin-top:8px">
       <div style="font-size:9px;color:var(--sub);letter-spacing:.08em;text-transform:uppercase;
-        font-family:'Syne',sans-serif;margin-bottom:10px">Station by Station</div>
+        font-family:'Syne',sans-serif;margin-bottom:10px">${T ? T('station_by_station') : 'Station by Station'}</div>
       <div class="rh-list">${hopsHTML}</div>
     </div>`;
   }
