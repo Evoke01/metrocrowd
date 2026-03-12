@@ -153,6 +153,16 @@ window.SETTINGS = (function () {
       continue_github:'Continue with GitHub',
       login_footer:'Your reports help 3M+ daily commuters\nNo spam · No ads ·',
       // Morning/evening commute
+      start_navigation:'Start Live Navigation',
+      stop_navigation:'Stop Navigation',
+      nav_started:'Navigation started — GPS tracking active',
+      nav_ended:'Navigation ended',
+      nav_arrived:'You have arrived!',
+      you_are_at:'You are at',
+      next_stop:'Next stop',
+      stops_left:'stops left',
+      est_remaining:'est. remaining',
+      // Commute
       morning_commute:'MORNING COMMUTE',
       evening_commute:'EVENING COMMUTE',
       from:'From', to:'To',
@@ -275,6 +285,16 @@ window.SETTINGS = (function () {
       continue_github:'GitHub से जारी रखें',
       login_footer:'आपकी रिपोर्ट 30 लाख यात्रियों की मदद करती है\nकोई स्पैम नहीं · कोई विज्ञापन नहीं ·',
       // Morning/evening commute
+      start_navigation:'लाइव नेविगेशन शुरू करें',
+      stop_navigation:'नेविगेशन बंद करें',
+      nav_started:'नेविगेशन शुरू — GPS ट्रैकिंग चालू',
+      nav_ended:'नेविगेशन बंद हो गया',
+      nav_arrived:'आप पहुंच गए!',
+      you_are_at:'आप यहाँ हैं',
+      next_stop:'अगला स्टेशन',
+      stops_left:'स्टॉप बचे',
+      est_remaining:'अनुमानित समय बचा',
+      // Commute
       morning_commute:'सुबह की यात्रा',
       evening_commute:'शाम की यात्रा',
       from:'से', to:'तक',
