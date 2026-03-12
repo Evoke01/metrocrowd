@@ -160,7 +160,7 @@ window.COACH = (function () {
         border:1.5px solid rgba(245,168,0,.35);border-radius:16px;padding:16px;margin-bottom:12px">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px">
           <div>
-            <div style="font-size:9px;color:var(--sub);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">BOARD HERE</div>
+            <div style="font-size:9px;color:var(--sub);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">${T("coach_board_here")}</div>
             <div style="font-size:44px;font-weight:900;font-family:'Syne',sans-serif;color:var(--y);line-height:1">Coach ${best.num}</div>
             ${coaches[1]?`<div style="font-size:11px;color:var(--sub);margin-top:3px">or Coach ${coaches[1].num} as backup</div>`:''}
           </div>
@@ -186,8 +186,8 @@ window.COACH = (function () {
           padding:10px 14px;margin-bottom:12px;cursor:pointer;display:flex;align-items:center;gap:10px">
         <div style="color:var(--sub)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
         <div style="flex:1">
-          <div style="font-size:11px;font-weight:700;color:var(--txt)">Add destination</div>
-          <div style="font-size:10px;color:var(--sub);margin-top:1px">Get exit-optimised coach for where you're going</div>
+          <div style="font-size:11px;font-weight:700;color:var(--txt)">${T("coach_add_dest")}</div>
+          <div style="font-size:10px;color:var(--sub);margin-top:1px">${T('coach_dest_sub')}</div>
         </div>
         <div style="color:var(--sub);font-size:16px">›</div>
       </div>` : `
@@ -231,15 +231,15 @@ window.COACH = (function () {
       <div style="margin-bottom:14px">
         <div style="font-size:9px;color:var(--sub);letter-spacing:.08em;text-transform:uppercase;
           font-family:'Syne',sans-serif;margin-bottom:8px;display:flex;align-items:center;gap:8px">
-          <span>← FRONT</span><span style="flex:1;height:1px;background:var(--brd)"></span><span>REAR →</span>
+          <span>${T("coach_front")}</span><span style="flex:1;height:1px;background:var(--brd)"></span><span>${T("coach_rear")}</span>
         </div>
         <div style="display:flex;gap:4px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none">
           ${pills}
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
-          <div style="font-size:9px;color:var(--sub);display:flex;align-items:center;gap:3px"><div style="width:10px;height:3px;background:var(--y);border-radius:2px"></div>Best</div>
-          <div style="font-size:9px;color:var(--sub);display:flex;align-items:center;gap:3px"><div style="width:10px;height:3px;background:#4ade80;border-radius:2px"></div>Good</div>
-          <div style="font-size:9px;color:#f9a8d4;display:flex;align-items:center;gap:3px"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M12 13v8M9 18h6"/></svg>Ladies only</div>
+          <div style="font-size:9px;color:var(--sub);display:flex;align-items:center;gap:3px"><div style="width:10px;height:3px;background:var(--y);border-radius:2px"></div>${T("coach_best")}</div>
+          <div style="font-size:9px;color:var(--sub);display:flex;align-items:center;gap:3px"><div style="width:10px;height:3px;background:#4ade80;border-radius:2px"></div>${T("coach_good")}</div>
+          <div style="font-size:9px;color:#f9a8d4;display:flex;align-items:center;gap:3px"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M12 13v8M9 18h6"/></svg>${T("coach_ladies")}</div>
         </div>
       </div>`;
 
@@ -291,7 +291,7 @@ window.COACH = (function () {
 
     return `<div id="coach-section" data-station="${sid}" data-line="${line}" data-dest="${destId||''}">
       ${lineSel}${hero}${destPrompt}${strip}
-      <div style="font-size:11px;font-weight:700;color:var(--txt);margin:12px 0 8px">All coaches ranked</div>
+      <div style="font-size:11px;font-weight:700;color:var(--txt);margin:12px 0 8px">${T("coach_all_coaches")}</div>
       ${ranked}${ladiesNote}
     </div>`;
   }
@@ -319,7 +319,7 @@ window.COACH = (function () {
           padding:28px 20px;text-align:center;margin-top:8px">
           <div style="font-size:32px;margin-bottom:12px">🚇</div>
           <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--txt);margin-bottom:6px">
-            Metro Closed
+            ${T("coach_metro_closed")}
           </div>
           <div style="font-size:12px;color:var(--sub);line-height:1.6">
             DMRC service runs approximately<br>
