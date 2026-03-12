@@ -60,7 +60,7 @@ window.COMMUTE = (function () {
   }
 
   // ── Hero card takeover ────────────────────────────────────────────────────
-  async function renderCard() {
+  function renderCard() {
     const heroCard = document.getElementById('hero-card');
     const heroDef  = document.getElementById('hero-default');
     if (!heroCard) return;
@@ -93,15 +93,12 @@ window.COMMUTE = (function () {
     if (heroDef) heroDef.style.display = 'none';
     heroCard.onclick = null; // leaveNow button handles tap
 
-    // Show loading skeleton inline
-    heroCard.innerHTML = _commuteLoading(trip);
-
-    // Fetch live data
+    // Data is local — render immediately, no loading state needed
     try {
       const line    = METRO.STATIONS[trip.fromId]?.l?.[0] || 'Y';
       const lc      = window.COACH?.LINE_CFG?.[line] || {};
-      const crowdRes = await API.getCrowd(trip.fromId, line).catch(() => ({ crowd_pct: 0 }));
-      const fromPct  = crowdRes.crowd_pct || 0;
+      // Read from local crowd map (already computed, no network needed)
+      const fromPct = CROWD.state?.crowdMap?.[trip.fromId] || 0;
       const coach    = window.COACH?.recommend(trip.fromId, line, fromPct, trip.toId);
       const bestCoach= coach?.best?.num || null;
 
