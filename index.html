@@ -201,7 +201,7 @@
         <!-- Greeting + date -->
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
           <div>
-            <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--txt)" id="h-greet">Good Morning</div>
+            <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--txt)" id="h-greet" data-i18n="good_morning">Good Morning</div>
             <div style="font-size:12px;color:var(--sub);margin-top:1px" id="h-date">—</div>
           </div>
           <div style="display:flex;align-items:center;gap:6px">
@@ -248,14 +248,14 @@
 
         <!-- Quick actions -->
         <div class="qa">
-          <div class="qa-btn" onclick="UI.navTo('s-station')"><div class="qa-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div><div class="qa-label">Check Station</div><div class="qa-desc">Instant crowd lookup</div></div></div>
-          <div class="qa-btn" onclick="UI.navTo('s-report')"><div class="qa-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></div><div><div class="qa-label">Report Crowd</div><div class="qa-desc">2-tap submit</div></div></div>
+          <div class="qa-btn" onclick="UI.navTo('s-station')"><div class="qa-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div><div class="qa-label" data-i18n="check_station">Check Station</div><div class="qa-desc" data-i18n="instant_crowd">Instant crowd lookup</div></div></div>
+          <div class="qa-btn" onclick="UI.navTo('s-report')"><div class="qa-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></div><div><div class="qa-label" data-i18n="report_crowd">Report Crowd</div><div class="qa-desc" data-i18n="two_tap">2-tap submit</div></div></div>
         </div>
 
         <!-- All lines -->
         <div class="sec-head">
-          <span class="sec-t">All Lines</span>
-          <span class="sec-l" onclick="UI.navTo('s-route')">Route planner →</span>
+          <span class="sec-t"><span data-i18n="all_lines">All Lines</span></span>
+          <span class="sec-l" onclick="UI.navTo('s-route')"><span data-i18n="route_planner">Route planner →</span></span>
         </div>
         <div class="card" id="line-list"></div>
       </div>
@@ -727,11 +727,11 @@
         </div>
 
         <!-- Sign out -->
-        <button onclick="AUTH.signOut()" style="width:100%;background:var(--card2);color:var(--sub);border:1px solid var(--brd);border-radius:12px;padding:12px;font-size:12px;font-weight:700;cursor:pointer;margin-bottom:10px">Sign Out</button>
+        <button onclick="AUTH.signOut()" style="width:100%;background:var(--card2);color:var(--sub);border:1px solid var(--brd);border-radius:12px;padding:12px;font-size:12px;font-weight:700;cursor:pointer;margin-bottom:10px"><span data-i18n="sign_out">Sign Out</span></button>
 
         <!-- Delete account -->
         <button onclick="AUTH.deleteAccount()" style="width:100%;background:transparent;color:#ef4444;border:1px solid rgba(239,68,68,.25);border-radius:12px;padding:11px;font-size:11px;font-weight:700;cursor:pointer">
-          Delete Account &amp; All Data
+          <span data-i18n="delete_account">Delete Account &amp; All Data</span>
         </button>
 
       </div>
@@ -743,6 +743,7 @@
       </div>
     </div>
   </div>
+<script src="settings.js" defer></script>
 <script src="legal.js" defer></script>
 <script src="ui-proxy.js" defer></script>
 </body>
