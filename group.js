@@ -34,12 +34,23 @@ window.GROUP = (function () {
     } catch { return null; }
   }
 
-  async function _post(path, body) {
-    const r = await fetch(API + path, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
-    return r.json();
+  async function _post(path, body, timeoutMs = 20000) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+    try {
+      const r = await fetch(API + path, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        signal: ctrl.signal,
+      });
+      clearTimeout(timer);
+      if (!r.ok) return { ok: false, error: `HTTP ${r.status}` };
+      return r.json();
+    } catch (e) {
+      clearTimeout(timer);
+      return { ok: false, error: e.name === 'AbortError' ? 'timeout' : e.message };
+    }
   }
 
   // ── Create a group from a computed route ─────────────────────
@@ -53,7 +64,10 @@ window.GROUP = (function () {
     _myAvatar = user.user_metadata?.avatar_url || null;
     _routePath = routeResult.path || routeResult.hops.map(h => h.id);
 
+    // Show warm-up message — Render free tier can take up to 30s to wake
     NAV.showToast('info', 'Creating group…');
+    const warmupTimer = setTimeout(() =>
+      NAV.showToast('info', 'Server waking up, please wait…'), 4000);
 
     const res = await _post('/groups/create', {
       user_id:      _myId,
@@ -62,9 +76,17 @@ window.GROUP = (function () {
       from_station: _routePath[0],
       to_station:   _routePath[_routePath.length - 1],
       route_path:   _routePath,
-    });
+    }, 40000); // 40s timeout to allow for cold start
 
-    if (!res.ok) { NAV.showToast('warn', 'Could not create group'); return; }
+    clearTimeout(warmupTimer);
+
+    if (!res?.ok) {
+      const msg = res?.error === 'timeout'
+        ? 'Server timed out — try again in 30 seconds'
+        : 'Could not create group — try again';
+      NAV.showToast('warn', msg);
+      return;
+    }
 
     _code    = res.code;
     _session = { from_station: _routePath[0], to_station: _routePath[_routePath.length - 1], route_path: _routePath };
@@ -93,12 +115,22 @@ window.GROUP = (function () {
     _myAvatar = user.user_metadata?.avatar_url || null;
 
     NAV.showToast('info', 'Joining group…');
+    const joinTimer = setTimeout(() =>
+      NAV.showToast('info', 'Server waking up, please wait…'), 4000);
 
     const res = await _post('/groups/join', {
       code, user_id: _myId, display_name: _myName, avatar_url: _myAvatar,
-    });
+    }, 40000);
 
-    if (!res.ok) { NAV.showToast('warn', res.detail || 'Group not found'); return; }
+    clearTimeout(joinTimer);
+
+    if (!res?.ok) {
+      const msg = res?.error === 'timeout'
+        ? 'Server timed out — try again in 30 seconds'
+        : res?.detail || 'Group not found or expired';
+      NAV.showToast('warn', msg);
+      return;
+    }
 
     _code    = code.toUpperCase();
     _session = res.session;
@@ -106,7 +138,10 @@ window.GROUP = (function () {
     _active  = true;
 
     // Load existing members
-    const g = await fetch(`${API}/groups/${_code}`).then(r => r.json());
+    const ctrl2 = new AbortController();
+    setTimeout(() => ctrl2.abort(), 10000);
+    const g = await fetch(`${API}/groups/${_code}`, { signal: ctrl2.signal })
+      .then(r => r.json()).catch(() => ({ ok: false }));
     if (g.ok) {
       (g.members || []).forEach(m => { _members[m.user_id] = m; });
     }
