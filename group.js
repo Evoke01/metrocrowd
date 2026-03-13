@@ -114,9 +114,9 @@ window.GROUP = (function () {
     _myName   = user.user_metadata?.full_name || user.email?.split('@')[0] || 'You';
     _myAvatar = user.user_metadata?.avatar_url || null;
 
-    NAV.showToast('info', 'Joining group…');
-    const joinTimer = setTimeout(() =>
-      NAV.showToast('info', 'Server waking up, please wait…'), 4000);
+    // Show loading inside modal if open, else toast
+    _setJoinLoading(true, 'Joining…');
+    const joinTimer = setTimeout(() => _setJoinLoading(true, 'Waking server…'), 4000);
 
     const res = await _post('/groups/join', {
       code, user_id: _myId, display_name: _myName, avatar_url: _myAvatar,
@@ -125,12 +125,17 @@ window.GROUP = (function () {
     clearTimeout(joinTimer);
 
     if (!res?.ok) {
+      _setJoinLoading(false);
+      const errEl = document.getElementById('gji-msg');
       const msg = res?.error === 'timeout'
         ? 'Server timed out — try again in 30 seconds'
         : res?.detail || 'Group not found or expired';
-      NAV.showToast('warn', msg);
+      if (errEl) errEl.textContent = msg;
+      else NAV.showToast('warn', msg);
       return;
     }
+    // Success — close modal
+    document.getElementById('group-join-modal')?.remove();
 
     _code    = code.toUpperCase();
     _session = res.session;
@@ -218,95 +223,271 @@ window.GROUP = (function () {
     const existing = document.getElementById('group-share-modal');
     if (existing) existing.remove();
 
+    const fromName = METRO.STATIONS[_routePath[0]]?.n || _routePath[0];
+    const toName   = METRO.STATIONS[_routePath[_routePath.length-1]]?.n || _routePath[_routePath.length-1];
+    const joinLink = `${location.origin}${location.pathname}?join=${_code}`;
+    const canNativeShare = !!navigator.share;
+
     const modal = document.createElement('div');
     modal.id = 'group-share-modal';
     modal.style.cssText = `
-      position:fixed;inset:0;z-index:1100;background:rgba(0,0,0,.7);
-      display:flex;align-items:center;justify-content:center;padding:20px;
+      position:fixed;inset:0;z-index:1100;background:rgba(0,0,0,.75);
+      backdrop-filter:blur(4px);
+      display:flex;align-items:flex-end;justify-content:center;padding:0;
     `;
     modal.innerHTML = `
-      <div style="background:var(--card);border:1px solid var(--brd);border-radius:20px;
-        padding:24px;max-width:320px;width:100%;text-align:center">
-        <div style="font-size:11px;color:var(--sub);letter-spacing:.1em;
-          text-transform:uppercase;margin-bottom:8px;font-family:'Syne',sans-serif">
-          GROUP CODE
-        </div>
-        <div style="font-family:'Syne',sans-serif;font-size:42px;font-weight:900;
-          color:var(--y);letter-spacing:.15em;margin-bottom:4px">${_code}</div>
-        <div style="font-size:11px;color:var(--sub);margin-bottom:20px">
-          Share this code with friends · expires in 3 hours
+      <div style="background:var(--card);border:1px solid var(--brd);
+        border-radius:20px 20px 0 0;padding:24px 20px 36px;
+        max-width:480px;width:100%;text-align:center;
+        animation:slideUp .25s cubic-bezier(.22,1,.36,1)">
+
+        <div style="width:36px;height:3px;background:var(--brd);border-radius:2px;
+          margin:0 auto 20px"></div>
+
+        <!-- Route context -->
+        <div style="font-size:11px;color:var(--sub);margin-bottom:6px">
+          ${fromName} → ${toName}
         </div>
 
+        <!-- Big code display -->
+        <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;
+          color:var(--sub);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">
+          GROUP CODE
+        </div>
+        <div id="gcode-display" style="font-family:'Syne',sans-serif;font-size:52px;
+          font-weight:900;color:var(--y);letter-spacing:.2em;margin-bottom:4px;
+          line-height:1">${_code}</div>
+        <div style="font-size:10px;color:var(--sub);margin-bottom:24px">
+          Expires in 3 hours · ${Object.keys(_members).length} member${Object.keys(_members).length!==1?'s':''}
+        </div>
+
+        <!-- Primary: native share or copy link -->
+        ${canNativeShare ? `
+        <button onclick="GROUP._nativeShare()"
+          style="width:100%;height:48px;background:var(--y);color:#000;border:none;
+          border-radius:14px;font-family:'Syne',sans-serif;font-size:14px;
+          font-weight:800;cursor:pointer;margin-bottom:8px;
+          display:flex;align-items:center;justify-content:center;gap:8px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Share Group Invite
+        </button>` : `
+        <button onclick="GROUP._copyLink()"
+          style="width:100%;height:48px;background:var(--y);color:#000;border:none;
+          border-radius:14px;font-family:'Syne',sans-serif;font-size:14px;
+          font-weight:800;cursor:pointer;margin-bottom:8px;
+          display:flex;align-items:center;justify-content:center;gap:8px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+          Copy Invite Link
+        </button>`}
+
+        <!-- Secondary: copy just the code -->
         <button onclick="GROUP._copyCode()"
-          style="width:100%;height:44px;background:var(--y);color:#000;border:none;
-          border-radius:12px;font-family:'Syne',sans-serif;font-size:13px;
-          font-weight:800;cursor:pointer;margin-bottom:8px">
-          Copy Code
+          style="width:100%;height:44px;background:var(--card2);color:var(--txt);
+          border:1px solid var(--brd);border-radius:14px;font-size:13px;
+          font-weight:700;cursor:pointer;margin-bottom:8px">
+          Copy Code Only: ${_code}
         </button>
+
         <button onclick="document.getElementById('group-share-modal').remove()"
-          style="width:100%;height:40px;background:var(--card2);color:var(--sub);
-          border:1px solid var(--brd);border-radius:12px;font-size:12px;cursor:pointer">
+          style="width:100%;height:40px;background:transparent;color:var(--sub);
+          border:none;font-size:12px;cursor:pointer">
           Done
         </button>
       </div>
     `;
+    modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
     document.body.appendChild(modal);
   }
 
+  function _nativeShare() {
+    const fromName = METRO.STATIONS[_routePath[0]]?.n || _routePath[0];
+    const toName   = METRO.STATIONS[_routePath[_routePath.length-1]]?.n || _routePath[_routePath.length-1];
+    const joinLink = `${location.origin}${location.pathname}?join=${_code}`;
+    navigator.share({
+      title: 'Join my MetroCrowd trip',
+      text:  `Track me live: ${fromName} → ${toName}. Code: ${_code}`,
+      url:   joinLink,
+    }).catch(() => {});
+    document.getElementById('group-share-modal')?.remove();
+  }
+
+  function _copyLink() {
+    const joinLink = `${location.origin}${location.pathname}?join=${_code}`;
+    navigator.clipboard?.writeText(joinLink).then(() =>
+      NAV.showToast('check', 'Invite link copied'));
+    document.getElementById('group-share-modal')?.remove();
+  }
+
   function _copyCode() {
-    navigator.clipboard?.writeText(_code).then(() => {
-      NAV.showToast('check', `Code ${_code} copied`);
-    });
+    navigator.clipboard?.writeText(_code).then(() =>
+      NAV.showToast('check', `Code ${_code} copied`));
     document.getElementById('group-share-modal')?.remove();
   }
 
   // ── Join code entry modal ────────────────────────────────────
-  function showJoinModal() {
+  function showJoinModal(prefillCode) {
     const existing = document.getElementById('group-join-modal');
     if (existing) existing.remove();
 
     const modal = document.createElement('div');
     modal.id = 'group-join-modal';
     modal.style.cssText = `
-      position:fixed;inset:0;z-index:1100;background:rgba(0,0,0,.7);
-      display:flex;align-items:center;justify-content:center;padding:20px;
+      position:fixed;inset:0;z-index:1100;background:rgba(0,0,0,.75);
+      backdrop-filter:blur(4px);
+      display:flex;align-items:flex-end;justify-content:center;
     `;
     modal.innerHTML = `
-      <div style="background:var(--card);border:1px solid var(--brd);border-radius:20px;
-        padding:24px;max-width:320px;width:100%">
-        <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;
+      <div style="background:var(--card);border:1px solid var(--brd);
+        border-radius:20px 20px 0 0;padding:24px 20px 36px;
+        max-width:480px;width:100%;
+        animation:slideUp .25s cubic-bezier(.22,1,.36,1)">
+
+        <div style="width:36px;height:3px;background:var(--brd);border-radius:2px;
+          margin:0 auto 20px"></div>
+
+        <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:900;
           color:var(--txt);margin-bottom:4px">Join a Group Trip</div>
-        <div style="font-size:11px;color:var(--sub);margin-bottom:16px">
-          Enter the 6-character code from your friend
+        <div style="font-size:12px;color:var(--sub);margin-bottom:20px">
+          Enter or paste the 6-character code from your friend
         </div>
-        <input id="group-code-input" maxlength="6"
-          placeholder="Enter code e.g. XK7M2P"
-          style="width:100%;height:48px;background:var(--card2);border:1px solid var(--brd);
-          border-radius:12px;padding:0 14px;font-family:'Syne',sans-serif;font-size:20px;
-          font-weight:800;color:var(--y);text-align:center;letter-spacing:.15em;
-          text-transform:uppercase;box-sizing:border-box;margin-bottom:12px"
-          oninput="this.value=this.value.toUpperCase()"/>
-        <button onclick="GROUP._submitJoin()"
-          style="width:100%;height:44px;background:var(--y);color:#000;border:none;
-          border-radius:12px;font-family:'Syne',sans-serif;font-size:13px;
-          font-weight:800;cursor:pointer;margin-bottom:8px">
+
+        <!-- Code input — 6 big boxes -->
+        <div id="gji-boxes" style="display:flex;gap:8px;justify-content:center;margin-bottom:8px">
+          ${[0,1,2,3,4,5].map(i=>`
+            <div style="flex:1;max-width:48px;height:56px;background:var(--card2);
+              border:2px solid var(--brd);border-radius:12px;
+              display:flex;align-items:center;justify-content:center;
+              font-family:'Syne',sans-serif;font-size:22px;font-weight:900;
+              color:var(--y);transition:border-color .15s" id="gji-box-${i}">
+            </div>`).join('')}
+        </div>
+        <!-- Hidden real input captures keyboard -->
+        <input id="group-code-input" maxlength="6" autocomplete="off"
+          autocapitalize="characters" spellcheck="false"
+          style="position:absolute;opacity:0;width:1px;height:1px;pointer-events:none"
+          oninput="GROUP._onCodeInput(this.value)"
+          onkeydown="if(event.key==='Enter')GROUP._submitJoin()"/>
+
+        <!-- Paste from clipboard button -->
+        <button id="gji-paste-btn" onclick="GROUP._pasteCode()"
+          style="width:100%;height:36px;background:transparent;color:var(--sub);
+          border:1px solid var(--brd);border-radius:10px;font-size:11px;
+          cursor:pointer;margin-bottom:16px;display:flex;align-items:center;
+          justify-content:center;gap:6px">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+          Paste from clipboard
+        </button>
+
+        <!-- Error / status message -->
+        <div id="gji-msg" style="font-size:11px;color:#ef4444;text-align:center;
+          margin-bottom:10px;min-height:16px"></div>
+
+        <!-- Join button -->
+        <button id="gji-btn" onclick="GROUP._submitJoin()"
+          style="width:100%;height:50px;background:var(--brd);color:var(--sub);border:none;
+          border-radius:14px;font-family:'Syne',sans-serif;font-size:14px;
+          font-weight:800;cursor:not-allowed;margin-bottom:8px;
+          display:flex;align-items:center;justify-content:center;gap:8px;
+          transition:background .2s,color .2s" disabled>
           Join Trip
         </button>
         <button onclick="document.getElementById('group-join-modal').remove()"
-          style="width:100%;height:40px;background:var(--card2);color:var(--sub);
-          border:1px solid var(--brd);border-radius:12px;font-size:12px;cursor:pointer">
+          style="width:100%;height:40px;background:transparent;color:var(--sub);
+          border:none;font-size:12px;cursor:pointer">
           Cancel
         </button>
       </div>
     `;
+    modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
     document.body.appendChild(modal);
-    setTimeout(() => document.getElementById('group-code-input')?.focus(), 80);
+
+    // Focus hidden input to bring up keyboard
+    const inp = document.getElementById('group-code-input');
+    setTimeout(() => inp?.focus(), 80);
+
+    // Tap anywhere on boxes → focus hidden input
+    document.getElementById('gji-boxes')?.addEventListener('click', () => inp?.focus());
+
+    // Prefill if code passed (e.g. from URL param)
+    if (prefillCode) {
+      inp.value = prefillCode.toUpperCase().slice(0,6);
+      GROUP._onCodeInput(inp.value);
+    } else {
+      // Auto-paste if clipboard has a 6-char code
+      navigator.clipboard?.readText?.().then(txt => {
+        const clean = txt?.trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
+        if (clean?.length === 6) {
+          inp.value = clean;
+          GROUP._onCodeInput(clean);
+          document.getElementById('gji-paste-btn').textContent = `✓ Pasted: ${clean}`;
+        }
+      }).catch(() => {});
+    }
+  }
+
+  function _onCodeInput(val) {
+    const clean = val.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6);
+    // Update the hidden input to stay in sync
+    const inp = document.getElementById('group-code-input');
+    if (inp && inp.value !== clean) inp.value = clean;
+    // Update box display
+    for (let i = 0; i < 6; i++) {
+      const box = document.getElementById(`gji-box-${i}`);
+      if (!box) continue;
+      box.textContent = clean[i] || '';
+      box.style.borderColor = clean[i] ? 'var(--y)' : (i === clean.length ? 'rgba(255,208,0,.5)' : 'var(--brd)');
+      box.style.background   = clean[i] ? 'rgba(255,208,0,.08)' : 'var(--card2)';
+    }
+    // Enable/disable join button
+    const btn = document.getElementById('gji-btn');
+    if (btn) {
+      const ready = clean.length === 6;
+      btn.disabled = !ready;
+      btn.style.background  = ready ? 'var(--y)' : 'var(--brd)';
+      btn.style.color       = ready ? '#000' : 'var(--sub)';
+      btn.style.cursor      = ready ? 'pointer' : 'not-allowed';
+    }
+    document.getElementById('gji-msg').textContent = '';
+  }
+
+  async function _pasteCode() {
+    try {
+      const txt = await navigator.clipboard.readText();
+      const clean = txt?.trim().toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6);
+      if (!clean) { document.getElementById('gji-msg').textContent = 'Nothing to paste'; return; }
+      const inp = document.getElementById('group-code-input');
+      if (inp) inp.value = clean;
+      GROUP._onCodeInput(clean);
+    } catch {
+      document.getElementById('gji-msg').textContent = 'Clipboard access denied — type the code';
+    }
+  }
+
+  function _setJoinLoading(loading, msg) {
+    const btn = document.getElementById('gji-btn');
+    if (!btn) return;
+    if (loading) {
+      btn.disabled = true;
+      btn.style.background = 'var(--brd)';
+      btn.style.color = 'var(--sub)';
+      btn.style.cursor = 'not-allowed';
+      btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg> ${msg || 'Joining…'}`;
+    } else {
+      btn.disabled = false;
+      btn.style.background = 'var(--y)';
+      btn.style.color = '#000';
+      btn.style.cursor = 'pointer';
+      btn.textContent = 'Join Trip';
+    }
   }
 
   function _submitJoin() {
-    const code = document.getElementById('group-code-input')?.value?.trim();
-    if (!code || code.length !== 6) { NAV.showToast('warn', 'Enter a 6-character code'); return; }
-    document.getElementById('group-join-modal')?.remove();
+    const code = document.getElementById('group-code-input')?.value?.trim().toUpperCase();
+    if (!code || code.length !== 6) {
+      document.getElementById('gji-msg').textContent = 'Enter the full 6-character code';
+      return;
+    }
+    _setJoinLoading(true, 'Joining…');
     join(code);
   }
 
@@ -428,10 +609,24 @@ window.GROUP = (function () {
     });
   }
 
+  // ── Deep link: ?join=CODE auto-opens join modal ──────────────
+  function _checkDeepLink() {
+    const params = new URLSearchParams(location.search);
+    const code   = params.get('join');
+    if (code) {
+      const url = new URL(location.href);
+      url.searchParams.delete('join');
+      history.replaceState({}, '', url);
+      setTimeout(() => showJoinModal(code.toUpperCase().slice(0,6)), 800);
+    }
+  }
+  setTimeout(_checkDeepLink, 500);
+
   return {
     create, join, leave, updatePosition,
     showJoinModal, highlightOnRoute,
-    _copyCode, _submitJoin,
+    _onCodeInput, _pasteCode, _setJoinLoading,
+    _copyCode, _copyLink, _nativeShare, _submitJoin,
     get active() { return _active; },
     get code()   { return _code; },
   };
