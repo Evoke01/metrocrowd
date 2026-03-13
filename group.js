@@ -47,9 +47,12 @@ window.GROUP = (function () {
       clearTimeout(timer);
       if (!r.ok) {
         let detail = '';
-        try { const j = await r.json(); detail = j.detail || JSON.stringify(j); } catch {}
+        try {
+          const j = await r.json();
+          detail = j.detail || j.error || JSON.stringify(j);
+        } catch {}
         console.error(`[GROUP] ${path} → HTTP ${r.status}:`, detail);
-        return { ok: false, error: `${r.status}: ${detail}` };
+        return { ok: false, error: detail || `HTTP ${r.status}` };
       }
       return r.json();
     } catch (e) {
