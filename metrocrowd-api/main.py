@@ -23,16 +23,12 @@ logger = logging.getLogger(__name__)
 app = FastAPI(title="MetroCrowd API", version="1.0.0")
 
 app.add_middleware(CORSMiddleware,
-    allow_origins=[
-        "https://metrocrowd.vercel.app",
-        "http://localhost:3000",
-        "http://localhost:8080",
-    ],
-    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_origins=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 
-# ── Request ID middleware (checklist 4.1) ─────────────────────
+# ── Request ID middleware ──────────────────────────────────────
 @app.middleware("http")
 async def add_request_id(request: Request, call_next):
     request.state.id = str(uuid.uuid4())[:8]
@@ -40,15 +36,20 @@ async def add_request_id(request: Request, call_next):
     response.headers["X-Request-Id"] = request.state.id
     return response
 
-# ── Global error handler — suppress stack traces (checklist 4.1) ─
+# ── Global error handler — always includes CORS headers ───────
 @app.exception_handler(Exception)
 async def generic_exception_handler(request: Request, exc: Exception):
     req_id = getattr(request.state, "id", "unknown")
-    logger.error(f"Unhandled exception [req:{req_id}]: {type(exc).__name__}", exc_info=True)
-    # NEVER include str(exc), traceback, file paths, or stack frames in response
+    logger.error(f"Unhandled exception [req:{req_id}]: {type(exc).__name__}: {exc}", exc_info=True)
+    origin = request.headers.get("origin", "*")
     return JSONResponse(
         status_code=500,
         content={"error": "Internal server error", "request_id": req_id},
+        headers={
+            "Access-Control-Allow-Origin": origin,
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+            "Access-Control-Allow-Headers": "*",
+        },
     )
 
 # ── Routers ───────────────────────────────────────────────────
