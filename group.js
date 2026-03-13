@@ -63,7 +63,13 @@ window.GROUP = (function () {
     }
   }
 
-  // ── Create a group from a computed route ─────────────────────
+  // ── Helper: generate 6-char code ─────────────────────────────
+  function _genCode() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    return Array.from({length:6}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
+  }
+
+  // ── Create a group directly via Supabase (no Render needed) ──
   async function create(routeResult) {
     if (!routeResult?.ok) { NAV.showToast('warn', 'Compute a route first'); return; }
     const user = await _getMe();
@@ -74,48 +80,68 @@ window.GROUP = (function () {
     _myAvatar = user.user_metadata?.avatar_url || null;
     _routePath = routeResult.path || routeResult.hops.map(h => h.id);
 
-    // Show warm-up message — Render free tier can take up to 30s to wake
     NAV.showToast('info', 'Creating group…');
-    const warmupTimer = setTimeout(() =>
-      NAV.showToast('info', 'Server waking up, please wait…'), 4000);
 
-    const res = await _post('/groups/create', {
-      user_id:      _myId,
-      display_name: _myName,
-      avatar_url:   _myAvatar,
-      from_station: _routePath[0],
-      to_station:   _routePath[_routePath.length - 1],
-      route_path:   _routePath,
-    }, 40000); // 40s timeout to allow for cold start
+    try {
+      const sb = window.SB?.client;
+      if (!sb) throw new Error('Not connected');
 
-    clearTimeout(warmupTimer);
+      // Generate unique code
+      let code = _genCode();
+      for (let i = 0; i < 5; i++) {
+        const { data } = await sb.from('group_sessions').select('id').eq('id', code);
+        if (!data?.length) break;
+        code = _genCode();
+      }
 
-    if (!res?.ok) {
-      const msg = res?.error === 'timeout'
-        ? 'Server timed out — try again in 30 seconds'
-        : `Create failed: ${res?.error || 'unknown error'}`;
-      NAV.showToast('warn', msg);
-      return;
+      const expires = new Date(Date.now() + 3*60*60*1000).toISOString();
+
+      // Insert session
+      const { error: e1 } = await sb.from('group_sessions').insert({
+        id:           code,
+        created_by:   _myId,
+        from_station: _routePath[0],
+        to_station:   _routePath[_routePath.length - 1],
+        route_path:   _routePath,
+        expires_at:   expires,
+      });
+      if (e1) throw new Error(e1.message);
+
+      // Insert self as first member
+      const { error: e2 } = await sb.from('group_members').insert({
+        session_id:      code,
+        user_id:         _myId,
+        display_name:    _myName,
+        avatar_url:      _myAvatar,
+        current_station: _routePath[0],
+        station_index:   0,
+      });
+      if (e2) throw new Error(e2.message);
+
+      const res = { ok: true, code };
+
+      _code    = res.code;
+      _session = { from_station: _routePath[0], to_station: _routePath[_routePath.length - 1], route_path: _routePath };
+      _active  = true;
+
+      _members[_myId] = {
+        user_id: _myId, display_name: _myName, avatar_url: _myAvatar,
+        current_station: _routePath[0], station_index: 0,
+      };
+
+      _subscribe();
+      _buildPanel();
+      _render();
+
+      NAV.showToast('check', `Group created: ${_code}`);
+      _showShareModal();
+    } catch (err) {
+      console.error('[GROUP] create error:', err);
+      NAV.showToast('warn', `Could not create group: ${err.message}`);
     }
-
-    _code    = res.code;
-    _session = { from_station: _routePath[0], to_station: _routePath[_routePath.length - 1], route_path: _routePath };
-    _active  = true;
-
-    _members[_myId] = {
-      user_id: _myId, display_name: _myName, avatar_url: _myAvatar,
-      current_station: _routePath[0], station_index: 0,
-    };
-
-    _subscribe();
-    _buildPanel();
-    _render();
-
-    NAV.showToast('check', `Group created: ${_code}`);
-    _showShareModal();
   }
 
-  // ── Join via code ─────────────────────────────────────────────
+  // ── Join via code (directly via Supabase) ────────────────────
   async function join(code) {
     const user = await _getMe();
     if (!user) { NAV.showToast('warn', 'Sign in to join a group'); return; }
@@ -124,48 +150,59 @@ window.GROUP = (function () {
     _myName   = user.user_metadata?.full_name || user.email?.split('@')[0] || 'You';
     _myAvatar = user.user_metadata?.avatar_url || null;
 
-    // Show loading inside modal if open, else toast
     _setJoinLoading(true, 'Joining…');
-    const joinTimer = setTimeout(() => _setJoinLoading(true, 'Waking server…'), 4000);
 
-    const res = await _post('/groups/join', {
-      code, user_id: _myId, display_name: _myName, avatar_url: _myAvatar,
-    }, 40000);
+    try {
+      const sb  = window.SB?.client;
+      if (!sb) throw new Error('Not connected');
+      const KEY = code.toUpperCase();
 
-    clearTimeout(joinTimer);
+      // Fetch session
+      const { data: sessions, error: e1 } = await sb
+        .from('group_sessions').select('*').eq('id', KEY).eq('active', true);
+      if (e1) throw new Error(e1.message);
+      if (!sessions?.length) throw new Error('Group not found or expired');
 
-    if (!res?.ok) {
+      const sess = sessions[0];
+      if (sess.expires_at && new Date(sess.expires_at) < new Date())
+        throw new Error('Group session has expired');
+
+      // Upsert self as member
+      const { error: e2 } = await sb.from('group_members').upsert({
+        session_id:      KEY,
+        user_id:         _myId,
+        display_name:    _myName,
+        avatar_url:      _myAvatar,
+        current_station: sess.from_station,
+        station_index:   0,
+        last_seen:       new Date().toISOString(),
+      }, { onConflict: 'session_id,user_id' });
+      if (e2) throw new Error(e2.message);
+
+      // Load all existing members
+      const { data: members } = await sb
+        .from('group_members').select('*').eq('session_id', KEY);
+      (members || []).forEach(m => { _members[m.user_id] = m; });
+
+      document.getElementById('group-join-modal')?.remove();
+
+      _code      = KEY;
+      _session   = sess;
+      _routePath = sess.route_path || [];
+      _active    = true;
+
+      _subscribe();
+      _buildPanel();
+      _render();
+
+      NAV.showToast('check', `Joined group ${_code}`);
+    } catch (err) {
+      console.error('[GROUP] join error:', err);
       _setJoinLoading(false);
       const errEl = document.getElementById('gji-msg');
-      const msg = res?.error === 'timeout'
-        ? 'Server timed out — try again in 30 seconds'
-        : res?.detail || 'Group not found or expired';
-      if (errEl) errEl.textContent = msg;
-      else NAV.showToast('warn', msg);
-      return;
+      if (errEl) errEl.textContent = err.message;
+      else NAV.showToast('warn', err.message);
     }
-    // Success — close modal
-    document.getElementById('group-join-modal')?.remove();
-
-    _code    = code.toUpperCase();
-    _session = res.session;
-    _routePath = res.session.route_path || [];
-    _active  = true;
-
-    // Load existing members
-    const ctrl2 = new AbortController();
-    setTimeout(() => ctrl2.abort(), 10000);
-    const g = await fetch(`${API}/groups/${_code}`, { signal: ctrl2.signal })
-      .then(r => r.json()).catch(() => ({ ok: false }));
-    if (g.ok) {
-      (g.members || []).forEach(m => { _members[m.user_id] = m; });
-    }
-
-    _subscribe();
-    _buildPanel();
-    _render();
-
-    NAV.showToast('check', `Joined group ${_code}`);
   }
 
   // ── Push my position (called by TRIPNAV on each station change) ─
