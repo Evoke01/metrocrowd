@@ -75,8 +75,8 @@ async def create_group(req: CreateReq):
         logger.info(f"[Groups] Created {code} by {req.user_id}")
         return {"ok": True, "code": code}
     except Exception as e:
-        logger.error(f"[Groups] create error: {e}")
-        raise HTTPException(500, "Failed to create group")
+        logger.error(f"[Groups] create error: {type(e).__name__}: {e}", exc_info=True)
+        raise HTTPException(500, f"Failed to create group: {str(e)}")
 
 @router.post("/join")
 async def join_group(req: JoinReq):
