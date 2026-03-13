@@ -1,10 +1,4 @@
 {
-  "crons": [
-    {
-      "path": "/api/warmup",
-      "schedule": "*/10 * * * *"
-    }
-  ],
   "rewrites": [
     {
       "source": "/_app/static/js/analytics.js",
