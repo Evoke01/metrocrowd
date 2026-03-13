@@ -553,3 +553,5 @@ button, [onclick], .bni, .chip, .ir-opt, .cp, .qa-btn,
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
 }
+
+@keyframes slideUp { from { transform: translateY(100%); opacity:0; } to { transform: translateY(0); opacity:1; } }
