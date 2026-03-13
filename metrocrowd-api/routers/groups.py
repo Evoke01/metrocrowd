@@ -52,25 +52,34 @@ class LeaveReq(BaseModel):
 # ── Endpoints ─────────────────────────────────────────────────
 @router.post("/create")
 async def create_group(req: CreateReq):
-    db   = _db()
-    code = _code()
-    # Ensure unique
-    for _ in range(5):
-        exists = db.table("group_sessions").select("id").eq("id", code).execute()
-        if not exists.data: break
-        code = _code()
-
-    expires = (datetime.now(timezone.utc) + timedelta(hours=3)).isoformat()
     try:
+        db   = _db()
+        code = _code()
+        # Ensure unique
+        for _ in range(5):
+            exists = db.table("group_sessions").select("id").eq("id", code).execute()
+            if not exists.data: break
+            code = _code()
+
+        expires = (datetime.now(timezone.utc) + timedelta(hours=3)).isoformat()
+
+        # created_by is uuid column — pass as string (Supabase client handles cast)
+        # user_id in group_members is also uuid
         db.table("group_sessions").insert({
-            "id": code, "created_by": req.user_id,
-            "from_station": req.from_station, "to_station": req.to_station,
-            "route_path": req.route_path, "expires_at": expires,
+            "id": code,
+            "created_by": str(req.user_id),
+            "from_station": req.from_station,
+            "to_station": req.to_station,
+            "route_path": req.route_path,
+            "expires_at": expires,
         }).execute()
         db.table("group_members").insert({
-            "session_id": code, "user_id": req.user_id,
-            "display_name": req.display_name, "avatar_url": req.avatar_url,
-            "current_station": req.from_station, "station_index": 0,
+            "session_id": code,
+            "user_id": str(req.user_id),
+            "display_name": req.display_name,
+            "avatar_url": req.avatar_url,
+            "current_station": req.from_station,
+            "station_index": 0,
         }).execute()
         logger.info(f"[Groups] Created {code} by {req.user_id}")
         return {"ok": True, "code": code}
