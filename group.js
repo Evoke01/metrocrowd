@@ -45,11 +45,18 @@ window.GROUP = (function () {
         signal: ctrl.signal,
       });
       clearTimeout(timer);
-      if (!r.ok) return { ok: false, error: `HTTP ${r.status}` };
+      if (!r.ok) {
+        let detail = '';
+        try { const j = await r.json(); detail = j.detail || JSON.stringify(j); } catch {}
+        console.error(`[GROUP] ${path} → HTTP ${r.status}:`, detail);
+        return { ok: false, error: `${r.status}: ${detail}` };
+      }
       return r.json();
     } catch (e) {
       clearTimeout(timer);
-      return { ok: false, error: e.name === 'AbortError' ? 'timeout' : e.message };
+      const msg = e.name === 'AbortError' ? 'timeout' : e.message;
+      console.error(`[GROUP] ${path} fetch error:`, msg);
+      return { ok: false, error: msg };
     }
   }
 
@@ -83,7 +90,7 @@ window.GROUP = (function () {
     if (!res?.ok) {
       const msg = res?.error === 'timeout'
         ? 'Server timed out — try again in 30 seconds'
-        : 'Could not create group — try again';
+        : `Create failed: ${res?.error || 'unknown error'}`;
       NAV.showToast('warn', msg);
       return;
     }
