@@ -60,139 +60,133 @@
   <!-- ═══ LOGIN GATE ════════════════════════════════════════════ -->
   <div id="login-gate" style="
     position:fixed;inset:0;z-index:9999;
-    background:#060606;
+    background:#030303;
     display:flex;flex-direction:column;
-    align-items:center;justify-content:center;
-    padding:32px 24px;
-    font-family:'DM Sans',sans-serif;
+    align-items:center;
+    font-family:'Plus Jakarta Sans',sans-serif;
+    overflow:hidden;
   ">
-    <!-- Logo -->
-    <div style="text-align:center;margin-bottom:40px">
-      <div style="font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:#EFEFEF;letter-spacing:-.5px">
-        Metro<span style="color:#FFD000">Crowd</span>
+    <!-- Background glow -->
+    <div style="position:absolute;top:30%;left:50%;transform:translate(-50%,-50%);width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(255,208,0,0.06),transparent 70%);pointer-events:none"></div>
+
+    <!-- Top section: brand + hero -->
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px 20px;width:100%;max-width:400px">
+
+      <!-- Brand -->
+      <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:32px">MetroCrowd</div>
+
+      <!-- Icon with glow ring -->
+      <div style="position:relative;margin-bottom:32px">
+        <div style="position:absolute;inset:-12px;border-radius:50%;border:1px solid rgba(255,208,0,.15);animation:ring-pulse 3s ease-in-out infinite"></div>
+        <div style="position:absolute;inset:-22px;border-radius:50%;border:1px solid rgba(255,208,0,.07);animation:ring-pulse 3s ease-in-out infinite .5s"></div>
+        <div style="width:64px;height:64px;border-radius:50%;background:rgba(255,208,0,.08);border:1px solid rgba(255,208,0,.2);display:flex;align-items:center;justify-content:center;color:#FFD000">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="7" width="20" height="11" rx="2"/>
+            <path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/>
+            <line x1="7" y1="12" x2="17" y2="12"/>
+            <path d="M7 18l-2 3M17 18l2 3"/>
+          </svg>
+        </div>
       </div>
-      <div style="font-size:11px;color:rgba(255,255,255,.3);margin-top:5px;letter-spacing:.8px;text-transform:uppercase">Delhi Metro · Live Crowd</div>
+
+      <!-- Headline -->
+      <div style="font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:#F0F0F0;text-align:center;line-height:1.15;letter-spacing:-.5px;margin-bottom:12px">
+        Real-time crowd data<br>for every Delhi Metro
+      </div>
+      <div style="font-size:13px;color:rgba(240,240,240,.35);text-align:center;line-height:1.7;max-width:260px">
+        Live crowd levels, coach finder &amp; smart route planner
+      </div>
     </div>
 
-    <!-- Illustration -->
-    <div style="margin-bottom:24px;color:#FFD000;opacity:.7"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="11" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><line x1="7" y1="12" x2="17" y2="12"/><path d="M7 18l-2 3M17 18l2 3"/></svg></div>
+    <!-- Bottom CTA sheet -->
+    <div style="width:100%;max-width:400px;padding:24px 24px 16px;border-top:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02)">
 
-    <!-- Headline -->
-    <div style="font-family:'Syne',sans-serif;font-size:19px;font-weight:800;color:#EFEFEF;text-align:center;margin-bottom:8px;line-height:1.25">
-      Real-time crowd data<br>for every Delhi Metro station
-    </div>
-    <div style="font-size:12px;color:rgba(255,255,255,.35);text-align:center;margin-bottom:40px;line-height:1.65;max-width:270px">
-      Sign in to report crowds, sync across devices, and get personalised alerts
-    </div>
-
-    <!-- Google button -->
-    <button onclick="LEGAL.trySignIn('google')" id="lg-google" style="
-      width:100%;max-width:340px;
-      background:#fff;color:#1a1a1a;
-      border:none;border-radius:14px;
-      padding:15px 20px;
-      font-size:14px;font-weight:700;
-      cursor:pointer;
-      display:flex;align-items:center;justify-content:center;gap:12px;
-      margin-bottom:10px;
-    ">
-      <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.8 2.5 30.2 0 24 0 14.7 0 6.8 5.5 3 13.5l7.8 6C12.8 13.2 17.9 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4 7.1-10 7.1-17z"/><path fill="#FBBC05" d="M10.8 28.5A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.1.8-4.5L2.5 13.5A24 24 0 0 0 0 24c0 3.8.9 7.4 2.5 10.5l8.3-6z"/><path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.2-5.5l-7.5-5.8c-2 1.4-4.6 2.3-7.7 2.3-6.1 0-11.2-3.7-13.2-9l-7.8 6C6.8 42.5 14.7 48 24 48z"/></svg>
-      Continue with Google
-    </button>
-
-    <!-- GitHub button -->
-    <button onclick="LEGAL.trySignIn('github')" id="lg-github" style="
-      width:100%;max-width:340px;
-      background:#161b22;color:#fff;
-      border:1px solid rgba(255,255,255,.1);border-radius:14px;
-      padding:15px 20px;
-      font-size:14px;font-weight:700;
-      cursor:pointer;
-      display:flex;align-items:center;justify-content:center;gap:12px;
-      margin-bottom:32px;
-    ">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.38.6.1.82-.26.82-.58v-2.04c-3.34.72-4.04-1.6-4.04-1.6-.54-1.38-1.33-1.75-1.33-1.75-1.08-.74.08-.72.08-.72 1.2.08 1.83 1.23 1.83 1.23 1.06 1.82 2.78 1.3 3.46 1 .1-.77.42-1.3.76-1.6-2.66-.3-5.47-1.33-5.47-5.93 0-1.3.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.17 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.3-1.23 3.3-1.23.66 1.65.24 2.87.12 3.17.77.84 1.24 1.9 1.24 3.22 0 4.6-2.8 5.63-5.48 5.92.43.37.82 1.1.82 2.22v3.3c0 .32.22.7.83.58A12 12 0 0 0 24 12C24 5.37 18.63 0 12 0z"/></svg>
-      Continue with GitHub
-    </button>
-
-    <!-- Loading state -->
-    <div id="lg-loading" style="display:none;text-align:center">
-      <div style="font-size:13px;color:rgba(255,255,255,.4)" id="lg-loading-msg">Redirecting…</div>
-    </div>
-
-    <!-- Consent gate (hidden until sign-in tapped) -->
-    <div id="lg-consent" style="display:none;width:100%;max-width:360px">
-      <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:#efefef;
-        text-align:center;margin-bottom:4px">Before you continue</div>
-      <div style="font-size:12px;color:rgba(255,255,255,.35);text-align:center;margin-bottom:18px">
-        Please review and accept to proceed</div>
-
-      <!-- Required -->
-      <label id="lg-c1-label" style="display:flex;align-items:flex-start;gap:12px;padding:14px;
-        background:#141414;border:1.5px solid rgba(239,68,68,.2);border-radius:14px;
-        cursor:pointer;margin-bottom:10px">
-        <input type="checkbox" id="lg-c1"
-          style="width:18px;height:18px;flex-shrink:0;margin-top:2px;cursor:pointer;accent-color:#FFD000">
-        <div style="font-size:11px;color:rgba(255,255,255,.6);line-height:1.6">
-          I have read and agree to MetroCrowd's
-          <a href="/legal.html#privacy" target="_blank" style="color:#FFD000">Privacy Policy</a> and
-          <a href="/legal.html#terms" target="_blank" style="color:#FFD000">Terms of Service</a>.
-          I understand MetroCrowd will process my name, email and crowd reports to provide the service.
-          <strong style="color:#fff">I am 18 years of age or older.</strong>
-          <span style="display:inline-block;margin-left:4px;font-size:9px;padding:1px 5px;
-            border-radius:5px;background:rgba(239,68,68,.2);color:#ef4444;
-            font-weight:700">REQUIRED</span>
-        </div>
-      </label>
-
-      <!-- Optional push -->
-      <label style="display:flex;align-items:flex-start;gap:12px;padding:14px;
-        background:#141414;border:1px solid #222;border-radius:14px;cursor:pointer;margin-bottom:10px">
-        <input type="checkbox" id="lg-c2"
-          style="width:18px;height:18px;flex-shrink:0;margin-top:2px;cursor:pointer;accent-color:#FFD000">
-        <div style="font-size:11px;color:rgba(255,255,255,.5);line-height:1.6">
-          I agree to receive push notifications for crowd alerts and service updates.
-          I can withdraw at any time in Settings.
-          <span style="display:inline-block;margin-left:4px;font-size:9px;padding:1px 5px;
-            border-radius:5px;background:rgba(74,222,128,.1);color:#4ade80;
-            font-weight:700">OPTIONAL</span>
-        </div>
-      </label>
-
-      <!-- Optional analytics -->
-      <label style="display:flex;align-items:flex-start;gap:12px;padding:14px;
-        background:#141414;border:1px solid #222;border-radius:14px;cursor:pointer;margin-bottom:20px">
-        <input type="checkbox" id="lg-c3"
-          style="width:18px;height:18px;flex-shrink:0;margin-top:2px;cursor:pointer;accent-color:#FFD000">
-        <div style="font-size:11px;color:rgba(255,255,255,.5);line-height:1.6">
-          I agree to share anonymous usage data to help improve MetroCrowd.
-          No personal data shared. No ad profiles created.
-          <span style="display:inline-block;margin-left:4px;font-size:9px;padding:1px 5px;
-            border-radius:5px;background:rgba(74,222,128,.1);color:#4ade80;
-            font-weight:700">OPTIONAL</span>
-        </div>
-      </label>
-
-      <button id="lg-consent-btn" onclick="LEGAL.proceedAfterConsent()" disabled
-        style="width:100%;height:48px;background:#333;color:#666;border:none;border-radius:14px;
-        font-family:'Syne',sans-serif;font-size:14px;font-weight:800;cursor:not-allowed;
-        margin-bottom:12px;transition:background .2s,color .2s">
-        Continue
+      <!-- Google button -->
+      <button onclick="LEGAL.trySignIn('google')" id="lg-google" style="
+        width:100%;background:#fff;color:#1a1a1a;
+        border:none;border-radius:14px;
+        padding:15px 20px;font-size:14px;font-weight:700;
+        cursor:pointer;
+        display:flex;align-items:center;justify-content:center;gap:12px;
+        margin-bottom:10px;letter-spacing:.01em;
+      ">
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.8 2.5 30.2 0 24 0 14.7 0 6.8 5.5 3 13.5l7.8 6C12.8 13.2 17.9 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4 7.1-10 7.1-17z"/><path fill="#FBBC05" d="M10.8 28.5A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.1.8-4.5L2.5 13.5A24 24 0 0 0 0 24c0 3.8.9 7.4 2.5 10.5l8.3-6z"/><path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.2-5.5l-7.5-5.8c-2 1.4-4.6 2.3-7.7 2.3-6.1 0-11.2-3.7-13.2-9l-7.8 6C6.8 42.5 14.7 48 24 48z"/></svg>
+        Continue with Google
       </button>
-      <div onclick="LEGAL.cancelConsent()"
-        style="font-size:11px;color:rgba(255,255,255,.25);text-align:center;cursor:pointer;padding:8px">
-        ← Go back
+
+      <!-- GitHub button -->
+      <button onclick="LEGAL.trySignIn('github')" id="lg-github" style="
+        width:100%;background:#0d1117;color:#e6edf3;
+        border:1px solid rgba(255,255,255,.12);border-radius:14px;
+        padding:15px 20px;font-size:14px;font-weight:700;
+        cursor:pointer;
+        display:flex;align-items:center;justify-content:center;gap:12px;
+        margin-bottom:24px;letter-spacing:.01em;
+      ">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="#e6edf3"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.38.6.1.82-.26.82-.58v-2.04c-3.34.72-4.04-1.6-4.04-1.6-.54-1.38-1.33-1.75-1.33-1.75-1.08-.74.08-.72.08-.72 1.2.08 1.83 1.23 1.83 1.23 1.06 1.82 2.78 1.3 3.46 1 .1-.77.42-1.3.76-1.6-2.66-.3-5.47-1.33-5.47-5.93 0-1.3.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.17 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.3-1.23 3.3-1.23.66 1.65.24 2.87.12 3.17.77.84 1.24 1.9 1.24 3.22 0 4.6-2.8 5.63-5.48 5.92.43.37.82 1.1.82 2.22v3.3c0 .32.22.7.83.58A12 12 0 0 0 24 12C24 5.37 18.63 0 12 0z"/></svg>
+        Continue with GitHub
+      </button>
+
+      <!-- Loading state -->
+      <div id="lg-loading" style="display:none;text-align:center">
+        <div style="font-size:12px;color:rgba(240,240,240,.35)" id="lg-loading-msg">Redirecting…</div>
       </div>
-    </div>
 
+      <!-- Consent gate -->
+      <div id="lg-consent" style="display:none;width:100%">
+        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:#F0F0F0;text-align:center;margin-bottom:4px">Before you continue</div>
+        <div style="font-size:12px;color:rgba(240,240,240,.35);text-align:center;margin-bottom:18px">Please review and accept to proceed</div>
 
-    <!-- Footer (shown in initial sign-in step) -->
-    <div id="lg-footer" style="font-size:11px;color:rgba(255,255,255,.2);text-align:center;margin-top:16px;line-height:1.7">
-      Your reports help 3M+ daily commuters<br>
-      No spam · No ads ·
-      <a href="/legal.html" target="_blank" style="color:rgba(255,255,255,.3)">Legal</a>
+        <label id="lg-c1-label" style="display:flex;align-items:flex-start;gap:12px;padding:14px;background:#0d0d0d;border:1px solid rgba(239,68,68,.2);border-radius:12px;cursor:pointer;margin-bottom:8px">
+          <input type="checkbox" id="lg-c1" style="width:18px;height:18px;flex-shrink:0;margin-top:2px;cursor:pointer;accent-color:#FFD000">
+          <div style="font-size:11px;color:rgba(240,240,240,.55);line-height:1.6">
+            I have read and agree to MetroCrowd’s
+            <a href="/legal.html#privacy" target="_blank" style="color:#FFD000">Privacy Policy</a> and
+            <a href="/legal.html#terms" target="_blank" style="color:#FFD000">Terms of Service</a>.
+            I understand MetroCrowd will process my name, email and crowd reports to provide the service.
+            <strong style="color:#fff">I am 18 years of age or older.</strong>
+            <span style="display:inline-block;margin-left:4px;font-size:9px;padding:1px 5px;border-radius:5px;background:rgba(239,68,68,.18);color:#ef4444;font-weight:700">REQUIRED</span>
+          </div>
+        </label>
+
+        <label style="display:flex;align-items:flex-start;gap:12px;padding:14px;background:#0d0d0d;border:1px solid rgba(255,255,255,.07);border-radius:12px;cursor:pointer;margin-bottom:8px">
+          <input type="checkbox" id="lg-c2" style="width:18px;height:18px;flex-shrink:0;margin-top:2px;cursor:pointer;accent-color:#FFD000">
+          <div style="font-size:11px;color:rgba(240,240,240,.45);line-height:1.6">
+            I agree to receive push notifications for crowd alerts and service updates. I can withdraw at any time in Settings.
+            <span style="display:inline-block;margin-left:4px;font-size:9px;padding:1px 5px;border-radius:5px;background:rgba(74,222,128,.1);color:#4ade80;font-weight:700">OPTIONAL</span>
+          </div>
+        </label>
+
+        <label style="display:flex;align-items:flex-start;gap:12px;padding:14px;background:#0d0d0d;border:1px solid rgba(255,255,255,.07);border-radius:12px;cursor:pointer;margin-bottom:18px">
+          <input type="checkbox" id="lg-c3" style="width:18px;height:18px;flex-shrink:0;margin-top:2px;cursor:pointer;accent-color:#FFD000">
+          <div style="font-size:11px;color:rgba(240,240,240,.45);line-height:1.6">
+            I agree to share anonymous usage data to help improve MetroCrowd. No personal data shared. No ad profiles created.
+            <span style="display:inline-block;margin-left:4px;font-size:9px;padding:1px 5px;border-radius:5px;background:rgba(74,222,128,.1);color:#4ade80;font-weight:700">OPTIONAL</span>
+          </div>
+        </label>
+
+        <button id="lg-consent-btn" onclick="LEGAL.proceedAfterConsent()" disabled style="width:100%;height:50px;background:#222;color:#555;border:none;border-radius:12px;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;cursor:not-allowed;margin-bottom:10px;transition:all .2s">
+          Continue
+        </button>
+        <div onclick="LEGAL.cancelConsent()" style="font-size:11px;color:rgba(240,240,240,.2);text-align:center;cursor:pointer;padding:8px">
+          ← Go back
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div id="lg-footer" style="font-size:11px;color:rgba(240,240,240,.18);text-align:center;line-height:1.8">
+        Helping 3M+ daily commuters &middot;
+        <a href="/legal.html" target="_blank" style="color:rgba(240,240,240,.28)">Legal</a>
+      </div>
     </div>
   </div>
+
+  <style>
+    @keyframes ring-pulse {
+      0%,100% { opacity:1; transform:scale(1); }
+      50% { opacity:0.4; transform:scale(1.05); }
+    }
+  </style>
 
 <div id="app" style="visibility:hidden">
 
