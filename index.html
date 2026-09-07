@@ -14,7 +14,23 @@
 <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152.png">
 <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png">
-<title>MetroCrowd · Delhi Metro</title>
+<title>MetroCrowd · Real-time Delhi Metro Crowd Monitor</title>
+<meta name="description" content="Check live crowd levels at every Delhi Metro station, find the least-packed coach, plan crowd-aware routes, and help 3M+ daily commuters with a 2-tap report.">
+<meta name="keywords" content="Delhi Metro crowd, metro crowd level, DMRC crowd, Delhi Metro coach finder, metro route planner">
+<link rel="canonical" href="https://metrocrowd.vercel.app/">
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://metrocrowd.vercel.app/">
+<meta property="og:title" content="MetroCrowd · Real-time Delhi Metro Crowd Monitor">
+<meta property="og:description" content="Live crowd levels for every Delhi Metro station. Find the least-packed coach, plan smart routes, and report crowds in 2 taps.">
+<meta property="og:image" content="https://metrocrowd.vercel.app/icons/icon-512.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MetroCrowd · Delhi Metro Crowd Monitor">
+<meta name="twitter:description" content="Live crowd levels, coach finder, and route planner for Delhi Metro.">
+<!-- JSON-LD Organization Schema -->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"MetroCrowd","url":"https://metrocrowd.vercel.app","description":"Real-time crowd monitoring for Delhi Metro stations. Find least-packed coaches, plan crowd-aware routes, and submit crowd reports.","applicationCategory":"TransportationApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"INR"},"publisher":{"@type":"Organization","name":"MetroCrowd","url":"https://metrocrowd.vercel.app"}}
+</script>
 <link rel="stylesheet" href="style.css">
 <script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};</script>
 <script defer src="/_app/static/js/analytics.js" onerror="void 0"></script>
@@ -44,42 +60,41 @@
   <!-- ═══ LOGIN GATE ════════════════════════════════════════════ -->
   <div id="login-gate" style="
     position:fixed;inset:0;z-index:9999;
-    background:#080808;
+    background:#060606;
     display:flex;flex-direction:column;
     align-items:center;justify-content:center;
     padding:32px 24px;
     font-family:'DM Sans',sans-serif;
   ">
     <!-- Logo -->
-    <div style="text-align:center;margin-bottom:36px">
-      <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#EFEFEF;letter-spacing:-.5px">
+    <div style="text-align:center;margin-bottom:40px">
+      <div style="font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:#EFEFEF;letter-spacing:-.5px">
         Metro<span style="color:#FFD000">Crowd</span>
       </div>
-      <div style="font-size:12px;color:rgba(255,255,255,.38);margin-top:4px;letter-spacing:.5px">DELHI METRO · CROWD MONITOR</div>
+      <div style="font-size:11px;color:rgba(255,255,255,.3);margin-top:5px;letter-spacing:.8px;text-transform:uppercase">Delhi Metro · Live Crowd</div>
     </div>
 
     <!-- Illustration -->
-    <div style="margin-bottom:20px;color:var(--y);opacity:.85"><svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="11" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><line x1="7" y1="12" x2="17" y2="12"/><path d="M7 18l-2 3M17 18l2 3"/></svg></div>
+    <div style="margin-bottom:24px;color:#FFD000;opacity:.7"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="11" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><line x1="7" y1="12" x2="17" y2="12"/><path d="M7 18l-2 3M17 18l2 3"/></svg></div>
 
     <!-- Headline -->
-    <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#EFEFEF;text-align:center;margin-bottom:8px;line-height:1.2">
+    <div style="font-family:'Syne',sans-serif;font-size:19px;font-weight:800;color:#EFEFEF;text-align:center;margin-bottom:8px;line-height:1.25">
       Real-time crowd data<br>for every Delhi Metro station
     </div>
-    <div style="font-size:13px;color:rgba(255,255,255,.4);text-align:center;margin-bottom:36px;line-height:1.6;max-width:280px">
+    <div style="font-size:12px;color:rgba(255,255,255,.35);text-align:center;margin-bottom:40px;line-height:1.65;max-width:270px">
       Sign in to report crowds, sync across devices, and get personalised alerts
     </div>
 
     <!-- Google button -->
     <button onclick="LEGAL.trySignIn('google')" id="lg-google" style="
-      width:100%;max-width:360px;
+      width:100%;max-width:340px;
       background:#fff;color:#1a1a1a;
-      border:none;border-radius:16px;
+      border:none;border-radius:14px;
       padding:15px 20px;
-      font-size:15px;font-weight:700;
+      font-size:14px;font-weight:700;
       cursor:pointer;
       display:flex;align-items:center;justify-content:center;gap:12px;
       margin-bottom:10px;
-      box-shadow:0 4px 20px rgba(0,0,0,.4);
     ">
       <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.8 2.5 30.2 0 24 0 14.7 0 6.8 5.5 3 13.5l7.8 6C12.8 13.2 17.9 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4 7.1-10 7.1-17z"/><path fill="#FBBC05" d="M10.8 28.5A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.1.8-4.5L2.5 13.5A24 24 0 0 0 0 24c0 3.8.9 7.4 2.5 10.5l8.3-6z"/><path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.2-5.5l-7.5-5.8c-2 1.4-4.6 2.3-7.7 2.3-6.1 0-11.2-3.7-13.2-9l-7.8 6C6.8 42.5 14.7 48 24 48z"/></svg>
       Continue with Google
@@ -87,15 +102,14 @@
 
     <!-- GitHub button -->
     <button onclick="LEGAL.trySignIn('github')" id="lg-github" style="
-      width:100%;max-width:360px;
-      background:#24292e;color:#fff;
-      border:none;border-radius:16px;
+      width:100%;max-width:340px;
+      background:#161b22;color:#fff;
+      border:1px solid rgba(255,255,255,.1);border-radius:14px;
       padding:15px 20px;
-      font-size:15px;font-weight:700;
+      font-size:14px;font-weight:700;
       cursor:pointer;
       display:flex;align-items:center;justify-content:center;gap:12px;
-      margin-bottom:28px;
-      box-shadow:0 4px 20px rgba(0,0,0,.4);
+      margin-bottom:32px;
     ">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.38.6.1.82-.26.82-.58v-2.04c-3.34.72-4.04-1.6-4.04-1.6-.54-1.38-1.33-1.75-1.33-1.75-1.08-.74.08-.72.08-.72 1.2.08 1.83 1.23 1.83 1.23 1.06 1.82 2.78 1.3 3.46 1 .1-.77.42-1.3.76-1.6-2.66-.3-5.47-1.33-5.47-5.93 0-1.3.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.17 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.3-1.23 3.3-1.23.66 1.65.24 2.87.12 3.17.77.84 1.24 1.9 1.24 3.22 0 4.6-2.8 5.63-5.48 5.92.43.37.82 1.1.82 2.22v3.3c0 .32.22.7.83.58A12 12 0 0 0 24 12C24 5.37 18.63 0 12 0z"/></svg>
       Continue with GitHub
@@ -497,30 +511,42 @@
 
         <!-- Crowd level picker -->
         <div style="font-size:10px;color:var(--sub);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px" data-i18n="crowd_level_lbl">Crowd level</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
-          <div class="cp" onclick="UI.pickLevel(this)" data-v="empty" style="background:var(--card);border:1.5px solid var(--brd);border-radius:14px;padding:14px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden">
-            <div class="cp-check" style="display:none;position:absolute;top:8px;right:8px;width:18px;height:18px;background:rgba(74,222,128,.2);border-radius:50%;align-items:center;justify-content:center;color:#4ade80"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-            <div style="font-size:22px;margin-bottom:6px">😌</div>
-            <div style="font-size:13px;font-weight:700;color:var(--txt)" data-i18n="empty_label">Empty</div>
-            <div style="font-size:10px;color:var(--sub);margin-top:2px" data-i18n="seats_available">Seats available</div>
+        <div class="cpick">
+          <!-- Empty -->
+          <div class="cp" onclick="UI.pickLevel(this)" data-v="empty" aria-label="Empty — seats available">
+            <div class="cp-check">✓</div>
+            <div class="cp-level" style="border-color:rgba(74,222,128,.3);color:#4ade80">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            </div>
+            <div class="cp-label" data-i18n="empty_label">Empty</div>
+            <div class="cp-desc" data-i18n="seats_available">Seats available</div>
           </div>
-          <div class="cp" onclick="UI.pickLevel(this)" data-v="moderate" style="background:var(--card);border:1.5px solid var(--brd);border-radius:14px;padding:14px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden">
-            <div class="cp-check" style="display:none;position:absolute;top:8px;right:8px;width:18px;height:18px;background:rgba(251,191,36,.2);border-radius:50%;align-items:center;justify-content:center;color:#fbbf24"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-            <div style="font-size:22px;margin-bottom:6px">🙂</div>
-            <div style="font-size:13px;font-weight:700;color:var(--txt)" data-i18n="moderate_label">Moderate</div>
-            <div style="font-size:10px;color:var(--sub);margin-top:2px" data-i18n="some_people">Some people, comfortable</div>
+          <!-- Moderate -->
+          <div class="cp" onclick="UI.pickLevel(this)" data-v="moderate" aria-label="Moderate — some people, comfortable">
+            <div class="cp-check">✓</div>
+            <div class="cp-level" style="border-color:rgba(251,191,36,.3);color:#fbbf24">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+            </div>
+            <div class="cp-label" data-i18n="moderate_label">Moderate</div>
+            <div class="cp-desc" data-i18n="some_people">Some people, comfortable</div>
           </div>
-          <div class="cp" onclick="UI.pickLevel(this)" data-v="crowded" style="background:var(--card);border:1.5px solid var(--brd);border-radius:14px;padding:14px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden">
-            <div class="cp-check" style="display:none;position:absolute;top:8px;right:8px;width:18px;height:18px;background:rgba(249,115,22,.2);border-radius:50%;align-items:center;justify-content:center;color:#f97316"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-            <div style="font-size:22px;margin-bottom:6px">😰</div>
-            <div style="font-size:13px;font-weight:700;color:var(--txt)" data-i18n="crowded_label">Crowded</div>
-            <div style="font-size:10px;color:var(--sub);margin-top:2px" data-i18n="standing_room">Standing room only</div>
+          <!-- Crowded -->
+          <div class="cp" onclick="UI.pickLevel(this)" data-v="crowded" aria-label="Crowded — standing room only">
+            <div class="cp-check">✓</div>
+            <div class="cp-level" style="border-color:rgba(249,115,22,.3);color:#f97316">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+            </div>
+            <div class="cp-label" data-i18n="crowded_label">Crowded</div>
+            <div class="cp-desc" data-i18n="standing_room">Standing room only</div>
           </div>
-          <div class="cp" onclick="UI.pickLevel(this)" data-v="packed" style="background:var(--card);border:1.5px solid var(--brd);border-radius:14px;padding:14px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden">
-            <div class="cp-check" style="display:none;position:absolute;top:8px;right:8px;width:18px;height:18px;background:rgba(239,68,68,.2);border-radius:50%;align-items:center;justify-content:center;color:#ef4444"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-            <div style="font-size:22px;margin-bottom:6px">😱</div>
-            <div style="font-size:13px;font-weight:700;color:var(--txt)" data-i18n="packed_label">Packed</div>
-            <div style="font-size:10px;color:var(--sub);margin-top:2px" data-i18n="skip_next">Skip — next train</div>
+          <!-- Packed -->
+          <div class="cp" onclick="UI.pickLevel(this)" data-v="packed" aria-label="Packed — skip this train">
+            <div class="cp-check">✓</div>
+            <div class="cp-level" style="border-color:rgba(239,68,68,.3);color:#ef4444">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div class="cp-label" data-i18n="packed_label">Packed</div>
+            <div class="cp-desc" data-i18n="skip_next">Skip — next train</div>
           </div>
         </div>
 
