@@ -458,13 +458,15 @@ window.UI=(function(){
 
   function doRoute(){
     if(!routeFrom||!routeTo){showToast('⚠','Pick both stations first');return;}
+    if(routeFrom===routeTo){showToast('⚠','Choose two different stations');return;}
     if(typeof ROUTE==='undefined'){
       const el=document.getElementById('rres');
       if(el)el.innerHTML='<div class="route-error">Route module loading… try again.</div>';
       return;
     }
     const avoid=document.getElementById('opt-avoid')?.classList.contains('on')??true;
-    const result=ROUTE.compute(routeFrom,routeTo,avoid);
+    const mode=document.getElementById('opt-fastest')?.classList.contains('on')?'fastest':'fewest';
+    const result=ROUTE.compute(routeFrom,routeTo,avoid,mode);
     ROUTE.render(result);
     // Scroll to results
     const rres=document.getElementById('rres');
@@ -604,38 +606,55 @@ window.UI=(function(){
 
   function _setRouteStation(side,id){
     const s=METRO.STATIONS[id];if(!s)return;
+    const changed=(side==='from'?routeFrom:routeTo)!==id;
     const v=CROWD.state?.crowdMap?.[id]||0;
     const vc=_v3Color(v);
     if(side==='from'){
       routeFrom=id;
       const el=document.getElementById('rFrom');if(el){el.textContent=s.n;el.classList.remove('ph');}
       const ce=document.getElementById('rFromC');if(ce){ce.textContent='Crowd: '+v+'%';ce.style.color=vc;ce.style.display='block';}
-      const sel=document.getElementById('rFrom');if(sel)sel.value=id;
     } else {
       routeTo=id;
       const el=document.getElementById('rTo');if(el){el.textContent=s.n;el.classList.remove('ph');}
       const ce=document.getElementById('rToC');if(ce){ce.textContent='Crowd: '+v+'%';ce.style.color=vc;ce.style.display='block';}
-      const sel=document.getElementById('rTo');if(sel)sel.value=id;
     }
+    if(changed)_clearRouteResult();
   }
 
   function swapRoute(){
     const tmpId=routeFrom;routeFrom=routeTo;routeTo=tmpId;
-    const fromEl=document.getElementById('rFrom'),toEl=document.getElementById('rTo');
-    const fromC=document.getElementById('rFromC'),toC=document.getElementById('rToC');
-    const fromSel=document.getElementById('rFrom'),toSel=document.getElementById('rTo');
-    // Swap display
-    const tmpTxt=fromEl?.textContent;if(fromEl&&toEl){fromEl.textContent=toEl.textContent;toEl.textContent=tmpTxt||'';}
-    const tmpCss=fromC?.textContent;if(fromC&&toC){fromC.textContent=toC.textContent||'';toC.textContent=tmpCss||'';}
-    if(fromEl)fromEl.classList.toggle('ph',!routeFrom);
-    if(toEl)toEl.classList.toggle('ph',!routeTo);
-    if(fromSel)fromSel.value=routeFrom||'';
-    if(toSel)toSel.value=routeTo||'';
+    _refreshRouteDisplay();
+    _clearRouteResult();
   }
 
   function _refreshRouteDisplay(){
-    if(routeFrom){const s=METRO.STATIONS[routeFrom];const e=document.getElementById('rFrom');if(e&&s){e.textContent=s.n;e.classList.remove('ph');}}
-    if(routeTo){const s=METRO.STATIONS[routeTo];const e=document.getElementById('rTo');if(e&&s){e.textContent=s.n;e.classList.remove('ph');}}
+    [['from',routeFrom],['to',routeTo]].forEach(([side,id])=>{
+      const name=document.getElementById(side==='from'?'rFrom':'rTo');
+      const crowd=document.getElementById(side==='from'?'rFromC':'rToC');
+      const station=id&&METRO.STATIONS[id];
+      if(name){name.textContent=station?.n||(side==='from'?T('select_origin'):T('select_destination'));name.classList.toggle('ph',!station);}
+      if(crowd){
+        if(station){const v=CROWD.state?.crowdMap?.[id]||0;crowd.textContent=`Crowd: ${v}%`;crowd.style.color=_v3Color(v);crowd.style.display='block';}
+        else{crowd.textContent='';crowd.style.display='none';}
+      }
+    });
+  }
+
+  function _clearRouteResult(){
+    const result=document.getElementById('rres');
+    if(result){result.innerHTML='';result.style.display='none';}
+    document.getElementById('guide-panel')?.remove();
+    window._lastRouteResult=null;
+    if(typeof ROUTE!=='undefined')ROUTE.clearRoute();
+  }
+
+  function setRouteMode(mode){
+    const fastest=document.getElementById('opt-fastest');
+    const fewest=document.getElementById('opt-fewest');
+    if(!fastest||!fewest)return;
+    fastest.classList.toggle('on',mode==='fastest');
+    fewest.classList.toggle('on',mode==='fewest');
+    _clearRouteResult();
   }
 
   function populateRouteSelects(){
@@ -1480,7 +1499,7 @@ window.UI=(function(){
     openCoachLineSelect: openCoachLinePicker, coachSetDir: setCoachDir,
     setCFHour, pickCoachLine,
     // Route
-    swapRoute, doRoute,
+    swapRoute, doRoute, setRouteMode,
     // Report
     pickLevel: pickCp, submitReport, quickReport,
     // UI helpers

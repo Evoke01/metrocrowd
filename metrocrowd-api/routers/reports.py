@@ -5,7 +5,7 @@
 # ══════════════════════════════════════════════════════════════
 import os
 from fastapi import APIRouter, Query
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from supabase import create_client
 
 router = APIRouter()
@@ -14,9 +14,9 @@ SUPABASE_KEY = os.environ["SUPABASE_KEY"]
 EXPIRY_HOURS = 2
 
 @router.get("/network")
-def network_reports(limit: int = Query(default=30)):
+def network_reports(limit: int = Query(default=30, ge=1, le=100)):
     """Recent crowd reports across entire network."""
-    since = (datetime.utcnow() - timedelta(hours=EXPIRY_HOURS)).isoformat()
+    since = (datetime.now(timezone.utc) - timedelta(hours=EXPIRY_HOURS)).isoformat()
     client = create_client(SUPABASE_URL, SUPABASE_KEY)
     resp = client.table("crowd_reports") \
         .select("id,station_id,station_name,level,created_at") \
@@ -27,9 +27,9 @@ def network_reports(limit: int = Query(default=30)):
     return {"reports": resp.data or []}
 
 @router.get("/{station_id}")
-def station_reports(station_id: str, limit: int = Query(default=10)):
+def station_reports(station_id: str, limit: int = Query(default=10, ge=1, le=100)):
     """Recent crowd reports for a single station."""
-    since = (datetime.utcnow() - timedelta(hours=EXPIRY_HOURS)).isoformat()
+    since = (datetime.now(timezone.utc) - timedelta(hours=EXPIRY_HOURS)).isoformat()
     client = create_client(SUPABASE_URL, SUPABASE_KEY)
     resp = client.table("crowd_reports") \
         .select("id,station_id,station_name,level,created_at") \

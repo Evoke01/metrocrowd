@@ -30,7 +30,6 @@ window.GPS = (function(){
   let watchId       = null;
   let lockedStation = null;    // currently confirmed station id
   let buffer        = [];      // rolling [{lat,lng,acc}]
-  let targetSelect  = null;    // DOM element id to auto-fill
   let onStation     = null;    // optional callback(stationId, stationName, distM)
 
   // ── Coordinate patches ─────────────────────────────────────────
@@ -151,13 +150,6 @@ window.GPS = (function(){
                      : '📍';
     setStatus(`${statusIcon} ${s.n} · ${distLabel}`, locked ? 'var(--low)' : 'var(--muted)');
 
-    // Fill target select if this is a one-shot request
-    if(targetSelect && locked){
-      const sel = document.getElementById(targetSelect);
-      if(sel){ sel.value = result.id; sel.dispatchEvent(new Event('change')); }
-      targetSelect = null; // clear after one fill
-    }
-
     // Fire callback if registered
     if(onStation && locked) onStation(result.id, s.n, result.dist);
 
@@ -174,15 +166,50 @@ window.GPS = (function(){
 
   // ── Public: one-shot request (fills a select, then watches) ────
   function requestLocation(selectId){
+    locateOnce(result => {
+      if(!result) return;
+      const sel = document.getElementById(selectId);
+      if(sel){ sel.value = result.id; sel.dispatchEvent(new Event('change')); }
+    });
+  }
+
+  // User-initiated one-shot lookup avoids an always-on location watch.
+  function locateOnce(callback){
     if(!navigator.geolocation){
       setStatus('Geolocation not supported by your browser.', 'var(--pk)');
+      callback?.(null);
       return;
     }
-    targetSelect  = selectId;
-    buffer        = [];      // reset buffer for fresh reading
-    lockedStation = null;    // allow re-lock
     updateBtn(true);
-    startWatch();
+    navigator.geolocation.getCurrentPosition(pos => {
+      const { latitude: lat, longitude: lng, accuracy } = pos.coords;
+      if(accuracy > 150){
+        setStatus(`Location is too imprecise (±${Math.round(accuracy)}m). Try again outdoors.`, 'var(--muted)');
+        updateBtn(false);
+        callback?.(null);
+        return;
+      }
+      const nearest = nearestRaw(lat, lng);
+      if(!nearest.id){ updateBtn(false); callback?.(null); return; }
+      if(nearest.dist > 1500){
+        setStatus('No metro station found within 1.5 km.', 'var(--muted)');
+        updateBtn(false);
+        callback?.(null);
+        return;
+      }
+      const station = METRO.STATIONS[nearest.id];
+      const distance = nearest.dist < 1000
+        ? `${Math.round(nearest.dist)}m away`
+        : `${(nearest.dist / 1000).toFixed(1)}km away`;
+      setStatus(`📍 ${station?.n || nearest.id} · ${distance} · ±${Math.round(accuracy)}m`, 'var(--low)');
+      lockedStation = nearest.id;
+      updateBtn(false);
+      callback?.({ id: nearest.id, name: station?.n || nearest.id,
+                   distance: nearest.dist, accuracy });
+    }, err => {
+      onError(err);
+      callback?.(null);
+    }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 15000 });
   }
 
   // ── Public: start continuous watching ──────────────────────────
@@ -262,7 +289,7 @@ window.GPS = (function(){
     return items;
   }
 
-  return { init, requestLocation, startWatch, stopWatch, setOnStation,
+  return { init, requestLocation, locateOnce, startWatch, stopWatch, setOnStation,
            nearestStation, distanceM, debugNearest,
            get locked(){ return lockedStation; },
            get buffer(){ return [...buffer]; } };

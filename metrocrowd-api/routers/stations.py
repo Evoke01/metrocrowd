@@ -7,16 +7,18 @@
 import os
 from fastapi import APIRouter, Query
 from supabase import create_client
+from zoneinfo import ZoneInfo
 
 router = APIRouter()
 SUPABASE_URL = os.environ["SUPABASE_URL"]
 SUPABASE_KEY = os.environ["SUPABASE_KEY"]
+IST = ZoneInfo("Asia/Kolkata")
 
 @router.get("/")
 def list_stations():
     """All stations with their latest crowd from ml_predictions (current hour)."""
     from datetime import datetime
-    now  = datetime.now()
+    now  = datetime.now(IST)
     client = create_client(SUPABASE_URL, SUPABASE_KEY)
     resp = client.table("ml_predictions") \
         .select("station_id,crowd_pct,confidence") \
@@ -26,7 +28,9 @@ def list_stations():
     return {"stations": resp.data or []}
 
 @router.get("/nearest")
-def nearest(lat: float = Query(...), lon: float = Query(...), n: int = Query(default=5)):
+def nearest(lat: float = Query(..., ge=-90, le=90),
+            lon: float = Query(..., ge=-180, le=180),
+            n: int = Query(default=5, ge=1, le=50)):
     """Nearest N stations to a GPS coordinate using PostGIS."""
     client = create_client(SUPABASE_URL, SUPABASE_KEY)
     resp = client.rpc("nearest_stations", {"user_lat": lat, "user_lon": lon, "limit_n": n}).execute()

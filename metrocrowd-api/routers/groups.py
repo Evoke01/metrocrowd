@@ -6,7 +6,7 @@
 #  GET  /groups/{code}          — get all members + positions
 #  POST /groups/leave           — leave / end session
 # ══════════════════════════════════════════════════════════════
-import os, random, string, logging
+import os, secrets, string, logging
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, field_validator
 from typing import Optional, List
@@ -27,7 +27,7 @@ def _db() -> Client:
 # ── Helpers ───────────────────────────────────────────────────
 def _new_code() -> str:
     """Generate a 6-char uppercase alphanumeric code."""
-    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+    return ''.join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(6))
 
 def _unique_code() -> str:
     """Keep generating until we get one not in use."""
@@ -41,7 +41,8 @@ def _unique_code() -> str:
 
 def _parse_dt(val: str) -> datetime:
     """Parse ISO datetime string safely, with or without Z."""
-    return datetime.fromisoformat(val.replace("Z", "+00:00"))
+    parsed = datetime.fromisoformat(val.replace("Z", "+00:00"))
+    return parsed.replace(tzinfo=timezone.utc) if parsed.tzinfo is None else parsed
 
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
@@ -90,13 +91,24 @@ class JoinReq(BaseModel):
     @field_validator("display_name")
     @classmethod
     def name_not_empty(cls, v: str) -> str:
-        return v.strip()[:40]
+        v = v.strip()
+        if not v:
+            raise ValueError("display_name cannot be empty")
+        return v[:40]
 
 class UpdatePosReq(BaseModel):
     code:            str
     user_id:         str
     current_station: str
     station_index:   int
+
+    @field_validator("code")
+    @classmethod
+    def normalise_code(cls, v: str) -> str:
+        v = v.strip().upper()
+        if len(v) != 6:
+            raise ValueError("code must be exactly 6 characters")
+        return v
 
     @field_validator("station_index")
     @classmethod
@@ -109,9 +121,18 @@ class LeaveReq(BaseModel):
     code:    str
     user_id: str
 
+    @field_validator("code")
+    @classmethod
+    def normalise_code(cls, v: str) -> str:
+        v = v.strip().upper()
+        if len(v) != 6:
+            raise ValueError("code must be exactly 6 characters")
+        return v
+
 # ── Endpoints ─────────────────────────────────────────────────
 @router.post("/create")
 async def create_group(req: CreateReq):
+    code = None
     try:
         db   = _db()
         code = _unique_code()
@@ -125,16 +146,20 @@ async def create_group(req: CreateReq):
             "active":       True,           # FIX: was missing — caused join to fail
             "expires_at":   _expires(),
         }).execute()
-
-        db.table("group_members").insert({
-            "session_id":      code,
-            "user_id":         req.user_id,
-            "display_name":    req.display_name,
-            "avatar_url":      req.avatar_url,
-            "current_station": req.from_station,
-            "station_index":   0,
-            "last_seen":       _now(),
-        }).execute()
+        try:
+            db.table("group_members").insert({
+                "session_id":      code,
+                "user_id":         req.user_id,
+                "display_name":    req.display_name,
+                "avatar_url":      req.avatar_url,
+                "current_station": req.from_station,
+                "station_index":   0,
+                "last_seen":       _now(),
+            }).execute()
+        except Exception:
+            # Avoid leaving an active session that has no creator member.
+            db.table("group_sessions").delete().eq("id", code).execute()
+            raise
 
         logger.info(f"[Groups] Created {code} by {req.user_id}")
         return {"ok": True, "code": code}
@@ -190,6 +215,13 @@ async def join_group(req: JoinReq):
 async def update_position(req: UpdatePosReq):
     db = _db()
     try:
+        sess = db.table("group_sessions").select("active,expires_at") \
+            .eq("id", req.code).eq("active", True).maybe_single().execute()
+        if not sess.data:
+            raise HTTPException(404, "Group not found or already ended")
+        if sess.data.get("expires_at") and _parse_dt(sess.data["expires_at"]) < datetime.now(timezone.utc):
+            raise HTTPException(410, "Group session has expired")
+
         result = db.table("group_members").update({
             "current_station": req.current_station,
             "station_index":   req.station_index,
@@ -218,10 +250,14 @@ async def get_group(code: str):
         raise HTTPException(400, "Invalid group code")
 
     db   = _db()
-    sess = db.table("group_sessions").select("*").eq("id", code).execute()
+    sess = db.table("group_sessions").select("*").eq("id", code).eq("active", True).execute()
 
     if not sess.data:
         raise HTTPException(404, "Group not found")
+
+    session = sess.data[0]
+    if session.get("expires_at") and _parse_dt(session["expires_at"]) < datetime.now(timezone.utc):
+        raise HTTPException(410, "Group session has expired")
 
     members = db.table("group_members") \
                 .select("*") \
@@ -230,7 +266,7 @@ async def get_group(code: str):
 
     return {
         "ok":      True,
-        "session": sess.data[0],
+        "session": session,
         "members": members.data or [],
     }
 

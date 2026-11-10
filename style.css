@@ -1103,3 +1103,114 @@ button, [onclick], .bni, .chip, .ir-opt, .cp, .qa-btn,
   animation: shimmer 1.8s infinite;
   border-radius: var(--r-sm);
 }
+
+/* ── Motion polish ──────────────────────────────────────────── */
+.screen.active .sv > :nth-child(-n+6) {
+  animation: section-arrive 420ms var(--ease-out) both;
+}
+.screen.active .sv > :nth-child(2) { animation-delay: 35ms; }
+.screen.active .sv > :nth-child(3) { animation-delay: 70ms; }
+.screen.active .sv > :nth-child(4) { animation-delay: 105ms; }
+.screen.active .sv > :nth-child(5) { animation-delay: 140ms; }
+.screen.active .sv > :nth-child(6) { animation-delay: 175ms; }
+
+@keyframes section-arrive {
+  from { opacity: 0; transform: translateY(9px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.bni.on .ni { animation: nav-icon-settle 360ms var(--spring) both; }
+@keyframes nav-icon-settle {
+  0% { transform: translateY(2px) scale(.88); }
+  65% { transform: translateY(-2px) scale(1.14); }
+  100% { transform: translateY(-1px) scale(1.08); }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .card, .hero-card, .cp, .coach-card {
+    transition: border-color var(--t-base) var(--ease-out),
+                box-shadow var(--t-base) var(--ease-out),
+                transform var(--t-base) var(--ease-out);
+  }
+  .card:hover, .hero-card:hover, .cp:hover, .coach-card:hover {
+    border-color: var(--y-brd);
+    box-shadow: var(--shadow-card), 0 8px 24px rgba(0,0,0,.22);
+    transform: translateY(-2px);
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--y);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+/* ── Phone-first layout ─────────────────────────────────────── */
+@media (max-width: 600px) {
+  html, body {
+    width: 100%;
+    min-width: 320px;
+    height: 100%;
+    height: 100dvh;
+  }
+
+  #app {
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    height: 100dvh;
+    margin: 0;
+  }
+
+  #sbar {
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+  }
+
+  #auth-btn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .sv {
+    padding-left: max(14px, env(safe-area-inset-left));
+    padding-right: max(14px, env(safe-area-inset-right));
+    padding-bottom: calc(120px + env(safe-area-inset-bottom));
+    scrollbar-width: none;
+  }
+  .sv::-webkit-scrollbar { display: none; }
+
+  #bnav {
+    height: 68px;
+    margin-left: max(8px, env(safe-area-inset-left));
+    margin-right: max(8px, env(safe-area-inset-right));
+    margin-bottom: max(8px, calc(env(safe-area-inset-bottom) + 6px));
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+
+  .bni { min-width: 44px; min-height: 52px; }
+  .chip { min-height: 44px; }
+  .qa-btn, .dir-btn, .line-btn, .back-btn,
+  .gps-btn, .swap-btn, .ov-back, .rep-dtoggle {
+    min-height: 44px;
+  }
+
+  .swap-btn, .gps-btn, .back-btn, .ov-back {
+    min-width: 44px;
+  }
+}
+
+@media (max-width: 600px) and (max-height: 500px) and (orientation: landscape) {
+  #sbar { height: calc(40px + env(safe-area-inset-top)); }
+  #bnav { height: 52px; }
+  .sv { padding-top: 8px; padding-bottom: calc(70px + env(safe-area-inset-bottom)); }
+}

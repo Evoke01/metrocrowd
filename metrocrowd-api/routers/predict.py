@@ -11,10 +11,12 @@
 import os
 from fastapi import APIRouter, Query
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from supabase import create_client
 from ml.model import predict as ml_predict
 
 router = APIRouter()
+IST = ZoneInfo("Asia/Kolkata")
 
 SUPABASE_URL = os.environ["SUPABASE_URL"]
 SUPABASE_KEY = os.environ["SUPABASE_KEY"]
@@ -39,11 +41,11 @@ def _get_cached(station_id: str, hour: int, dow: int) -> dict | None:
 def predict_crowd(
     station_id: str,
     line: str            = Query(default="Yellow"),
-    historical_avg: float = Query(default=40.0),
-    recent_avg: float    = Query(default=40.0),
+    historical_avg: float = Query(default=40.0, ge=0, le=100),
+    recent_avg: float    = Query(default=40.0, ge=0, le=100),
 ):
     """Returns crowd % for a station right now."""
-    now  = datetime.now()
+    now  = datetime.now(IST)
     hour = now.hour
     dow  = now.weekday()
 
@@ -66,10 +68,10 @@ def predict_crowd(
 def forecast(
     station_id: str,
     line: str             = Query(default="Yellow"),
-    historical_avg: float = Query(default=40.0),
+    historical_avg: float = Query(default=40.0, ge=0, le=100),
 ):
     """Returns 24-hour forecast array. Uses cached predictions where available."""
-    now = datetime.now()
+    now = datetime.now(IST)
     dow = now.weekday()
 
     # Try to load all 24 hours from cache at once

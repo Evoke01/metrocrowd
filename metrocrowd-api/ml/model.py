@@ -56,9 +56,11 @@ def build_features(station_id: str, line: str, dt: datetime,
                    station_importance: float = 0.5) -> np.ndarray:
     """Convert inputs into the feature vector the model expects."""
     LINE_ENCODE = {
-        "Yellow": 0, "Blue": 1, "Red": 2, "Green": 3,
-        "Violet": 4, "Orange": 5, "Pink": 6, "Magenta": 7,
-        "Grey": 8, "Rapid": 9, "Aqua": 10
+        "Y": 0, "Yellow": 0, "B": 1, "Blue": 1,
+        "R": 2, "Red": 2, "G": 3, "Green": 3,
+        "V": 4, "Violet": 4, "O": 5, "A": 5, "Orange": 5,
+        "P": 6, "Pink": 6, "M": 7, "Magenta": 7,
+        "Gr": 8, "Grey": 8, "Rapid": 9, "Aq": 10, "Aqua": 10,
     }
     return np.array([[
         dt.hour,
@@ -83,9 +85,16 @@ def predict(station_id: str, line: str, dt: datetime = None,
     model = load_model()
     if model is None:
         # No model trained yet — return historical average
-        return {"crowd_pct": round(historical_avg), "confidence": "low", "source": "historical"}
+        return {"crowd_pct": round(max(0, min(100, historical_avg))), "confidence": "low", "source": "historical"}
 
     features = build_features(station_id, line, dt, historical_avg, recent_avg)
+    # Pre-holiday models have seven inputs; continue serving them safely until
+    # the worker publishes a newly trained model.
+    feature_count = getattr(model, "n_features_in_", features.shape[1])
+    if feature_count == features.shape[1] - 1:
+        features = np.delete(features, 3, axis=1)
+    elif feature_count != features.shape[1]:
+        return {"crowd_pct": round(max(0, min(100, historical_avg))), "confidence": "low", "source": "historical"}
     pred = float(model.predict(features)[0])
     pred = max(0, min(100, pred))
 

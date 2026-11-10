@@ -46,6 +46,7 @@ window.ROUTE=(function(){
 
   // ── Segment line: prefer EDGE_LINE, then shared line ─────────
   function segmentLine(a,b){
+    if(METRO.WALK_TRANSFERS?.[a+'>'+b]) return 'Walk';
     return EDGE_LINE[a+'→'+b] || EDGE_LINE[b+'→'+a] || sharedLine(a,b) || 'B';
   }
 
@@ -94,6 +95,46 @@ window.ROUTE=(function(){
       }
     }
     return avoidPacked?bfs(from,to,false):null;
+  }
+
+  // Weighted shortest path: fastest trades a few stops for fewer transfers,
+  // while fewest stops keeps hop count dominant. Crowd avoidance adds cost to
+  // busy stations and skips severely packed interchanges where possible.
+  function weightedPath(from,to,avoidPacked,mode='fastest'){
+    ensureGraph();
+    if(!from||!to||from===to||!METRO.STATIONS[from]||!METRO.STATIONS[to]) return null;
+    const startKey=from+'|', states=new Map([[startKey,{node:from,line:null}]]);
+    const dist=new Map([[startKey,0]]),prev=new Map(),done=new Set();
+    let destinationKey=null;
+    while(true){
+      let curKey=null,best=Infinity;
+      for(const [key,d] of dist){if(!done.has(key)&&d<best){curKey=key;best=d;}}
+      if(curKey===null) break;
+      const current=states.get(curKey),cur=current.node;
+      if(cur===to){destinationKey=curKey;break;}
+      done.add(curKey);
+      for(const next of graph[cur]||[]){
+        const crowd=CROWD.state.crowdMap[next]||0;
+        if(avoidPacked&&next!==to&&METRO.STATIONS[next]?.ix&&crowd>82) continue;
+        const nextLine=segmentLine(cur,next);
+        const nextKey=next+'|'+nextLine;
+        if(done.has(nextKey)) continue;
+        const transfers=current.line&&current.line!=='Walk'&&nextLine!=='Walk'&&current.line!==nextLine?1:0;
+        const edgeMinutes=METRO.WALK_TRANSFERS?.[cur+'>'+next]||2.5;
+        const base=mode==='fewest'?10000:edgeMinutes*60;
+        const transferCost=transfers*(mode==='fewest' ? 0.1 : 240);
+        const crowdCost=avoidPacked?crowd*(mode==='fewest' ? 0.005 : 0.02):0;
+        const candidate=best+base+transferCost+crowdCost;
+        if(candidate<(dist.get(nextKey)??Infinity)){
+          dist.set(nextKey,candidate);prev.set(nextKey,curKey);
+          states.set(nextKey,{node:next,line:nextLine});
+        }
+      }
+    }
+    if(!destinationKey) return avoidPacked?weightedPath(from,to,false,mode):null;
+    const path=[];let key=destinationKey;
+    while(key){path.push(states.get(key).node);if(key===startKey)break;key=prev.get(key);}
+    return path[path.length-1]===from?path.reverse():null;
   }
 
   // ══════════════════════════════════════════════════════════════
@@ -277,9 +318,9 @@ window.ROUTE=(function(){
   }
 
   // ── Compute ───────────────────────────────────────────────────
-  function compute(from,to,avoidPacked){
+  function compute(from,to,avoidPacked,mode='fewest'){
     ensureGraph();
-    const path=bfs(from,to,avoidPacked);
+    const path=weightedPath(from,to,avoidPacked,mode);
     drawRoute(path);
     if(!path||path.length<2) return{ok:false,reason:'No route found between these stations.'};
 
@@ -287,9 +328,16 @@ window.ROUTE=(function(){
     const avg=Math.round(crowdVals.reduce((s,v)=>s+v,0)/crowdVals.length);
     const max=Math.max(...crowdVals);
     const stops=path.length-1;
-    const estMin=Math.round(stops*2.5);
     const segs=buildSegments(path);
-    const changes=segs.length-1;
+    let previousLine=null,changes=0;
+    for(const seg of segs){
+      if(seg.line==='Walk')continue;
+      if(previousLine&&previousLine!==seg.line)changes++;
+      previousLine=seg.line;
+    }
+    const walkMinutes=path.slice(1).reduce((sum,id,i)=>sum+(METRO.WALK_TRANSFERS?.[path[i]+'>'+id]||0),0);
+    const walkEdges=path.slice(1).filter((id,i)=>METRO.WALK_TRANSFERS?.[path[i]+'>'+id]).length;
+    const estMin=Math.round((stops-walkEdges)*2.5+changes*4+walkMinutes);
     const fareInfo=calcFare(path,segs);
 
     const hops=path.map((id,i)=>{
@@ -298,7 +346,7 @@ window.ROUTE=(function(){
       const line=i<path.length-1?segmentLine(id,path[i+1]):(i>0?segmentLine(path[i-1],id):'Y');
       const nextLine=i<path.length-1?segmentLine(id,path[i+1]):null;
       const prevLine=i>0?segmentLine(path[i-1],id):null;
-      const isChange=i>0&&i<path.length-1&&prevLine&&nextLine&&prevLine!==nextLine;
+      const isChange=i>0&&i<path.length-1&&prevLine&&nextLine&&prevLine!=='Walk'&&nextLine!=='Walk'&&prevLine!==nextLine;
       return{id,s,v,line,isChange,isFirst:i===0,isLast:i===path.length-1};
     });
 
@@ -421,8 +469,6 @@ window.ROUTE=(function(){
 
     // Store result for nav access
     window._lastRouteResult = result;
-      // Show platform + gate guide below route result
-      if (typeof GUIDE !== 'undefined') GUIDE.showForRoute(result);
 
     res.style.display='block';
     res.innerHTML=`<div style="background:var(--card);border:1px solid var(--brd);border-radius:16px;padding:14px 14px 6px;margin-top:4px">
@@ -515,5 +561,5 @@ window.ROUTE=(function(){
     });
   }
 
-  return{compute,render,drawRoute,clearRoute,populateSelects,requestLocation,nearestStation};
+  return{compute,render,drawRoute,clearRoute,populateSelects,requestLocation,nearestStation,findPath:weightedPath};
 })();

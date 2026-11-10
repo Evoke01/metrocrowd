@@ -26,7 +26,7 @@ async def my_stats(user_id: str = Query(...)):
         return {"ok": False, "stats": {}}
 
 @router.get("/trips")
-async def my_trips(user_id: str = Query(...), limit: int = Query(default=30)):
+async def my_trips(user_id: str = Query(...), limit: int = Query(default=30, ge=1, le=100)):
     db = _db()
     try:
         r = db.table("trip_sessions") \

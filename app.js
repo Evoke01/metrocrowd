@@ -36,7 +36,7 @@ window.APP=(function(){
     if(typeof NOTIFY!=='undefined') await NOTIFY.init();
 
     // GPS
-    if(typeof GPS!=='undefined'){ GPS.init(); GPS.startWatch(); }
+    if(typeof GPS!=='undefined') GPS.init();
 
     // Anon ID badge
     const badge=document.getElementById('anon-id-badge');

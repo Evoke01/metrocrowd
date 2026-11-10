@@ -2,8 +2,28 @@ services:
   - type: web
     name: metrocrowd-api
     runtime: python
+    rootDir: metrocrowd-api
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
+      - key: REWARDS_ADMIN_USER_IDS
+        sync: false
+      - key: VAPID_PRIVATE_KEY
+        sync: false
+      - key: VAPID_EMAIL
+        sync: false
+      - key: OTD_API_KEY
+        sync: false
+  - type: worker
+    name: metrocrowd-worker
+    runtime: python
+    rootDir: metrocrowd-api
+    buildCommand: pip install -r requirements.txt
+    startCommand: python worker.py
     envVars:
       - key: SUPABASE_URL
         sync: false
@@ -14,6 +34,4 @@ services:
       - key: VAPID_EMAIL
         sync: false
       - key: OTD_API_KEY
-        sync: false
-      - key: OOTD_API_KEY
         sync: false

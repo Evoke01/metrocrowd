@@ -6,7 +6,7 @@
 # ══════════════════════════════════════════════════════════════
 import os, logging
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime, timezone
 from supabase import create_client
@@ -27,11 +27,11 @@ class PrefsModel(BaseModel):
     streak_reminder:   bool = True
     network_alert:     bool = True
     home_station:      Optional[str] = None
-    drop_threshold:    int = 45
-    quiet_start:       int = 22
-    quiet_end:         int = 7
-    morning_peak_hour: int = 8
-    evening_peak_hour: int = 18
+    drop_threshold:    int = Field(default=45, ge=0, le=100)
+    quiet_start:       int = Field(default=22, ge=0, le=23)
+    quiet_end:         int = Field(default=7, ge=0, le=23)
+    morning_peak_hour: int = Field(default=8, ge=0, le=23)
+    evening_peak_hour: int = Field(default=18, ge=0, le=23)
 
 class TestReq(BaseModel):
     user_id: str
@@ -46,7 +46,7 @@ async def get_prefs(user_id: str):
 @router.post("/prefs")
 async def save_prefs(req: PrefsModel):
     db = _db()
-    data = req.dict()
+    data = req.model_dump()
     data["updated_at"] = datetime.now(timezone.utc).isoformat()
     try:
         db.table("notification_prefs").upsert(data, on_conflict="user_id").execute()

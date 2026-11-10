@@ -6,6 +6,7 @@
 # ══════════════════════════════════════════════════════════════
 import os, json, requests
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from google.transit import gtfs_realtime_pb2
 from supabase import create_client
 
@@ -24,6 +25,7 @@ OCCUPANCY_MAP = {
     5: 95,   # FULL
     6: 100,  # NOT_ACCEPTING_PASSENGERS
 }
+IST = ZoneInfo("Asia/Kolkata")
 
 def fetch_vehicle_positions() -> list[dict]:
     """Fetch raw vehicle positions from OTD. Returns empty list on failure."""
@@ -63,7 +65,7 @@ def fetch_and_store() -> int:
     if not positions:
         return 0
 
-    now  = datetime.now()
+    now  = datetime.now(IST)
     hour = now.hour
     dow  = now.weekday()
 

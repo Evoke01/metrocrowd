@@ -299,6 +299,9 @@ window.COMMUTE = (function () {
             </div>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           </div>
+          <button onclick="COMMUTE._useCurrentFor('home')"
+            style="margin-top:7px;background:transparent;border:1px solid #333;border-radius:9px;
+            padding:7px 10px;color:#ccc;font-size:10px;cursor:pointer">Use my current station</button>
         </div>
 
         <!-- Work station -->
@@ -343,6 +346,24 @@ window.COMMUTE = (function () {
     SEARCH.open('commute-pick');
   }
 
+  function _useCurrentFor(which) {
+    if (!window.GPS?.locateOnce) {
+      NAV.showToast('warn', 'Location is unavailable on this device');
+      return;
+    }
+    GPS.locateOnce(result => {
+      if (!result) {
+        NAV.showToast('warn', 'Could not determine your nearest station');
+        return;
+      }
+      if (which === 'home') _tmpHome = result.id;
+      else _tmpWork = result.id;
+      const label = document.getElementById(which === 'home' ? 'cm-home-val' : 'cm-work-val');
+      if (label) { label.textContent = result.name; label.style.color = '#fff'; }
+      NAV.showToast('ok', `${result.name} set as your ${which} station`);
+    });
+  }
+
   function _onSearchPick(id) {
     const s = METRO.STATIONS[id]; if (!s) return;
     const which = window._commutePickTarget;
@@ -377,7 +398,7 @@ window.COMMUTE = (function () {
   return {
     init, renderCard, setup, disable, leaveNow, openSetup, _cancelSetup,
     getTrip, getDirection,
-    _pickStation, _onSearchPick, _saveFromModal,
+    _pickStation, _useCurrentFor, _onSearchPick, _saveFromModal,
     get state() { return state; },
   };
 })();

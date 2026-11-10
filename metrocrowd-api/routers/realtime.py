@@ -18,7 +18,7 @@ import requests
 router = APIRouter()
 log    = logging.getLogger(__name__)
 
-OTD_KEY  = os.getenv("OOTD_API_KEY", "")
+OTD_KEY  = os.getenv("OTD_API_KEY", os.getenv("OOTD_API_KEY", ""))
 OTD_URL  = f"https://otd.delhi.gov.in/api/realtime/VehiclePositions.pb?key={OTD_KEY}"
 TIMEOUT  = 10
 CACHE_TTL = 30  # seconds
@@ -33,7 +33,7 @@ def _fetch_vehicles() -> list[dict] | None:
         return _cache["vp"]["data"]
 
     if not OTD_KEY:
-        log.warning("OOTD_API_KEY not set — skipping OTD fetch")
+        log.warning("OTD_API_KEY not set — skipping OTD fetch")
         return None
 
     try:
@@ -127,10 +127,10 @@ def get_vehicles(route_id: str = ""):
 # ── /realtime/vehicles/near ───────────────────────────────────
 @router.get("/vehicles/near")
 def get_vehicles_near(
-    lat:    float = Query(..., description="Latitude"),
-    lng:    float = Query(..., description="Longitude"),
-    radius: float = Query(1.0,  description="Search radius in km"),
-    limit:  int   = Query(10,   description="Max results"),
+    lat:    float = Query(..., ge=-90, le=90, description="Latitude"),
+    lng:    float = Query(..., ge=-180, le=180, description="Longitude"),
+    radius: float = Query(1.0, gt=0, le=100, description="Search radius in km"),
+    limit:  int   = Query(10, ge=1, le=100, description="Max results"),
 ):
     vehicles = _fetch_vehicles()
     if not vehicles:

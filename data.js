@@ -1,6 +1,9 @@
 window.METRO=window.METRO||{};
 METRO.LINE_COLORS={Y:'#FFD600',B:'#2979FF',R:'#F44336',P:'#E040FB',M:'#AB47BC',V:'#7E57C2',G:'#4CAF50',A:'#FF9800',Gr:'#9E9E9E',Aq:'#00BCD4'};
+METRO.LINE_COLORS.Walk='#94A3B8';
 METRO.LINE_NAMES={Y:'Yellow',B:'Blue',R:'Red',P:'Pink',M:'Magenta',V:'Violet',G:'Green',A:'Airport',Gr:'Grey',Aq:'Aqua'};
+METRO.LINE_NAMES.Walk='Walk transfer';
+METRO.WALK_TRANSFERS={'AQ51>N52':8,'N52>AQ51':8};
 METRO.RUSH=[.27,.17,.12,.11,.21,.47,.68,.86,.98,.90,.70,.60,.63,.58,.56,.63,.75,.93,.98,.86,.70,.58,.46,.33];
 
 METRO.STATIONS={
@@ -311,6 +314,8 @@ METRO.buildGraph=function(){
       if(METRO.STATIONS[a]&&METRO.STATIONS[b]){g[a].add(b);g[b].add(a)}
     }
   });
+  // Sector 51 (Aqua) connects to the Blue Line at Noida Sector 52 by foot.
+  if(g.AQ51&&g.N52){g.AQ51.add('N52');g.N52.add('AQ51');}
   return g;
 };
 

@@ -6,12 +6,14 @@
 # ══════════════════════════════════════════════════════════════
 import os
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from supabase import create_client
 from push.notify import notify_station
 
 SUPABASE_URL   = os.environ["SUPABASE_URL"]
 SUPABASE_KEY   = os.environ["SUPABASE_KEY"]
 ALERT_THRESHOLD = 75   # fire push when crowd_pct crosses this
+IST = ZoneInfo("Asia/Kolkata")
 
 def run_alerts():
     """
@@ -21,7 +23,7 @@ def run_alerts():
     (uses last_notified_at on push_subscriptions).
     """
     client = create_client(SUPABASE_URL, SUPABASE_KEY)
-    now    = datetime.now()
+    now    = datetime.now(IST)
     hour   = now.hour
     dow    = now.weekday()
 

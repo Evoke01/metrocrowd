@@ -22,6 +22,12 @@ window.TRIPNAV = (function () {
   let _sessionId   = null;          // returned from API after session/start
   let _startedAt   = null;          // Date.now() when navigation began
   let _prevArrival = null;          // Date.now() of last station arrival
+  let _sessionStartPromise = null;
+  let _sessionReady = false;
+  let _sessionStopped = null;
+  let _eventQueue = Promise.resolve();
+  let _candidateIdx = -1;
+  let _candidateHits = 0;
 
   // ── Haversine ────────────────────────────────────────────────
   function _hav(lat1, lng1, lat2, lng2) {
@@ -43,15 +49,21 @@ window.TRIPNAV = (function () {
   }
 
   // ── Data collection helpers ───────────────────────────────────
-  function _userId() {
-    try { return window.SB?.client?.auth?.currentUser?.id || null; } catch { return null; }
+  async function _authHeaders() {
+    try {
+      const { data } = await window.SB.client.auth.getSession();
+      const token = data?.session?.access_token;
+      return token ? { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` } : null;
+    } catch { return null; }
   }
 
   async function _apiPost(path, body) {
     try {
+      const headers = await _authHeaders();
+      if (!headers) return;
       await fetch(API_BASE + path, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify(body),
         // fire-and-forget: don't block navigation on this
         keepalive: true,
@@ -67,14 +79,16 @@ window.TRIPNAV = (function () {
     const estSec    = (_path.length - 1) * 150;  // baseline 2.5 min/stop
 
     try {
+      const headers = await _authHeaders();
+      if (!headers) return;
       const res = await fetch(API_BASE + '/trips/session/start', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
-          user_id:          _userId(),
           from_station:     _path[0],
           to_station:       _path[_path.length - 1],
           line_codes:       lineCodes,
+          path_station_ids: _path,
           total_stops:      _path.length - 1,
           est_duration_sec: estSec,
         }),
@@ -85,11 +99,13 @@ window.TRIPNAV = (function () {
     } catch { _sessionId = null; }
   }
 
-  async function _endSession(completed) {
-    if (!_sessionId || !_startedAt) return;
-    const actualSec = Math.round((Date.now() - _startedAt) / 1000);
+  async function _endSession(completed, startedAt) {
+    const sessionId = _sessionId;
+    if (!sessionId || !startedAt) return;
+    await _eventQueue;
+    const actualSec = Math.round((Date.now() - startedAt) / 1000);
     await _apiPost('/trips/session/end', {
-      session_id:          _sessionId,
+      session_id:          sessionId,
       actual_duration_sec: actualSec,
       stops_tracked:       _currentIdx + 1,
       completed:           completed,
@@ -98,6 +114,7 @@ window.TRIPNAV = (function () {
 
   async function _logArrival(stationIdx) {
     if (!_sessionId) return;
+    const sessionId = _sessionId;
     const stationId  = _path[stationIdx];
     const hop        = _result.hops?.[stationIdx];
     const lineCode   = hop?.line || null;
@@ -108,15 +125,16 @@ window.TRIPNAV = (function () {
       : null;
     _prevArrival = now;
 
-    await _apiPost('/trips/event', {
-      session_id:        _sessionId,
-      user_id:           _userId(),
+    const body = {
+      session_id:        sessionId,
       station_id:        stationId,
       station_index:     stationIdx,
       line_code:         lineCode,
       seconds_from_prev: secFromPrev,
       crowd_pct:         crowdPct,
-    });
+    };
+    _eventQueue = _eventQueue.then(() => _apiPost('/trips/event', body));
+    await _eventQueue;
   }
 
   // ── Main entry ───────────────────────────────────────────────
@@ -128,6 +146,8 @@ window.TRIPNAV = (function () {
     _path       = result.path || result.hops.map(h => h.id);
     _active     = true;
     _currentIdx = 0;
+    _candidateIdx = -1;
+    _candidateHits = 0;
     _startedAt  = Date.now();
     _prevArrival = Date.now();
 
@@ -136,7 +156,18 @@ window.TRIPNAV = (function () {
     _startGPS();
 
     // Start session + log first station (origin)
-    _startSession().then(() => _logArrival(0));
+    _sessionReady = false;
+    _sessionStopped = null;
+    _eventQueue = Promise.resolve();
+    _sessionStartPromise = _startSession().then(async () => {
+      if (_sessionId) await _logArrival(0);
+      _sessionReady = true;
+      if (_sessionStopped && _sessionId) {
+        const pending = _sessionStopped;
+        _sessionStopped = null;
+        await _endSession(pending.completed, pending.startedAt);
+      }
+    });
 
     _render();
     document.getElementById('rres')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -152,8 +183,10 @@ window.TRIPNAV = (function () {
       _watchId = null;
     }
 
-    // Log session end
-    _endSession(!!arrived);
+    // Log session end after the origin/final station events have drained.
+    const endedAt = _startedAt;
+    if (_sessionId && _sessionReady) _endSession(!!arrived, endedAt);
+    else if (_sessionStartPromise) _sessionStopped = { completed: !!arrived, startedAt: endedAt };
 
     _panel?.remove(); _panel = null;
     _clearHighlights();
@@ -172,27 +205,34 @@ window.TRIPNAV = (function () {
     _sessionId = null;
     _startedAt = null;
     _prevArrival = null;
+    _candidateIdx = -1;
+    _candidateHits = 0;
   }
 
   // ── GPS watch ────────────────────────────────────────────────
   function _startGPS() {
     if (!navigator.geolocation) { NAV.showToast('warn', 'GPS not available'); return; }
     _watchId = navigator.geolocation.watchPosition(
-      pos => {
+      async pos => {
         const { latitude: lat, longitude: lng, accuracy: acc } = pos.coords;
         if (acc > 150) return;
 
         const { idx, dist } = _nearestOnPath(lat, lng);
 
-        if (idx >= _currentIdx && dist < 400) {
-          if (idx !== _currentIdx) {
+        const arrivalRadius = Math.max(120, Math.min(350, acc * 1.5));
+        if (idx > _currentIdx && dist <= arrivalRadius) {
+          if (_candidateIdx === idx) _candidateHits++;
+          else { _candidateIdx = idx; _candidateHits = 1; }
+          // Require repeated fixes near the same next station to avoid
+          // logging a false arrival from a single noisy GPS jump.
+          if (_candidateHits >= 2) {
             const prevIdx = _currentIdx;
             _currentIdx = idx;
+            _candidateIdx = -1;
+            _candidateHits = 0;
 
             // Log each newly passed station
-            for (let i = prevIdx + 1; i <= idx; i++) {
-              _logArrival(i);
-            }
+            for (let i = prevIdx + 1; i <= idx; i++) await _logArrival(i);
             _render();
             if (navigator.vibrate) navigator.vibrate([60, 30, 60]);
             // Notify group members of position change
@@ -201,6 +241,9 @@ window.TRIPNAV = (function () {
               GROUP.highlightOnRoute();
             }
           }
+        } else {
+          _candidateIdx = -1;
+          _candidateHits = 0;
         }
 
         const accEl = document.getElementById('tnav-acc');

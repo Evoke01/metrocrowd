@@ -70,25 +70,27 @@ def train_crowd_model(reports_df: pd.DataFrame, events_df: pd.DataFrame):
     # Source 1: manual crowd_reports
     if len(reports_df) >= 10:
         df = reports_df.copy()
-        df["created_at"] = pd.to_datetime(df["created_at"])
+        df["created_at"] = pd.to_datetime(df["created_at"], utc=True).dt.tz_convert("Asia/Kolkata")
         df["hour"]       = df["created_at"].dt.hour
         df["dow"]        = df["created_at"].dt.dayofweek
         df["is_weekend"] = (df["dow"] >= 5).astype(int)
+        df["is_holiday"] = 0
         df["line_enc"]   = df["line_codes"].apply(
             lambda lc: LINE_ENCODE.get(lc[0] if isinstance(lc, list) and lc else "", 0))
         df["target"]     = df["crowd_value"]
         df["weight"]     = 1.0          # base weight for user reports
-        frames.append(df[["station_id","hour","dow","is_weekend","line_enc","target","weight"]])
+        frames.append(df[["station_id","hour","dow","is_weekend","is_holiday","line_enc","target","weight"]])
 
     # Source 2: real GPS trip events (higher weight — actual observations)
     if len(events_df) >= 5:
         df2 = events_df.copy()
         df2["hour"]      = df2["hour_of_day"]
         df2["dow"]       = df2["day_of_week"]
+        df2["is_holiday"] = 0
         df2["line_enc"]  = df2["line_code"].apply(lambda l: LINE_ENCODE.get(l or "", 0))
         df2["target"]    = df2["crowd_pct"]
         df2["weight"]    = 1.8          # GPS-confirmed → higher trust
-        frames.append(df2[["station_id","hour","dow","is_weekend","line_enc","target","weight"]])
+        frames.append(df2[["station_id","hour","dow","is_weekend","is_holiday","line_enc","target","weight"]])
 
     if not frames:
         logger.warning("[Train] No crowd data. Skipping crowd model.")
@@ -109,7 +111,7 @@ def train_crowd_model(reports_df: pd.DataFrame, events_df: pd.DataFrame):
     recent_avg  = recent.groupby("station_id")["target"].mean()
     combined["recent_avg"] = combined["station_id"].map(recent_avg).fillna(combined["historical_avg"])
 
-    FEATURES = ["hour","dow","is_weekend","line_enc",
+    FEATURES = ["hour","dow","is_weekend","is_holiday","line_enc",
                 "station_importance","historical_avg","recent_avg"]
     X = combined[FEATURES].values
     y = combined["target"].values

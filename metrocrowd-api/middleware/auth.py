@@ -56,3 +56,27 @@ def require_auth(request: Request) -> dict:
     if not token:
         raise HTTPException(status_code=401, detail="Authentication required")
     return verify_supabase_jwt(token)
+
+
+def require_supabase_user(request: Request) -> dict:
+    """Validate an access token with Supabase Auth (supports current signing keys)."""
+    token = get_token_from_request(request)
+    if not token:
+        raise HTTPException(status_code=401, detail="Authentication required")
+    try:
+        from supabase import create_client
+        client = create_client(os.environ["SUPABASE_URL"], os.environ["SUPABASE_KEY"])
+        response = client.auth.get_user(token)
+        user = response.user
+        if not user:
+            raise HTTPException(status_code=401, detail="Invalid access token")
+        return {
+            "sub": str(user.id),
+            "email": user.email,
+            "is_anonymous": bool(getattr(user, "is_anonymous", False)),
+        }
+    except HTTPException:
+        raise
+    except Exception as exc:
+        log.info("Supabase user token validation failed: %s", type(exc).__name__)
+        raise HTTPException(status_code=401, detail="Invalid or expired access token")

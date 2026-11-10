@@ -83,6 +83,7 @@ window.AUTH = (function(){
     // Load report count for profile
     reportCount = await fetchReportCount(user.id);
     updateProfileUI(user, reportCount);
+    if(typeof REWARDS !== 'undefined') REWARDS.onSignedIn().catch(e => console.warn('[AUTH] rewards init failed:', e));
   }
 
   function onSignedOut(){

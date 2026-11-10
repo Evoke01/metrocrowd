@@ -25,7 +25,7 @@ SB_URL  = os.environ["SUPABASE_URL"]
 SB_KEY  = os.environ["SUPABASE_KEY"]
 VAPID_PRIVATE = os.environ.get("VAPID_PRIVATE_KEY", "")
 VAPID_PUBLIC  = os.environ.get("VAPID_PUBLIC_KEY",  "")
-VAPID_EMAIL   = "mailto:metrocrowd@example.com"
+VAPID_EMAIL   = os.environ.get("VAPID_EMAIL", "mailto:admin@metrocrowd.app")
 
 CROWD_LABELS = {
     (0,  30):  ("😌", "Empty",    "#4ade80"),
@@ -105,8 +105,8 @@ def _send_push(subscription_info, title, body, icon="🚇", url="/", tag="mc-not
         return False
 
 def _get_subscriptions(db, user_id):
-    r = db.table("push_subscriptions").select("subscription").eq("user_id", user_id).execute()
-    return [row["subscription"] for row in (r.data or [])]
+    r = db.table("push_subscriptions").select("subscription_json").eq("user_id", user_id).execute()
+    return [row["subscription_json"] for row in (r.data or []) if row.get("subscription_json")]
 
 def _get_crowd(station_id):
     """Fetch crowd % for a station from Supabase recent reports."""
@@ -316,11 +316,13 @@ class NotificationEngine:
             r2 = db.table("crowd_reports").select("created_at") \
                    .eq("user_id", uid) \
                    .order("created_at", desc=True).limit(50).execute()
-            days = set(datetime.fromisoformat(row["created_at"]).strftime("%Y-%m-%d")
+            days = set(datetime.fromisoformat(row["created_at"].replace("Z", "+00:00"))
+                       .astimezone(IST).strftime("%Y-%m-%d")
                        for row in (r2.data or []))
             streak = 0
+            today = _ist_now().date()
             for i in range(7):
-                d = (datetime.now(timezone.utc) - timedelta(days=i)).strftime("%Y-%m-%d")
+                d = (today - timedelta(days=i)).strftime("%Y-%m-%d")
                 if d in days: streak += 1
                 else: break
 
@@ -352,7 +354,9 @@ class NotificationEngine:
                        .eq("streak_reminder", True).execute()
 
         sent = 0
-        today_start = datetime.now(timezone.utc).replace(hour=0,minute=0,second=0).isoformat()
+        today_start = _ist_now().replace(hour=0, minute=0, second=0, microsecond=0) \
+            .astimezone(timezone.utc).isoformat()
+        yesterday_start = (datetime.fromisoformat(today_start) - timedelta(days=1)).isoformat()
         for prefs in (prefs_rows.data or []):
             uid = prefs["user_id"]
             key = _dedup_key(uid, "streak_reminder")
@@ -368,9 +372,9 @@ class NotificationEngine:
                 continue  # already active today
 
             # Check they had a streak worth protecting
-            yesterday = (datetime.now(timezone.utc)-timedelta(days=1)).isoformat()
             r3 = db.table("crowd_reports").select("id") \
-                   .eq("user_id", uid).gte("created_at", yesterday).limit(1).execute()
+                   .eq("user_id", uid).gte("created_at", yesterday_start) \
+                   .lt("created_at", today_start).limit(1).execute()
             if not r3.data:
                 continue  # no streak to protect
 
@@ -415,7 +419,7 @@ class NotificationEngine:
                        .eq("network_alert", True).execute()
 
         sent = 0
-        hour_bucket = now.strftime("%H")
+        hour_bucket = _ist_now().strftime("%H")
         for line in hot_lines:
             for prefs in (prefs_rows.data or []):
                 uid = prefs["user_id"]

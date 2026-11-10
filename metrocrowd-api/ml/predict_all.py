@@ -7,11 +7,13 @@
 # ══════════════════════════════════════════════════════════════
 import os
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from supabase import create_client
 from ml.model import predict, load_model
 
 SUPABASE_URL = os.environ["SUPABASE_URL"]
 SUPABASE_KEY = os.environ["SUPABASE_KEY"]
+IST = ZoneInfo("Asia/Kolkata")
 
 # Station list (in production, fetch from Supabase gtfs_stops)
 # For now, import from the static data as a fallback reference
@@ -20,7 +22,8 @@ STATION_LINES: dict[str, str] = {}  # station_id → line name, loaded from DB
 def _load_stations(client) -> dict[str, str]:
     """Load all stations and their primary line from Supabase."""
     resp = client.table("gtfs_stops").select("stop_id,name").execute()
-    # line info comes from crowd_reports history
+    # Line information comes from crowd_reports where available. Include all
+    # GTFS stops so stations without a report still receive fallback forecasts.
     lines_resp = client.table("crowd_reports") \
         .select("station_id,line_codes") \
         .limit(1000).execute()
@@ -28,13 +31,19 @@ def _load_stations(client) -> dict[str, str]:
     for row in lines_resp.data:
         if row["station_id"] not in line_map and row.get("line_codes"):
             line_map[row["station_id"]] = row["line_codes"][0] if row["line_codes"] else "Yellow"
-    return line_map
+    stations = {row["stop_id"]: line_map.get(row["stop_id"], "Yellow")
+                for row in (resp.data or []) if row.get("stop_id")}
+    stations.update(line_map)
+    return stations
 
 def _get_historical_avgs(client) -> dict[str, float]:
     """Get average crowd value per station from crowd_reports."""
-    resp = client.rpc("get_station_averages", {}).execute()
-    if resp.data:
-        return {row["station_id"]: row["avg_crowd"] for row in resp.data}
+    try:
+        resp = client.rpc("get_station_averages", {}).execute()
+        if resp.data:
+            return {row["station_id"]: row["avg_crowd"] for row in resp.data}
+    except Exception:
+        pass
     # Fallback: query directly
     resp = client.table("crowd_reports").select("station_id,crowd_value").execute()
     from collections import defaultdict
@@ -46,7 +55,7 @@ def _get_historical_avgs(client) -> dict[str, float]:
 
 def run() -> int:
     client   = create_client(SUPABASE_URL, SUPABASE_KEY)
-    now      = datetime.now()
+    now      = datetime.now(IST)
     dow      = now.weekday()
     model    = load_model()  # None = fall back to historical avg in predict()
     hist     = _get_historical_avgs(client)

@@ -1,4 +1,4 @@
-const CACHE = 'metro-v4';
+const CACHE = 'metro-v5';
 const CACHE_FILES = [
   '/', '/index.html', '/style.css',
   '/data.js', '/crowd.js', '/route.js', '/gps.js',
@@ -6,7 +6,7 @@ const CACHE_FILES = [
   '/ui.js', '/coach.js', '/news.js', '/notify.js',
   '/map.js', '/realtime.js', '/legal.js', '/install.js',
   '/settings.js', '/commute.js', '/tripnav.js', '/group.js',
-  '/stats.js', '/notifprefs.js', '/guide.js',
+  '/stats.js', '/rewards.js', '/notifprefs.js', '/guide.js',
   '/ui/home.js', '/ui/station.js', '/ui/route.js',
   '/ui/report.js', '/ui/search.js', '/ui/nav.js',
   '/icons/icon-192.png', '/icons/icon-512.png'

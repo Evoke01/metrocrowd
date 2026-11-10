@@ -2,14 +2,12 @@
 # ══════════════════════════════════════════════════════════════
 #  worker.py — Background job runner
 #  Runs as a SEPARATE process from main.py (FastAPI).
-#  Deployed on Railway as a second service using Procfile.
+#  Deployed on Render as a separate background worker.
 #
-#  Procfile:
-#    web:    uvicorn main:app --host 0.0.0.0 --port $PORT
-#    worker: python worker.py
+#  Render start command: python worker.py
 #
 #  Why separate?
-#  If Railway restarts the web container, jobs don't lose state.
+#  The API and worker can restart and scale independently.
 #  The worker can be scaled and restarted independently.
 # ══════════════════════════════════════════════════════════════
 import time, logging, os
@@ -77,6 +75,7 @@ scheduler.add_job(job_gtfs,        CronTrigger(hour=3,minute=0), id="gtfs",     
 if __name__ == "__main__":
     log.info("Worker starting. Jobs: realtime(30s) · alerts(5m) · predictions(1h) · train(24h) · gtfs(3am)")
     # Run each job once immediately on startup
+    job_gtfs()
     job_realtime()
     job_predict_all()
     scheduler.start()
