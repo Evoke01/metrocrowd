@@ -32,6 +32,14 @@ window.AUTH = (function(){
     client.auth.onAuthStateChange(async (event, session) => {
       console.log('[AUTH] event:', event, session?.user?.email || session?.user?.id?.slice(0,8));
 
+      // The app creates an anonymous Supabase session for public writes. It
+      // must not be treated as a completed OAuth sign-in or dismiss the gate.
+      if(session?.user?.is_anonymous){
+        currentUser = null;
+        showGate();
+        return;
+      }
+
       if(event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED'){
         currentUser = session.user;
         hideGate();

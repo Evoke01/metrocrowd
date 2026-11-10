@@ -55,6 +55,10 @@ window.SB = (function(){
         realtime: { params: { eventsPerSecond: 10 } }
       });
 
+      // Make OAuth available immediately. Anonymous sign-in and data loading
+      // below can take several seconds on a slow connection.
+      if(typeof AUTH !== 'undefined') AUTH.init(client);
+
       // Init ANON module with Supabase client so it can sync the UUID
       if(typeof ANON !== 'undefined') await ANON.init(client);
       sessionId = getSessionId();
@@ -71,9 +75,6 @@ window.SB = (function(){
       isReady = true;
       setStatus('Connected ✓', 'ok');
       console.log('[SB] Connected to', SUPABASE_URL);
-
-      // Hand client to AUTH module — it owns all sign-in/sign-out logic
-      if(typeof AUTH !== 'undefined') AUTH.init(client);
 
       // Keep SB.userId in sync
       client.auth.onAuthStateChange((_ev, session) => {
