@@ -161,7 +161,7 @@ window.COACH = (function () {
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px">
           <div>
             <div style="font-size:9px;color:var(--sub);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">${T("coach_board_here")}</div>
-            <div style="font-size:44px;font-weight:900;font-family:'Syne',sans-serif;color:var(--y);line-height:1">Coach ${best.num}</div>
+            <div style="font-size:44px;font-weight:900;font-family:'DM Serif Display',sans-serif;color:var(--y);line-height:1">Coach ${best.num}</div>
             ${coaches[1]?`<div style="font-size:11px;color:var(--sub);margin-top:3px">or Coach ${coaches[1].num} as backup</div>`:''}
           </div>
           <div style="text-align:right">
@@ -218,7 +218,7 @@ window.COACH = (function () {
         ${c.num===best.num?`<div style="position:absolute;top:-8px;left:50%;transform:translateX(-50%);
           font-size:6px;background:var(--y);color:#000;padding:1px 5px;border-radius:4px;
           font-weight:800;white-space:nowrap">BEST</div>`:''}
-        <div style="font-size:13px;font-weight:900;font-family:'Syne',sans-serif;color:${nc};line-height:1">${c.num}</div>
+        <div style="font-size:13px;font-weight:900;font-family:'DM Serif Display',sans-serif;color:${nc};line-height:1">${c.num}</div>
         ${isL?`<div style="color:#f9a8d4;margin-top:3px"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M12 13v8M9 18h6"/></svg></div>`:
           `<div style="height:3px;width:80%;border-radius:2px;background:${cl2.col};opacity:.7;margin-top:4px"></div>`}
         ${c.exitFriendly&&!isL?`<div style="font-size:6px;color:var(--y);margin-top:2px">exit</div>`:''}
@@ -230,7 +230,7 @@ window.COACH = (function () {
     const strip = `
       <div style="margin-bottom:14px">
         <div style="font-size:9px;color:var(--sub);letter-spacing:.08em;text-transform:uppercase;
-          font-family:'Syne',sans-serif;margin-bottom:8px;display:flex;align-items:center;gap:8px">
+          font-family:'DM Serif Display',sans-serif;margin-bottom:8px;display:flex;align-items:center;gap:8px">
           <span>${T("coach_front")}</span><span style="flex:1;height:1px;background:var(--brd)"></span><span>${T("coach_rear")}</span>
         </div>
         <div style="display:flex;gap:4px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none">
@@ -249,7 +249,7 @@ window.COACH = (function () {
       return `<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;
           background:${i===0?'rgba(245,168,0,.07)':'var(--card2)'};
           border:1px solid ${i===0?'rgba(245,168,0,.25)':'var(--brd)'};margin-bottom:6px">
-        <div style="font-size:20px;font-weight:900;font-family:'Syne',sans-serif;
+        <div style="font-size:20px;font-weight:900;font-family:'DM Serif Display',sans-serif;
           color:${i===0?'var(--y)':'var(--sub)'};width:26px;text-align:center">${c.num}</div>
         <div style="flex:1">
           <div style="display:flex;align-items:center;gap:5px;margin-bottom:2px">
@@ -318,7 +318,7 @@ window.COACH = (function () {
         el.innerHTML=`<div style="background:var(--card);border:1px solid var(--brd);border-radius:16px;
           padding:28px 20px;text-align:center;margin-top:8px">
           <div style="font-size:32px;margin-bottom:12px">🚇</div>
-          <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--txt);margin-bottom:6px">
+          <div style="font-family:'DM Serif Display',sans-serif;font-size:16px;font-weight:800;color:var(--txt);margin-bottom:6px">
             ${T("coach_metro_closed")}
           </div>
           <div style="font-size:12px;color:var(--sub);line-height:1.6">

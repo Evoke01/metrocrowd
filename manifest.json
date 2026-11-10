@@ -1,13 +1,15 @@
 {
-  "name": "MetroCrowd – Delhi Metro",
+  "name": "MetroCrowd · Delhi Metro",
   "short_name": "MetroCrowd",
-  "description": "Real-time crowd monitor for Delhi Metro",
+  "description": "Real-time crowd levels for every Delhi Metro station. Find the least-packed coach, plan smart routes, and report crowds in 2 taps.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#0a0a0a",
-  "theme_color": "#0a0a0a",
+  "background_color": "#030303",
+  "theme_color": "#030303",
+  "lang": "en",
+  "dir": "ltr",
   "icons": [
     { "src": "/icons/icon-72.png",   "sizes": "72x72",   "type": "image/png", "purpose": "any" },
     { "src": "/icons/icon-96.png",   "sizes": "96x96",   "type": "image/png", "purpose": "any" },
@@ -20,19 +22,39 @@
     { "src": "/icons/icon-512.png",  "sizes": "512x512", "type": "image/png", "purpose": "any" },
     { "src": "/icons/icon-512.png",  "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
-  "categories": ["travel", "utilities"],
+  "categories": ["travel", "utilities", "transportation"],
+  "screenshots": [
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "MetroCrowd home screen showing live crowd levels"
+    }
+  ],
   "shortcuts": [
     {
-      "name": "Check Station",
+      "name": "Check Station Crowd",
       "short_name": "Station",
+      "description": "View live crowd level at any Delhi Metro station",
       "url": "/?tab=s-station",
       "icons": [{ "src": "/icons/icon-96.png", "sizes": "96x96", "type": "image/png" }]
     },
     {
       "name": "Report Crowd",
       "short_name": "Report",
+      "description": "Submit a crowd report for your current station",
       "url": "/?tab=s-report",
       "icons": [{ "src": "/icons/icon-96.png", "sizes": "96x96", "type": "image/png" }]
+    },
+    {
+      "name": "Plan Route",
+      "short_name": "Route",
+      "description": "Find the least-crowded route between two stations",
+      "url": "/?tab=s-route",
+      "icons": [{ "src": "/icons/icon-96.png", "sizes": "96x96", "type": "image/png" }]
     }
-  ]
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
 }

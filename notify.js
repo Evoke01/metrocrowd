@@ -15,7 +15,19 @@ window.NOTIFY = (function(){
     anomalyMap:    {},                // stationId → {delta, severity, detected}
     prevCrowdMap:  {},                // snapshot for anomaly comparison
     checkTimer:    null,
+    customAlerts:  {},                // stationId → threshold_number (user-defined)
   };
+
+  // Persist custom alerts
+  function loadAlerts(){
+    try{
+      const raw = localStorage.getItem('v3_alerts');
+      if(raw) state.customAlerts = JSON.parse(raw);
+    }catch{}
+  }
+  function saveAlerts(){
+    try{ localStorage.setItem('v3_alerts', JSON.stringify(state.customAlerts)); }catch{}
+  }
 
   // Persist subscriptions to localStorage
   function loadSubs(){
@@ -188,6 +200,40 @@ window.NOTIFY = (function(){
         }
       }
     });
+
+    // Check custom threshold alerts (alert when crowd drops below user-defined limit)
+    for(const [stationId, threshold] of Object.entries(state.customAlerts)){
+      const v = CROWD.state.crowdMap[stationId];
+      if(v !== undefined && v < threshold){
+        const s = METRO.STATIONS[stationId];
+        sendPush({
+          stationId,
+          title: `📉 ${s ? s.n : stationId} Alert`,
+          body: `Crowd level has dropped to ${v}% (below your ${threshold}% target).`,
+          urgency: 'high',
+          tag: `custom-alert-${stationId}`
+        });
+        
+        // Show in-app toast
+        if (typeof UI !== 'undefined' && UI.showToast) {
+          UI.showToast('📉', `${s ? s.n : stationId}: Crowd is now ${v}%`);
+        }
+
+        // Custom alerts are one-shot, remove after firing
+        removeCustomAlert(stationId);
+      }
+    }
+  }
+
+  function setCustomAlert(stationId, threshold) {
+    state.customAlerts[stationId] = threshold;
+    saveAlerts();
+    if(!state.pushEnabled) requestPermission();
+  }
+
+  function removeCustomAlert(stationId) {
+    delete state.customAlerts[stationId];
+    saveAlerts();
   }
 
   // ══════════════════════════════════════════════════════════════
@@ -415,7 +461,7 @@ window.NOTIFY = (function(){
     ).join('');
     return `<span class="conf-badge" title="${c.label}: ${c.sources.join(', ')}" style="--cc:${c.color}">
       ${pips}
-      <span style="font-size:7px;color:${c.color};font-family:'Space Mono',monospace;margin-left:3px">${c.tier.toUpperCase()}</span>
+      <span style="font-size:7px;color:${c.color};font-family:'JetBrains Mono',monospace;margin-left:3px">${c.tier.toUpperCase()}</span>
     </span>`;
   }
 
@@ -438,6 +484,7 @@ window.NOTIFY = (function(){
   // ── Init ──────────────────────────────────────────────────────
   async function init(){
     loadSubs();
+    loadAlerts();
     await initPush();
 
     // If already granted from a previous visit, mark ready
@@ -458,6 +505,8 @@ window.NOTIFY = (function(){
     computeAnomaly,    recomputeAllAnomalies,
     confidenceBadge, anomalyBanner, getAnomalies,
     sendPush,
+    setCustomAlert, removeCustomAlert,
+    get customAlerts(){ return state.customAlerts; },
     get subscriptions(){ return state.subscriptions; },
     get confidenceMap(){ return state.confidenceMap; },
     get anomalyMap(){    return state.anomalyMap;    },

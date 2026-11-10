@@ -44,6 +44,7 @@ window.UI=(function(){
       _applyHomeStation(homeStation,false);
       buildFC();
       buildHomeLineList();
+      renderPinnedStations();
     },120000);
   }
 
@@ -73,8 +74,59 @@ window.UI=(function(){
   function buildHomeGreeting(){
     const d=new Date(),h=d.getHours();
     const gr=h<12?'Good Morning':h<17?'Good Afternoon':'Good Evening';
+    
+    // Add quick tip if crowd is very high across network
+    let tip = '';
+    const avg = getNetworkAverage();
+    if(avg > 75) tip = ' — Network is very busy right now';
+    else if(avg < 40) tip = ' — Smooth riding across the network';
+
     _s('h-greet',gr);
-    _s('h-date',d.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'}));
+    _s('h-date',d.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'}) + tip);
+  }
+
+  function getNetworkAverage() {
+    if(typeof CROWD === 'undefined' || !CROWD.state.crowdMap) return 0;
+    const vals = Object.values(CROWD.state.crowdMap);
+    if(vals.length === 0) return 0;
+    return vals.reduce((a,b)=>a+b,0) / vals.length;
+  }
+
+  function renderPinnedStations() {
+    const area = document.getElementById('home-pinned');
+    if (!area) return;
+    
+    let pinned = [];
+    try {
+      const raw = localStorage.getItem('v3_pinned');
+      if (raw) pinned = JSON.parse(raw);
+    } catch(e) {}
+
+    if (!pinned || pinned.length === 0) {
+      area.style.display = 'none';
+      return;
+    }
+
+    area.style.display = 'flex';
+    let html = '<div style="font-size:10px;color:var(--sub);letter-spacing:.06em;text-transform:uppercase;margin:4px 0 2px" data-i18n="pinned_stations">Pinned Stations</div>';
+    
+    pinned.forEach(id => {
+      const s = METRO.STATIONS[id];
+      if(!s) return;
+      const v = CROWD?.state?.crowdMap[id] || 0;
+      const c = v<40?'#4ade80':v<70?'#fbbf24':'#ef4444';
+      
+      html += `
+        <div onclick="UI.openPanel('${id}'); UI.switchTab('map');" style="background:var(--s1);border:1px solid var(--brd);border-radius:14px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:border-color .2s">
+          <div style="font-family:'DM Serif Display',sans-serif;font-size:15px;font-weight:700;color:var(--txt)">${s.n}</div>
+          <div style="background:rgba(255,255,255,0.04);border:1px solid var(--brd);border-radius:8px;padding:4px 8px;display:flex;align-items:center;gap:6px">
+            <div style="width:6px;height:6px;border-radius:50%;background:${c};box-shadow:0 0 8px ${c}"></div>
+            <span style="font-family:'DM Serif Display',sans-serif;font-size:13px;font-weight:700;color:var(--txt)">${v}%</span>
+          </div>
+        </div>
+      `;
+    });
+    area.innerHTML = html;
   }
 
   function _applyHomeStation(id,animate){
@@ -748,7 +800,7 @@ window.UI=(function(){
     if(typeof NOTIFY==='undefined'){el.innerHTML='';return}
     const list=NOTIFY.getAnomalies();
     if(!list.length){
-      el.innerHTML='<div style="font-size:9px;color:var(--muted);font-family:Space Mono,monospace;padding:10px;text-align:center">No anomalies detected — model and reports agree ✓</div>';
+      el.innerHTML='<div style="font-size:9px;color:var(--muted);font-family:JetBrains Mono,monospace;padding:10px;text-align:center">No anomalies detected — model and reports agree ✓</div>';
       return;
     }
     el.innerHTML=list.map(a=>{
@@ -760,8 +812,8 @@ window.UI=(function(){
           <span style="font-size:16px">${a.icon}</span>
           <div style="flex:1;min-width:0">
             <div style="font-size:11px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s?.n||a.stationId}</div>
-            <div style="font-size:8px;font-family:'Space Mono',monospace;color:${a.color};margin-top:2px">${a.label}</div>
-            <div style="font-size:8px;font-family:'Space Mono',monospace;color:var(--muted);margin-top:1px">Model ${a.modelVal}% → Reported ${a.blendedVal}% · ${conf?.tier||'low'} confidence</div>
+            <div style="font-size:8px;font-family:'JetBrains Mono',monospace;color:${a.color};margin-top:2px">${a.label}</div>
+            <div style="font-size:8px;font-family:'JetBrains Mono',monospace;color:var(--muted);margin-top:1px">Model ${a.modelVal}% → Reported ${a.blendedVal}% · ${conf?.tier||'low'} confidence</div>
           </div>
         </div>
         <button onclick="event.stopPropagation();NOTIFY.toggleSubscription('${a.stationId}')"
@@ -778,8 +830,8 @@ window.UI=(function(){
     const ap=`10,${H-10} `+td.map((v,h)=>`${(h/23)*(W-20)+10},${H-10-(v/100)*(H-24)}`).join(' ')+` ${W-10},${H-10}`;
     const cx=(CROWD.state.hour/23)*(W-20)+10,cy=H-10-(td[CROWD.state.hour]/100)*(H-24);
     const rush=[[6,10],[16,21]].map(([a,b])=>`<rect x="${(a/23)*(W-20)+10}" y="4" width="${((b-a)/23)*(W-20)}" height="${H-16}" fill="#FF6B00" opacity=".07" rx="2"/>`).join('');
-    const ticks=[0,3,6,9,12,15,18,21].map(h=>{const x=(h/23)*(W-20)+10;const l=h===0?'12A':h===12?'12P':h<12?h+'A':(h-12)+'P';return`<text x="${x}" y="${H}" fill="#3E5272" font-size="6.5" font-family="Space Mono,monospace" text-anchor="middle">${l}</text>`}).join('');
-    svg2.innerHTML=`<defs><linearGradient id="tg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FF6B00" stop-opacity=".35"/><stop offset="100%" stop-color="#FF6B00" stop-opacity="0"/></linearGradient></defs>${rush}<polygon points="${ap}" fill="url(#tg)"/><polyline points="${pts}" fill="none" stroke="#FF6B00" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>${ticks}<line x1="${cx}" y1="4" x2="${cx}" y2="${H-10}" stroke="#FF6B00" stroke-width="1.2" stroke-dasharray="3,2" opacity=".8"/><circle cx="${cx}" cy="${cy}" r="3.5" fill="#FF6B00" stroke="#080C12" stroke-width="1.5"/><rect x="${cx-12}" y="${cy-14}" width="24" height="12" rx="3" fill="#FF6B00"/><text x="${cx}" y="${cy-5}" fill="#000" font-size="7" font-family="Space Mono,monospace" text-anchor="middle" font-weight="700">${td[CROWD.state.hour]}%</text>`;
+    const ticks=[0,3,6,9,12,15,18,21].map(h=>{const x=(h/23)*(W-20)+10;const l=h===0?'12A':h===12?'12P':h<12?h+'A':(h-12)+'P';return`<text x="${x}" y="${H}" fill="#3E5272" font-size="6.5" font-family="JetBrains Mono,monospace" text-anchor="middle">${l}</text>`}).join('');
+    svg2.innerHTML=`<defs><linearGradient id="tg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FF6B00" stop-opacity=".35"/><stop offset="100%" stop-color="#FF6B00" stop-opacity="0"/></linearGradient></defs>${rush}<polygon points="${ap}" fill="url(#tg)"/><polyline points="${pts}" fill="none" stroke="#FF6B00" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>${ticks}<line x1="${cx}" y1="4" x2="${cx}" y2="${H-10}" stroke="#FF6B00" stroke-width="1.2" stroke-dasharray="3,2" opacity=".8"/><circle cx="${cx}" cy="${cy}" r="3.5" fill="#FF6B00" stroke="#080C12" stroke-width="1.5"/><rect x="${cx-12}" y="${cy-14}" width="24" height="12" rx="3" fill="#FF6B00"/><text x="${cx}" y="${cy-5}" fill="#000" font-size="7" font-family="JetBrains Mono,monospace" text-anchor="middle" font-weight="700">${td[CROWD.state.hour]}%</text>`;
   }
 
   function renderIX(){
@@ -798,7 +850,7 @@ window.UI=(function(){
         <div class="ldot" style="background:${isOpen?color:'#2A3F58'}"></div>
         <div class="lnm" style="flex:1;min-width:0">
           <div>${name} <span style="color:var(--muted);font-size:8px">(${count})</span></div>
-          <div style="font-size:7px;font-family:'Space Mono',monospace;color:var(--muted);margin-top:1px">${isOpen?`● Open · Last ${lastTrain}`:`○ Closed · Opens ${firstTrain}`}</div>
+          <div style="font-size:7px;font-family:'JetBrains Mono',monospace;color:var(--muted);margin-top:1px">${isOpen?`● Open · Last ${lastTrain}`:`○ Closed · Opens ${firstTrain}`}</div>
         </div>
         <div class="lbw"><div class="lbar" style="width:${avg}%;background:${isOpen?color:'#2A3F58'};opacity:${isOpen?.85:.35}"></div></div>
         <div class="lpct" style="color:${isOpen?CROWD.color(avg):'var(--muted)'}">${isOpen?avg+'%':'—'}</div>
@@ -807,7 +859,7 @@ window.UI=(function(){
     (document.getElementById('toplist')||{innerHTML:''}).innerHTML=top.map(({id,v,s},i)=>s?`
       <div class="ixr" onclick="UI.openStationFromStats('${id}')">
         <div class="ixrk">#${i+1}</div><div class="ixnm">${s.n}</div>
-        <div style="font-size:8px;font-family:'Space Mono',monospace;flex-shrink:0;margin-right:3px;color:${METRO.LINE_COLORS[s.l[0]]}">${s.l[0]}</div>
+        <div style="font-size:8px;font-family:'JetBrains Mono',monospace;flex-shrink:0;margin-right:3px;color:${METRO.LINE_COLORS[s.l[0]]}">${s.l[0]}</div>
         <div class="ixbw"><div class="ixbar" style="width:${v}%;background:${CROWD.color(v)}"></div></div>
         <div class="ixpct" style="color:${CROWD.color(v)}">${v}%</div></div>`:'').join('');
   }
@@ -824,7 +876,7 @@ window.UI=(function(){
         :'Scanning Google News RSS…';
     }
     if(!all.length){
-      (document.getElementById('evlist')||{innerHTML:''}).innerHTML='<div style="font-size:9px;color:var(--muted);font-family:Space Mono,monospace;padding:14px;text-align:center;line-height:1.8">📡 Scanning Google News RSS for Delhi Metro alerts…<br>Results appear within 30 seconds.</div>';
+      (document.getElementById('evlist')||{innerHTML:''}).innerHTML='<div style="font-size:9px;color:var(--muted);font-family:JetBrains Mono,monospace;padding:14px;text-align:center;line-height:1.8">📡 Scanning Google News RSS for Delhi Metro alerts…<br>Results appear within 30 seconds.</div>';
       return;
     }
     (document.getElementById('evlist')||{innerHTML:''}).innerHTML=all.map(ev=>{
@@ -1016,8 +1068,8 @@ window.UI=(function(){
           <div style="display:flex;align-items:center;gap:6px;margin-top:${stationName?'0':'2px'}">
             <span style="font-size:11px">${icon}</span>
             <span class="rplv" style="color:${c};background:${bg}">${lv.charAt(0).toUpperCase()+lv.slice(1)}</span>
-            <span style="font-size:8px;color:var(--muted);font-family:'Space Mono',monospace">${ago}</span>
-            ${isOwn?'<span style="font-size:7px;color:var(--muted);font-family:Space Mono,monospace;border:1px solid var(--border);border-radius:4px;padding:0 4px">you</span>':''}
+            <span style="font-size:8px;color:var(--muted);font-family:'JetBrains Mono',monospace">${ago}</span>
+            ${isOwn?'<span style="font-size:7px;color:var(--muted);font-family:JetBrains Mono,monospace;border:1px solid var(--border);border-radius:4px;padding:0 4px">you</span>':''}
           </div>
         </div>
       </div>`;
@@ -1157,6 +1209,136 @@ window.UI=(function(){
       return;
     }
 
+  // ── PINNED STATIONS ──────────────────────────────────────────
+  
+  function getPinnedStations() {
+    try {
+      const raw = localStorage.getItem('v3_pinned');
+      return raw ? JSON.parse(raw) : [];
+    } catch(e) { return []; }
+  }
+
+  function setPinnedStations(arr) {
+    try { localStorage.setItem('v3_pinned', JSON.stringify(arr)); } catch(e) {}
+  }
+
+  function isStationPinned(id) {
+    return getPinnedStations().includes(id);
+  }
+
+  function togglePinStation() {
+    if(!panelId) return;
+    let pinned = getPinnedStations();
+    if(pinned.includes(panelId)) {
+      pinned = pinned.filter(pid => pid !== panelId);
+      showToast('📌', 'Station unpinned from home');
+    } else {
+      if(pinned.length >= 5) {
+        showToast('⚠️', 'You can only pin up to 5 stations');
+        return;
+      }
+      pinned.push(panelId);
+      showToast('📌', 'Station pinned to home screen');
+    }
+    setPinnedStations(pinned);
+    updatePinButtonState(panelId);
+    if(activeTab === 's-home') renderPinnedStations();
+  }
+
+  function updatePinButtonState(id) {
+    const btn = document.getElementById('btn-pin-stn');
+    const lbl = document.getElementById('pin-stn-lbl');
+    if(!btn || !lbl) return;
+    
+    if(isStationPinned(id)) {
+      btn.style.background = 'rgba(255,208,0,0.1)';
+      btn.style.borderColor = 'rgba(255,208,0,0.3)';
+      btn.style.color = 'var(--y)';
+      lbl.textContent = 'Pinned';
+    } else {
+      btn.style.background = 'rgba(255,255,255,0.05)';
+      btn.style.borderColor = 'var(--brd)';
+      btn.style.color = 'var(--txt)';
+      lbl.textContent = 'Pin';
+    }
+  }
+
+  // ── CROWD ALERTS MODAL ────────────────────────────────────────
+
+  let alertTargetStation = null;
+
+  function openAlertModal() {
+    if(!panelId) return;
+    alertTargetStation = panelId;
+    const modal = document.getElementById('alert-modal');
+    if(!modal) return;
+    
+    const s = METRO.STATIONS[panelId];
+    document.getElementById('alert-stn-name').textContent = s ? s.n : panelId;
+    
+    // Check if alert already exists
+    let existingThreshold = 50;
+    if(typeof NOTIFY !== 'undefined' && NOTIFY.customAlerts && NOTIFY.customAlerts[panelId]) {
+      existingThreshold = NOTIFY.customAlerts[panelId];
+      document.getElementById('btn-remove-alert').style.display = 'block';
+    } else {
+      document.getElementById('btn-remove-alert').style.display = 'none';
+    }
+    
+    const slider = document.getElementById('alert-slider');
+    slider.value = existingThreshold;
+    document.getElementById('alert-val-disp').textContent = existingThreshold + '%';
+    
+    modal.style.display = 'flex';
+  }
+
+  function closeAlertModal() {
+    const modal = document.getElementById('alert-modal');
+    if(modal) modal.style.display = 'none';
+    alertTargetStation = null;
+  }
+
+  function saveAlertModal() {
+    if(!alertTargetStation) return;
+    const slider = document.getElementById('alert-slider');
+    const threshold = parseInt(slider.value, 10);
+    
+    if(typeof NOTIFY !== 'undefined' && NOTIFY.setCustomAlert) {
+      NOTIFY.setCustomAlert(alertTargetStation, threshold);
+      showToast('🔔', `Alert set! We'll notify you when crowd drops below ${threshold}%.`);
+      updateAlertButtonState(alertTargetStation);
+    }
+    closeAlertModal();
+  }
+
+  function removeAlertModal() {
+    if(!alertTargetStation) return;
+    if(typeof NOTIFY !== 'undefined' && NOTIFY.removeCustomAlert) {
+      NOTIFY.removeCustomAlert(alertTargetStation);
+      showToast('🔔', 'Alert removed.');
+      updateAlertButtonState(alertTargetStation);
+    }
+    closeAlertModal();
+  }
+
+  function updateAlertButtonState(id) {
+    const btn = document.getElementById('btn-alert-stn');
+    const lbl = document.getElementById('alert-stn-lbl');
+    if(!btn || !lbl) return;
+    
+    if(typeof NOTIFY !== 'undefined' && NOTIFY.customAlerts && NOTIFY.customAlerts[id]) {
+      btn.style.background = 'rgba(255,208,0,0.1)';
+      btn.style.borderColor = 'rgba(255,208,0,0.3)';
+      btn.style.color = 'var(--y)';
+      lbl.textContent = 'Alert Set';
+    } else {
+      btn.style.background = 'rgba(255,255,255,0.05)';
+      btn.style.borderColor = 'var(--brd)';
+      btn.style.color = 'var(--txt)';
+      lbl.textContent = 'Alert';
+    }
+  }
+
     try{
       const twoHrsAgo=new Date(Date.now()-REPORT_EXPIRY).toISOString();
       const {data,error}=await SB.client
@@ -1203,8 +1385,8 @@ window.UI=(function(){
             <div style="display:flex;align-items:center;gap:6px">
               <span style="font-size:11px">${icon}</span>
               <span class="rplv" style="color:${c};background:${bg}">${lv.charAt(0).toUpperCase()+lv.slice(1)}</span>
-              <span style="font-size:8px;color:var(--muted);font-family:'Space Mono',monospace">just now</span>
-              <span style="font-size:7px;color:var(--low);font-family:Space Mono,monospace">● live</span>
+              <span style="font-size:8px;color:var(--muted);font-family:'JetBrains Mono',monospace">just now</span>
+              <span style="font-size:7px;color:var(--low);font-family:JetBrains Mono,monospace">● live</span>
             </div>
           </div>`;
         listEl.prepend(newEl);
@@ -1272,7 +1454,7 @@ window.UI=(function(){
   function triggerUpdate(){
     CROWD.recomputeAll();
     if(panelId)refreshPanel();
-    if(activeTab==='s-home'){buildFC();buildHomeLineList();}
+    if(activeTab==='s-home'){buildFC();buildHomeLineList();renderPinnedStations();}
     if(activeTab==='s-station'&&panelId)showStationScreen(panelId);
   }
 
@@ -1290,6 +1472,8 @@ window.UI=(function(){
     showStationScreen, openStationFromStats,
     // Search overlay
     openSearch, closeSearch, filterSearch, closeLineSelect,
+    // Pin & Alerts
+    togglePinStation, openAlertModal, closeAlertModal, saveAlertModal, removeAlertModal,
     // Station screen
     gpsStation, goCoachFromStation,
     // Coach screen

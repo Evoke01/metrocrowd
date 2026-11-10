@@ -153,7 +153,7 @@ window.LEGAL = (function () {
       'width:100%;max-width:480px;border-top:1px solid #222;box-sizing:border-box">' +
       '<div style="display:flex;justify-content:center;margin-bottom:16px">' +
       '<div style="width:36px;height:4px;border-radius:2px;background:#333"></div></div>' +
-      '<div style="font-family:\'Syne\',sans-serif;font-size:16px;font-weight:800;color:#fff;margin-bottom:12px">' +
+      '<div style="font-family:\'DM Serif Display\',sans-serif;font-size:16px;font-weight:800;color:#fff;margin-bottom:12px">' +
       '⚠️ About MetroCrowd Data</div>' +
       '<div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:14px;' +
       'padding:14px;margin-bottom:16px;font-size:12px;color:#c0c0c0;line-height:1.7">' +
@@ -168,7 +168,7 @@ window.LEGAL = (function () {
       '<a href="/legal.html#privacy" target="_blank" style="color:#888">Privacy Policy</a></div>' +
       '<button onclick="LEGAL.dismissDisclaimer()" ' +
       'style="width:100%;height:48px;background:#FFD000;border:none;border-radius:14px;' +
-      'font-family:\'Syne\',sans-serif;font-size:14px;font-weight:800;color:#000;cursor:pointer">' +
+      'font-family:\'DM Serif Display\',sans-serif;font-size:14px;font-weight:800;color:#000;cursor:pointer">' +
       'I Understand</button></div>';
     document.body.appendChild(m);
   }

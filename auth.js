@@ -231,7 +231,7 @@ window.AUTH = (function(){
         avatar.textContent = name ? name[0].toUpperCase() : '?';
         avatar.style.background = strColor(user.id);
         avatar.style.color = '#fff';
-        avatar.style.fontFamily = "'Space Mono',monospace";
+        avatar.style.fontFamily = "'JetBrains Mono',monospace";
         avatar.style.fontSize = '10px';
         avatar.style.fontWeight = '700';
       }

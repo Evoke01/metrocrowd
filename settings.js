@@ -350,7 +350,7 @@ window.SETTINGS = (function () {
     pill.innerHTML =
       '<button id="settings-lang-btn" onclick="SETTINGS.toggleLang()" ' +
       'style="height:28px;padding:0 9px;border-radius:20px;background:var(--card2);' +
-      'border:1px solid var(--brd2);font-family:\'Syne\',sans-serif;font-size:11px;' +
+      'border:1px solid var(--brd2);font-family:\'DM Serif Display\',sans-serif;font-size:11px;' +
       'font-weight:800;color:var(--sub);cursor:pointer;transition:all .15s;letter-spacing:.02em">हिं</button>' +
       '<button id="settings-theme-btn" onclick="SETTINGS.cycleTheme()" ' +
       'style="width:28px;height:28px;border-radius:50%;background:var(--card2);' +

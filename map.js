@@ -113,7 +113,7 @@ window.MAP=(function(){
       'stroke-dasharray':'5,6',opacity:'.7','pointer-events':'none'},gNCR);
 
     // City/region labels
-    const lblStyle={'font-family':'Space Mono,monospace','pointer-events':'none',
+    const lblStyle={'font-family':'JetBrains Mono,monospace','pointer-events':'none',
       'text-anchor':'middle','font-weight':'700'};
     txt(100,790,'GURUGRAM',{...lblStyle,'font-size':'10',fill:'#00BCD4',opacity:'.55','letter-spacing':'0.08em'},gNCR);
     txt(980,640,'NOIDA / G. NOIDA',{...lblStyle,'font-size':'9',fill:'#00E676',opacity:'.5','letter-spacing':'0.06em'},gNCR);
@@ -123,14 +123,14 @@ window.MAP=(function(){
 
     // Compass rose (bottom-right corner of unzoomed view)
     const cg=grp({'transform':'translate(1060,780)','pointer-events':'none'},gNCR);
-    txt(0,-16,'N',{'font-family':'Space Mono,monospace','font-size':'7',fill:'#3E5272',
+    txt(0,-16,'N',{'font-family':'JetBrains Mono,monospace','font-size':'7',fill:'#3E5272',
       'text-anchor':'middle'},cg);
     el('line',{x1:0,y1:-12,x2:0,y2:12,stroke:'#1C2A3C','stroke-width':'1'},cg);
     el('line',{x1:-12,y1:0,x2:12,y2:0,stroke:'#1C2A3C','stroke-width':'1'},cg);
     el('circle',{cx:0,cy:0,r:3,fill:'#2A5FA8',opacity:'.5'},cg);
-    txt(16,3,'E',{'font-family':'Space Mono,monospace','font-size':'6',fill:'#3E5272'},cg);
-    txt(-16,3,'W',{'font-family':'Space Mono,monospace','font-size':'6',fill:'#3E5272'},cg);
-    txt(0,22,'S',{'font-family':'Space Mono,monospace','font-size':'7',fill:'#3E5272',
+    txt(16,3,'E',{'font-family':'JetBrains Mono,monospace','font-size':'6',fill:'#3E5272'},cg);
+    txt(-16,3,'W',{'font-family':'JetBrains Mono,monospace','font-size':'6',fill:'#3E5272'},cg);
+    txt(0,22,'S',{'font-family':'JetBrains Mono,monospace','font-size':'7',fill:'#3E5272',
       'text-anchor':'middle'},cg);
   }
 
@@ -209,7 +209,7 @@ window.MAP=(function(){
       const t=el('text',{
         x:s.x+8, y:s.y+4,
         'font-size':'6',
-        'font-family':'Space Mono,monospace',
+        'font-family':'JetBrains Mono,monospace',
         fill,
         opacity:'0',
         'pointer-events':'none',

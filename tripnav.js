@@ -235,7 +235,7 @@ window.TRIPNAV = (function () {
         <div style="display:flex;align-items:center;gap:8px">
           <div style="width:8px;height:8px;border-radius:50%;background:var(--y);
             animation:tnavPulse 1.2s ease-in-out infinite"></div>
-          <span style="font-family:'Syne',sans-serif;font-size:11px;font-weight:800;
+          <span style="font-family:'DM Serif Display',sans-serif;font-size:11px;font-weight:800;
             color:var(--y);letter-spacing:.06em">NAVIGATING</span>
           <span id="tnav-acc" style="font-size:9px;color:var(--sub)"></span>
         </div>
@@ -254,7 +254,7 @@ window.TRIPNAV = (function () {
         <div>
           <div style="font-size:9px;color:var(--sub);text-transform:uppercase;
             letter-spacing:.06em;margin-bottom:3px">${T ? T('you_are_at') : 'You are at'}</div>
-          <div id="tnav-current" style="font-family:'Syne',sans-serif;font-size:13px;
+          <div id="tnav-current" style="font-family:'DM Serif Display',sans-serif;font-size:13px;
             font-weight:800;color:var(--y);line-height:1.2">—</div>
           <div id="tnav-current-crowd" style="font-size:10px;color:var(--sub);margin-top:2px"></div>
         </div>
@@ -262,7 +262,7 @@ window.TRIPNAV = (function () {
         <div style="text-align:right">
           <div style="font-size:9px;color:var(--sub);text-transform:uppercase;
             letter-spacing:.06em;margin-bottom:3px">${T ? T('next_stop') : 'Next stop'}</div>
-          <div id="tnav-next" style="font-family:'Syne',sans-serif;font-size:13px;
+          <div id="tnav-next" style="font-family:'DM Serif Display',sans-serif;font-size:13px;
             font-weight:700;color:var(--txt);line-height:1.2">—</div>
           <div id="tnav-next-crowd" style="font-size:10px;color:var(--sub);margin-top:2px"></div>
         </div>
@@ -270,15 +270,15 @@ window.TRIPNAV = (function () {
 
       <div style="display:flex;gap:12px;padding:8px 0;border-top:1px solid var(--brd)">
         <div style="flex:1;text-align:center">
-          <div id="tnav-remaining" style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--txt)">—</div>
+          <div id="tnav-remaining" style="font-family:'DM Serif Display',sans-serif;font-size:16px;font-weight:800;color:var(--txt)">—</div>
           <div style="font-size:9px;color:var(--sub)">${T ? T('stops_left') : 'stops left'}</div>
         </div>
         <div style="flex:1;text-align:center">
-          <div id="tnav-time" style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--txt)">—</div>
+          <div id="tnav-time" style="font-family:'DM Serif Display',sans-serif;font-size:16px;font-weight:800;color:var(--txt)">—</div>
           <div style="font-size:9px;color:var(--sub)">${T ? T('est_remaining') : 'est. remaining'}</div>
         </div>
         <div style="flex:1;text-align:center">
-          <div id="tnav-dest" style="font-family:'Syne',sans-serif;font-size:10px;font-weight:700;color:var(--sub);line-height:1.3">—</div>
+          <div id="tnav-dest" style="font-family:'DM Serif Display',sans-serif;font-size:10px;font-weight:700;color:var(--sub);line-height:1.3">—</div>
           <div style="font-size:9px;color:var(--sub)">${T ? T('destination') : 'destination'}</div>
         </div>
       </div>

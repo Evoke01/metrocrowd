@@ -131,7 +131,7 @@ window.ANON = (function(){
     }
     // Fallback: just show the URL in a monospace box
     el.innerHTML = `<div style="
-      font-family:'Space Mono',monospace;font-size:7px;
+      font-family:'JetBrains Mono',monospace;font-size:7px;
       word-break:break-all;color:var(--a2);
       background:var(--bg3);padding:10px;border-radius:8px;
       border:1px solid var(--border);line-height:1.5;
@@ -338,7 +338,7 @@ window.ANON = (function(){
     banner.innerHTML = `
       <div style="flex:1">
         <strong>Sync ID found</strong><br>
-        <span style="font-size:8px;font-family:'Space Mono',monospace;color:var(--muted)">${pending.slice(0,8)}… · from link</span>
+        <span style="font-size:8px;font-family:'JetBrains Mono',monospace;color:var(--muted)">${pending.slice(0,8)}… · from link</span>
       </div>
       <button class="anon-import-yes" onclick="ANON._acceptImport('${pending}')">Restore</button>
       <button class="anon-import-no"  onclick="ANON._dismissImport()">Dismiss</button>

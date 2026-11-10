@@ -27,7 +27,7 @@
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
           <img src="icons/icon-96.png" style="width:44px;height:44px;border-radius:12px;flex-shrink:0">
           <div style="flex:1">
-            <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:#fff">Install MetroCrowd</div>
+            <div style="font-family:'DM Serif Display',sans-serif;font-size:13px;font-weight:800;color:#fff">Install MetroCrowd</div>
             <div style="font-size:10px;color:#888;margin-top:1px">
               ${isDesktop ? 'Use as a desktop app — no browser bar' : 'Add to home screen for best experience'}
             </div>
@@ -36,7 +36,7 @@
         </div>
         <div style="display:flex;gap:8px">
           <button id="ib-install" style="flex:1;height:44px;background:#F5A800;border:none;border-radius:12px;
-            font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:#000;cursor:pointer">
+            font-family:'DM Serif Display',sans-serif;font-size:13px;font-weight:800;color:#000;cursor:pointer">
             ${isDesktop ? 'Install App' : 'Add to Home Screen'}
           </button>
           <button id="ib-how" style="height:44px;padding:0 14px;background:rgba(255,255,255,.06);
@@ -52,13 +52,13 @@
         background:#111;border-radius:24px 24px 0 0;padding:24px 20px calc(32px + env(safe-area-inset-bottom));
         max-width:480px;margin:0 auto;border-top:1px solid #222">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-          <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#fff">How to install</div>
+          <div style="font-family:'DM Serif Display',sans-serif;font-size:16px;font-weight:800;color:#fff">How to install</div>
           <button id="im-x" style="background:#1e1e1e;border:1px solid #333;color:#666;
             width:30px;height:30px;border-radius:50%;font-size:14px;cursor:pointer"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         </div>
         <div id="im-steps"></div>
         <button id="im-install" style="width:100%;height:48px;background:#F5A800;border:none;
-          border-radius:14px;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;
+          border-radius:14px;font-family:'DM Serif Display',sans-serif;font-size:14px;font-weight:800;
           color:#000;cursor:pointer;margin-top:16px;display:none">Install Now</button>
       </div>
     </div>`;

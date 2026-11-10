@@ -470,7 +470,7 @@ window.SB = (function(){
         position:fixed;bottom:120px;left:50%;transform:translateX(-50%);
         background:#0E1420;border:1px solid var(--border);
         color:var(--text);padding:7px 14px;border-radius:20px;
-        font-family:'Space Mono',monospace;font-size:10px;
+        font-family:'JetBrains Mono',monospace;font-size:10px;
         z-index:9999;max-width:86vw;text-align:center;
         box-shadow:0 4px 24px rgba(0,0,0,.6);
         transition:opacity .3s;pointer-events:none;

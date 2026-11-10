@@ -137,13 +137,13 @@ window.COMMUTE = (function () {
   function _commuteLoading(trip) {
     const tag = trip.dir === 'toWork' ? T('morning_commute') : T('evening_commute');
     return `<div style="padding:16px">
-      <div style="font-size:9px;color:var(--y);letter-spacing:.1em;font-family:'Syne',sans-serif;
+      <div style="font-size:9px;color:var(--y);letter-spacing:.1em;font-family:'DM Serif Display',sans-serif;
         display:flex;align-items:center;gap:5px;margin-bottom:10px">
         <div class="ldot"></div>${tag}</div>
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-        <div style="font-size:14px;font-weight:800;font-family:'Syne',sans-serif;color:var(--txt)">${trip.fromName}</div>
+        <div style="font-size:14px;font-weight:800;font-family:'DM Serif Display',sans-serif;color:var(--txt)">${trip.fromName}</div>
         <div style="color:var(--y);font-size:16px">→</div>
-        <div style="font-size:14px;font-weight:800;font-family:'Syne',sans-serif;color:var(--txt)">${trip.toName}</div>
+        <div style="font-size:14px;font-weight:800;font-family:'DM Serif Display',sans-serif;color:var(--txt)">${trip.toName}</div>
       </div>
       <div style="font-size:10px;color:var(--sub)">Loading live data…</div>
     </div>`;
@@ -165,7 +165,7 @@ window.COMMUTE = (function () {
       <!-- header -->
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
         <div style="font-size:9px;color:var(--y);letter-spacing:.1em;text-transform:uppercase;
-          font-family:'Syne',sans-serif;display:flex;align-items:center;gap:5px">
+          font-family:'DM Serif Display',sans-serif;display:flex;align-items:center;gap:5px">
           <div class="ldot"></div>${tag}
         </div>
         <div style="display:flex;align-items:center;gap:6px">
@@ -181,13 +181,13 @@ window.COMMUTE = (function () {
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
         <div style="flex:1;min-width:0">
           <div style="font-size:9px;color:var(--sub);margin-bottom:1px">${T('from')}</div>
-          <div style="font-size:15px;font-weight:900;font-family:'Syne',sans-serif;color:var(--txt);
+          <div style="font-size:15px;font-weight:900;font-family:'DM Serif Display',sans-serif;color:var(--txt);
             white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${trip.fromName}</div>
         </div>
         <div style="color:var(--y);font-size:20px;font-weight:900;flex-shrink:0">→</div>
         <div style="flex:1;min-width:0;text-align:right">
           <div style="font-size:9px;color:var(--sub);margin-bottom:1px">${T('to')}</div>
-          <div style="font-size:15px;font-weight:900;font-family:'Syne',sans-serif;color:var(--txt);
+          <div style="font-size:15px;font-weight:900;font-family:'DM Serif Display',sans-serif;color:var(--txt);
             white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${trip.toName}</div>
         </div>
       </div>
@@ -213,7 +213,7 @@ window.COMMUTE = (function () {
           </svg>
           <div>
             <div style="font-size:8px;color:var(--sub)">Board</div>
-            <div style="font-size:12px;font-weight:900;font-family:'Syne',sans-serif;color:var(--y)">Coach ${bestCoach}</div>
+            <div style="font-size:12px;font-weight:900;font-family:'DM Serif Display',sans-serif;color:var(--y)">Coach ${bestCoach}</div>
           </div>
         </div>` : ''}
         ${mins ? `
@@ -224,7 +224,7 @@ window.COMMUTE = (function () {
           </svg>
           <div>
             <div style="font-size:8px;color:var(--sub)">Journey</div>
-            <div style="font-size:12px;font-weight:900;font-family:'Syne',sans-serif;color:var(--txt)">~${mins} min</div>
+            <div style="font-size:12px;font-weight:900;font-family:'DM Serif Display',sans-serif;color:var(--txt)">~${mins} min</div>
           </div>
         </div>` : ''}
       </div>
@@ -232,7 +232,7 @@ window.COMMUTE = (function () {
       <!-- CTA -->
       <button onclick="event.stopPropagation();COMMUTE.leaveNow()"
         style="width:100%;height:44px;background:var(--y);border:none;border-radius:13px;
-        font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:#000;cursor:pointer;
+        font-family:'DM Serif Display',sans-serif;font-size:13px;font-weight:800;color:#000;cursor:pointer;
         display:flex;align-items:center;justify-content:center;gap:8px;
         box-shadow:0 4px 20px rgba(245,168,0,.25)">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -274,7 +274,7 @@ window.COMMUTE = (function () {
         border-top:1px solid #222;box-sizing:border-box">
 
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-          <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#fff">Smart Commute</div>
+          <div style="font-family:'DM Serif Display',sans-serif;font-size:16px;font-weight:800;color:#fff">Smart Commute</div>
           <button onclick="COMMUTE._cancelSetup()"
             style="background:#1e1e1e;border:1px solid #333;color:#888;width:30px;height:30px;
             border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center">
@@ -320,7 +320,7 @@ window.COMMUTE = (function () {
 
         <button onclick="COMMUTE._saveFromModal()"
           style="width:100%;height:48px;background:var(--y);border:none;border-radius:14px;
-          font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:#000;
+          font-family:'DM Serif Display',sans-serif;font-size:14px;font-weight:800;color:#000;
           cursor:pointer;margin-bottom:10px">Save Commute</button>
 
         ${state.enabled ? `

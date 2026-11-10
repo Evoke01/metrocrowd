@@ -1,0 +1,14 @@
+# MetroCrowd — robots.txt
+# https://metrocrowd.vercel.app/
+
+User-agent: *
+Allow: /
+Allow: /legal.html
+
+# Block non-public / low-value surfaces
+Disallow: /api/
+Disallow: /_app/
+Disallow: /metrocrowd-api/
+
+# Sitemaps
+Sitemap: https://metrocrowd.vercel.app/sitemap.xml
