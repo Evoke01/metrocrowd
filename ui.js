@@ -1209,6 +1209,25 @@ window.UI=(function(){
       return;
     }
 
+    try{
+      const twoHrsAgo=new Date(Date.now()-REPORT_EXPIRY).toISOString();
+      const {data,error}=await SB.client
+        .from('crowd_reports')
+        .select('id,station_id,station_name,level,created_at,session_id')
+        .eq('station_id', stationId)
+        .gt('created_at', twoHrsAgo)
+        .order('created_at',{ascending:false})
+        .limit(5);
+      if(error) throw error;
+      reportCache[stationId]={rows:data||[],ts:Date.now()};
+      _renderRows(data||[], listEl, METRO.STATIONS[stationId]?.n);
+      if(countEl) countEl.textContent=data?.length?`(${data.length})`:'';
+    }catch(err){
+      _renderRows([],listEl,METRO.STATIONS[stationId]?.n);
+      if(countEl) countEl.textContent='';
+    }
+  }
+
   // ── PINNED STATIONS ──────────────────────────────────────────
   
   function getPinnedStations() {
@@ -1251,8 +1270,8 @@ window.UI=(function(){
     if(!btn || !lbl) return;
     
     if(isStationPinned(id)) {
-      btn.style.background = 'rgba(255,208,0,0.1)';
-      btn.style.borderColor = 'rgba(255,208,0,0.3)';
+      btn.style.background = 'rgba(245,184,0,0.1)';
+      btn.style.borderColor = 'rgba(245,184,0,0.3)';
       btn.style.color = 'var(--y)';
       lbl.textContent = 'Pinned';
     } else {
@@ -1327,8 +1346,8 @@ window.UI=(function(){
     if(!btn || !lbl) return;
     
     if(typeof NOTIFY !== 'undefined' && NOTIFY.customAlerts && NOTIFY.customAlerts[id]) {
-      btn.style.background = 'rgba(255,208,0,0.1)';
-      btn.style.borderColor = 'rgba(255,208,0,0.3)';
+      btn.style.background = 'rgba(245,184,0,0.1)';
+      btn.style.borderColor = 'rgba(245,184,0,0.3)';
       btn.style.color = 'var(--y)';
       lbl.textContent = 'Alert Set';
     } else {
@@ -1336,25 +1355,6 @@ window.UI=(function(){
       btn.style.borderColor = 'var(--brd)';
       btn.style.color = 'var(--txt)';
       lbl.textContent = 'Alert';
-    }
-  }
-
-    try{
-      const twoHrsAgo=new Date(Date.now()-REPORT_EXPIRY).toISOString();
-      const {data,error}=await SB.client
-        .from('crowd_reports')
-        .select('id,station_id,station_name,level,created_at,session_id')
-        .eq('station_id', stationId)
-        .gt('created_at', twoHrsAgo)
-        .order('created_at',{ascending:false})
-        .limit(5);
-      if(error) throw error;
-      reportCache[stationId]={rows:data||[],ts:Date.now()};
-      _renderRows(data||[], listEl, METRO.STATIONS[stationId]?.n);
-      if(countEl) countEl.textContent=data?.length?`(${data.length})`:'';
-    }catch(err){
-      _renderRows([],listEl,METRO.STATIONS[stationId]?.n);
-      if(countEl) countEl.textContent='';
     }
   }
 
