@@ -228,7 +228,7 @@ async function loadOverview() {
     $('t-overview').innerHTML = `
       <div class="grid">
         <div class="card stat"><div class="k">Program</div><div class="v" style="color:${o.settings.enabled ? 'var(--ok)' : 'var(--bad)'}">${o.settings.enabled ? 'Live' : 'Off'}</div><div class="s">${o.settings.enabled ? 'Users are earning points' : 'Turn on in Settings'}</div></div>
-        <div class="card stat"><div class="k">Users with points</div><div class="v">${num(o.users)}</div><div class="s">reward accounts</div></div>
+        <div class="card stat"><div class="k">Signed-up users</div><div class="v">${num(o.signed_up ?? o.users)}</div><div class="s">${num(o.users)} have opened Rewards</div></div>
         <div class="card stat"><div class="k">Points outstanding</div><div class="v">${num(o.outstanding_points)}</div><div class="s">worth ${inr(o.outstanding_rupees)} if all cashed out</div></div>
         <div class="card stat"><div class="k">Earned last 7 days</div><div class="v">${num(o.earned_7d_points)}</div><div class="s">points</div></div>
       </div>
@@ -286,7 +286,7 @@ function renderUsers() {
     <td class="num"><b>${num(u.balance_points)}</b><div class="muted">${inr(u.balance_rupees)}</div></td>
     <td class="num">${num(u.earned)}</td><td class="num">${num(u.trips)}</td><td class="num">${num(u.reports)}</td><td class="num">${num(u.referrals)}</td>
     <td class="num">${inr(u.paid_rupees)}</td>
-    <td class="mono">${esc(u.referral_code)}</td>
+    <td class="mono">${u.referral_code ? esc(u.referral_code) : '<span class="muted">not opened</span>'}</td>
     <td class="muted">${when(u.created_at)}</td></tr>`).join('')
     : `<tr><td colspan="9" class="empty">No users yet</td></tr>`;
 }

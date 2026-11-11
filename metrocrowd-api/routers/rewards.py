@@ -164,9 +164,14 @@ def _people(db) -> dict:
             users = db.auth.admin.list_users(page=page, per_page=1000) or []
             for u in users:
                 meta = getattr(u, "user_metadata", None) or {}
+                created = getattr(u, "created_at", None)
+                last = getattr(u, "last_sign_in_at", None)
                 people[str(u.id)] = {
                     "email": getattr(u, "email", None),
                     "name": meta.get("full_name") or meta.get("name") or meta.get("user_name"),
+                    "anonymous": bool(getattr(u, "is_anonymous", False)) or not getattr(u, "email", None),
+                    "created_at": created.isoformat() if hasattr(created, "isoformat") else created,
+                    "last_sign_in_at": last.isoformat() if hasattr(last, "isoformat") else last,
                 }
             if len(users) < 1000:
                 break
@@ -200,6 +205,7 @@ async def admin_overview(_admin: str = Depends(_admin_id)):
             .gte("created_at", datetime.fromtimestamp(since, timezone.utc).isoformat()) \
             .limit(100000).execute().data or []
         outstanding = sum(a["balance_points"] or 0 for a in accounts)
+        signed_up = sum(1 for p in _people(db).values() if not p.get("anonymous"))
         by_status = {}
         for p in payouts:
             s = by_status.setdefault(p["status"], {"count": 0, "points": 0, "rupees": 0.0})
@@ -211,6 +217,7 @@ async def admin_overview(_admin: str = Depends(_admin_id)):
             "ok": True,
             "settings": settings,
             "users": len(accounts),
+            "signed_up": signed_up,
             "outstanding_points": outstanding,
             "outstanding_rupees": _rupees(outstanding, settings),
             "payouts": by_status,
@@ -245,12 +252,21 @@ async def admin_users(_admin: str = Depends(_admin_id)):
         for p in payouts:
             if p["status"] == "paid":
                 paid[p["user_id"]] = paid.get(p["user_id"], 0) + (p["amount_paise"] or 0) / 100
+        # Reward accounts are created the first time someone opens Rewards, so
+        # include every signed-up (non-anonymous) user, with 0 points if needed.
+        by_id = {a["user_id"]: a for a in accounts}
+        for uid, who in people.items():
+            if uid not in by_id and not who.get("anonymous"):
+                by_id[uid] = {"user_id": uid, "referral_code": None, "balance_points": 0,
+                              "created_at": who.get("created_at")}
+        account_ids = {x["user_id"] for x in accounts}
         users = []
-        for a in accounts:
-            uid = a["user_id"]
+        for uid, a in by_id.items():
             who = people.get(uid, {})
             users.append({
                 **a,
+                "has_account": uid in account_ids,
+                "last_sign_in_at": who.get("last_sign_in_at"),
                 "email": who.get("email"),
                 "name": who.get("name"),
                 "balance_rupees": _rupees(a["balance_points"], settings),
