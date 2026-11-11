@@ -63,20 +63,34 @@ def require_supabase_user(request: Request) -> dict:
     token = get_token_from_request(request)
     if not token:
         raise HTTPException(status_code=401, detail="Authentication required")
+    # Ask Supabase Auth directly. This works with both legacy JWT keys and the
+    # newer sb_secret_/sb_publishable_ keys and any token signing algorithm,
+    # and doesn't depend on the supabase-py client's key-format checks.
+    import requests
+    url = os.environ.get("SUPABASE_URL", "").rstrip("/")
+    key = os.environ.get("SUPABASE_KEY", "")
+    if not url or not key:
+        log.error("SUPABASE_URL / SUPABASE_KEY not set; cannot validate users")
+        raise HTTPException(status_code=500, detail="Server auth is not configured")
     try:
-        from supabase import create_client
-        client = create_client(os.environ["SUPABASE_URL"], os.environ["SUPABASE_KEY"])
-        response = client.auth.get_user(token)
-        user = response.user
-        if not user:
-            raise HTTPException(status_code=401, detail="Invalid access token")
-        return {
-            "sub": str(user.id),
-            "email": user.email,
-            "is_anonymous": bool(getattr(user, "is_anonymous", False)),
-        }
-    except HTTPException:
-        raise
-    except Exception as exc:
-        log.info("Supabase user token validation failed: %s", type(exc).__name__)
-        raise HTTPException(status_code=401, detail="Invalid or expired access token")
+        resp = requests.get(
+            f"{url}/auth/v1/user",
+            headers={"apikey": key, "Authorization": f"Bearer {token}"},
+            timeout=10,
+        )
+    except requests.RequestException as exc:
+        log.warning("Supabase Auth unreachable: %s", type(exc).__name__)
+        raise HTTPException(status_code=503, detail="Auth service unreachable, try again")
+    if resp.status_code in (401, 403):
+        raise HTTPException(status_code=401, detail="Session expired, please sign in again")
+    if resp.status_code != 200:
+        log.error("Supabase Auth returned %s: %s", resp.status_code, resp.text[:200])
+        raise HTTPException(status_code=502, detail=f"Auth check failed ({resp.status_code})")
+    user = resp.json() or {}
+    if not user.get("id"):
+        raise HTTPException(status_code=401, detail="Session expired, please sign in again")
+    return {
+        "sub": str(user["id"]),
+        "email": user.get("email"),
+        "is_anonymous": bool(user.get("is_anonymous", False)),
+    }

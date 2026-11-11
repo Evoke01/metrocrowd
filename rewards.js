@@ -33,7 +33,7 @@ window.REWARDS = (function () {
     return s.access_token;
   }
 
-  async function _api(path, options = {}) {
+  async function _api(path, options = {}, retried = false) {
     const token = await _token();
     if (!token) throw new Error('Sign in to use rewards.');
     const response = await fetch(API + path, {
@@ -44,6 +44,13 @@ window.REWARDS = (function () {
         ...(options.headers || {}),
       },
     });
+    // A stale access token (e.g. tab left open) — refresh the session once and retry.
+    if (response.status === 401 && !retried) {
+      try {
+        const { data, error } = await SB.client.auth.refreshSession();
+        if (!error && data?.session) return _api(path, options, true);
+      } catch (e) {}
+    }
     const body = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(body.detail || 'Rewards request failed.');
     return body;
