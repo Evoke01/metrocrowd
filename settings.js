@@ -22,7 +22,98 @@ window.SETTINGS = (function () {
     document.body.style.background = dark ? '#07080B' : '#F3F4F6';
     var meta = document.querySelector('meta[name="theme-color"]');
     if (meta) meta.setAttribute('content', dark ? '#07080B' : '#F3F4F6');
+    INK.setActive(!dark);
   }
+
+  // ── LIGHT-THEME CONTRAST GUARD ────────────────────────────────
+  // Crowd/line accents (#FFD600, #00E676, #4ade80…) are tuned for dark
+  // surfaces and set inline across many modules. On light surfaces they
+  // wash out, so in light theme any text whose colour fails contrast
+  // against the light surface behind it is darkened (same hue) until it
+  // reads clearly. Originals are restored when switching back to dark.
+  const INK = (function () {
+    let active = false, obs = null, queued = false;
+    const ORIG = 'inkOrig', SET = 'inkSet';
+    function parse(c) {
+      const m = c && c.match(/rgba?\(([^)]+)\)/); if (!m) return null;
+      const p = m[1].split(',').map(parseFloat);
+      return { r: p[0], g: p[1], b: p[2], a: p[3] === undefined ? 1 : p[3] };
+    }
+    function lum(c) {
+      const f = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+      return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b);
+    }
+    function ratio(a, b) { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); }
+    function mix(t, b) { const a = t.a; return { r: t.r*a + b.r*(1-a), g: t.g*a + b.g*(1-a), b: t.b*a + b.b*(1-a), a: 1 }; }
+    function surface(el) {
+      const stack = [];
+      for (let e = el; e && e.nodeType === 1; e = e.parentElement) {
+        const cs = getComputedStyle(e);
+        let c = parse(cs.backgroundColor);
+        if ((!c || c.a === 0) && cs.backgroundImage.indexOf('gradient') > -1) c = parse((cs.backgroundImage.match(/rgba?\([^)]+\)/) || [])[0]);
+        if (c && c.a > 0) { stack.push(c); if (c.a >= 0.99) break; }
+      }
+      let r = { r: 243, g: 244, b: 246, a: 1 };
+      for (let i = stack.length - 1; i >= 0; i--) r = mix(stack[i], r);
+      return r;
+    }
+    function darken(c, bg) {
+      // Scale toward black (keeps hue) until 4.5:1 against the surface.
+      for (let k = 1; k > 0.05; k -= 0.04) {
+        const d = { r: c.r * k, g: c.g * k, b: c.b * k, a: 1 };
+        if (ratio(d, bg) >= 4.5) return d;
+      }
+      return { r: 15, g: 17, b: 21, a: 1 };
+    }
+    function fix(el) {
+      if (!el.firstChild || el.closest('svg')) return;
+      let hasText = false;
+      for (let n = el.firstChild; n; n = n.nextSibling) if (n.nodeType === 3 && n.nodeValue.trim()) { hasText = true; break; }
+      if (!hasText) return;
+      // Someone changed the colour since we last fixed it: treat as new original.
+      if (el.dataset[SET] && el.style.color !== el.dataset[SET]) { el.dataset[ORIG] = el.style.color; delete el.dataset[SET]; }
+      const fg = parse(getComputedStyle(el).color); if (!fg || fg.a < 0.5) return;
+      const bg = surface(el);
+      if (lum(bg) < 0.45) return;                 // dark surface: leave as is
+      if (ratio(mix(fg, bg), bg) >= 3.2) return;  // already readable
+      if (!(ORIG in el.dataset)) el.dataset[ORIG] = el.style.color;
+      const d = darken(fg, bg);
+      el.style.color = 'rgb(' + Math.round(d.r) + ', ' + Math.round(d.g) + ', ' + Math.round(d.b) + ')';
+      el.dataset[SET] = el.style.color;
+    }
+    function scan() {
+      queued = false;
+      if (!active) return;
+      const all = document.body.getElementsByTagName('*');
+      for (let i = 0; i < all.length; i++) {
+        const el = all[i];
+        if (el.offsetParent === null && getComputedStyle(el).position !== 'fixed') continue;
+        fix(el);
+      }
+    }
+    function queue() { if (!queued) { queued = true; setTimeout(scan, 120); } }
+    function restore() {
+      document.querySelectorAll('[data-ink-orig]').forEach(el => {
+        el.style.color = el.dataset[ORIG] || '';
+        delete el.dataset[ORIG]; delete el.dataset[SET];
+      });
+    }
+    function setActive(on) {
+      active = on;
+      if (!document.body) { document.addEventListener('DOMContentLoaded', () => setActive(active)); return; }
+      if (on) {
+        if (!obs) {
+          obs = new MutationObserver(queue);
+          obs.observe(document.body, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['style', 'class'] });
+        }
+        queue();
+      } else {
+        if (obs) { obs.disconnect(); obs = null; }
+        restore();
+      }
+    }
+    return { setActive, scan };
+  })();
   function setTheme(t) { _theme=t; localStorage.setItem('mc_theme',t); _applyTheme(t); _updateThemeBtn(); }
   function cycleTheme() { setTheme(THEMES[(THEMES.indexOf(_theme)+1)%THEMES.length]); }
   function _themeIcon(t) {

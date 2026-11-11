@@ -1,4 +1,4 @@
-const CACHE = 'metro-v6';
+const CACHE = 'metro-v7';
 const CACHE_FILES = [
   '/', '/index.html', '/style.css',
   '/data.js', '/crowd.js', '/route.js', '/gps.js',

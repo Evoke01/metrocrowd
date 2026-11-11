@@ -1541,3 +1541,8 @@ h1, h2, h3, .pg-title, .hero-num, .cc-num, .dc-val, .rw-hero-n { font-family: va
   #bnav { height: 52px; }
   #sbar { height: 48px; }
 }
+
+/* ── Light theme readability fixes ─────────────────────────────── */
+[data-theme="light"] .overlay { background: rgba(243,244,246,0.97); }
+[data-theme="light"] .ov-input { background: #fff; color: var(--txt); }
+.btn-y:disabled { color: var(--sub); }
