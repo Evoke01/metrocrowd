@@ -42,8 +42,14 @@ window.LEGAL = (function () {
     var github  = document.getElementById('lg-github');
     var consent = document.getElementById('lg-consent');
     var footer  = document.getElementById('lg-footer');
+    var guest   = document.getElementById('lg-guest');
+    // The consent form lives on the welcome gate; make sure it is visible
+    // when sign-in starts from inside the app (Account modal, Rewards).
+    var gate = document.getElementById('login-gate');
+    if (gate && gate.style.display === 'none' && typeof AUTH !== 'undefined' && AUTH.showSignIn) AUTH.showSignIn();
     if (google)  google.style.display  = 'none';
     if (github)  github.style.display  = 'none';
+    if (guest)   guest.style.display   = 'none';
     if (consent) consent.style.display = 'block';
     if (footer)  footer.style.display  = 'none';
 
@@ -55,7 +61,7 @@ window.LEGAL = (function () {
       function update() {
         var ok = c1.checked;
         btn.disabled          = !ok;
-        btn.style.background  = ok ? '#FFD000' : '#333';
+        btn.style.background  = ok ? '#FFC629' : '#333';
         btn.style.color       = ok ? '#000'    : '#666';
         btn.style.cursor      = ok ? 'pointer' : 'not-allowed';
         if (lbl) lbl.style.borderColor = ok ? '#FFD000' : 'rgba(239,68,68,.2)';
@@ -74,6 +80,8 @@ window.LEGAL = (function () {
     var footer  = document.getElementById('lg-footer');
     if (google)  google.style.display  = 'flex';
     if (github)  github.style.display  = 'flex';
+    var guest = document.getElementById('lg-guest');
+    if (guest)   guest.style.display   = 'block';
     if (consent) consent.style.display = 'none';
     if (footer)  footer.style.display  = 'block';
     // Reset checkbox state
@@ -146,14 +154,14 @@ window.LEGAL = (function () {
     m.id = 'disclaimer-modal';
     m.style.cssText = 'position:fixed;inset:0;z-index:19999;background:rgba(0,0,0,.88);' +
       'backdrop-filter:blur(10px);display:flex;align-items:flex-end;justify-content:center;' +
-      'font-family:\'DM Sans\',sans-serif';
+      'font-family:var(--fb)';
     m.innerHTML =
       '<div style="background:#111;border-radius:24px 24px 0 0;' +
       'padding:24px 20px calc(36px + env(safe-area-inset-bottom));' +
       'width:100%;max-width:480px;border-top:1px solid #222;box-sizing:border-box">' +
       '<div style="display:flex;justify-content:center;margin-bottom:16px">' +
       '<div style="width:36px;height:4px;border-radius:2px;background:#333"></div></div>' +
-      '<div style="font-family:\'DM Serif Display\',sans-serif;font-size:16px;font-weight:800;color:#fff;margin-bottom:12px">' +
+      '<div style="font-family:var(--fd);font-size:17px;font-weight:800;color:#fff;margin-bottom:12px">' +
       '⚠️ About MetroCrowd Data</div>' +
       '<div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:14px;' +
       'padding:14px;margin-bottom:16px;font-size:12px;color:#c0c0c0;line-height:1.7">' +
@@ -167,8 +175,8 @@ window.LEGAL = (function () {
       '<a href="/legal.html#disclaimer" target="_blank" style="color:#888">Full disclaimer</a> · ' +
       '<a href="/legal.html#privacy" target="_blank" style="color:#888">Privacy Policy</a></div>' +
       '<button onclick="LEGAL.dismissDisclaimer()" ' +
-      'style="width:100%;height:48px;background:#FFD000;border:none;border-radius:14px;' +
-      'font-family:\'DM Serif Display\',sans-serif;font-size:14px;font-weight:800;color:#000;cursor:pointer">' +
+      'style="width:100%;height:50px;background:#FFC629;border:none;border-radius:16px;' +
+      'font-family:var(--fd);font-size:15px;font-weight:800;color:#000;cursor:pointer">' +
       'I Understand</button></div>';
     document.body.appendChild(m);
   }
@@ -179,8 +187,17 @@ window.LEGAL = (function () {
     if (m) m.remove();
   }
 
+  // Wait until the user is inside the app (welcome gate dismissed) so the
+  // disclaimer doesn't stack on top of the sign-in screen.
   function init() {
-    setTimeout(_showDisclaimerModal, 800);
+    if (localStorage.getItem(DISCLAIMER_KEY)) return;
+    var tries = 0;
+    var timer = setInterval(function () {
+      var gate = document.getElementById('login-gate');
+      var inApp = !gate || gate.style.display === 'none';
+      if (inApp) { clearInterval(timer); setTimeout(_showDisclaimerModal, 500); }
+      else if (++tries > 600) clearInterval(timer);
+    }, 1000);
   }
 
   return {

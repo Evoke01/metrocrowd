@@ -10,18 +10,35 @@ window.AUTH = (function(){
   let reportCount = 0;
 
   // ── Login gate ─────────────────────────────────────────────────
-  function showGate(){
+  const GUEST_KEY = 'mc_guest';
+  function _isGuest(){ try{ return localStorage.getItem(GUEST_KEY) === '1'; }catch(_){ return false; } }
+
+  // Guests can browse the whole app; signing in is only needed for
+  // syncing, rewards and alerts.
+  function showGate(force){
+    if(!force && _isGuest()){ hideGate(); return; }
     const g=document.getElementById('login-gate');
-    if(g) g.style.display='flex';
+    if(g){ g.style.display='flex'; g.style.opacity='1'; }
     const app=document.getElementById('app');
     if(app) app.style.visibility='hidden';
   }
 
   function hideGate(){
     const g=document.getElementById('login-gate');
-    if(g){ g.style.opacity='0'; g.style.transition='opacity .4s'; setTimeout(()=>g.style.display='none',400); }
+    if(g && g.style.display!=='none'){ g.style.transition='opacity .35s'; g.style.opacity='0'; setTimeout(()=>{ g.style.display='none'; },350); }
     const app=document.getElementById('app');
     if(app){ app.style.visibility='visible'; }
+  }
+
+  function continueAsGuest(){
+    try{ localStorage.setItem(GUEST_KEY,'1'); }catch(_){}
+    hideGate();
+  }
+
+  // From inside the app: bring the sign-in screen back.
+  function showSignIn(){
+    closeModal();
+    showGate(true);
   }
 
   // ── Bootstrap (called by SB.init after client is ready) ────────
@@ -91,7 +108,7 @@ window.AUTH = (function(){
     updateProfileUI(null, 0);
     showSignedOutView();
     closeModal();
-    showGate();
+    showGate(true);
   }
 
   // ── OAuth sign-in ───────────────────────────────────────────────
@@ -106,7 +123,7 @@ window.AUTH = (function(){
       const { error } = await client.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: 'https://metrocrowd.vercel.app',
+          redirectTo: (location.hostname === 'localhost' ? 'https://metrocrowd.vercel.app' : location.origin),
           queryParams: { access_type: 'offline', prompt: 'consent' },
           skipBrowserRedirect: false,
         }
@@ -131,7 +148,7 @@ window.AUTH = (function(){
       const { error } = await client.auth.signInWithOAuth({
         provider: 'github',
         options: {
-          redirectTo: 'https://metrocrowd.vercel.app',
+          redirectTo: (location.hostname === 'localhost' ? 'https://metrocrowd.vercel.app' : location.origin),
           skipBrowserRedirect: false,
         }
       });
@@ -372,7 +389,7 @@ window.AUTH = (function(){
   return {
     init, openModal, closeModal,
     signInGoogle, signInGitHub, signOut, deleteAccount,
-    showGate, hideGate,
+    showGate, hideGate, continueAsGuest, showSignIn,
     setStatus,
     get currentUser(){ return currentUser; },
     get isSignedIn(){ return !!currentUser; },

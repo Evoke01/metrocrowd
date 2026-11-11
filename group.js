@@ -297,11 +297,11 @@ window.GROUP = (function () {
         </div>
 
         <!-- Big code display -->
-        <div style="font-family:'DM Serif Display',sans-serif;font-size:13px;font-weight:700;
+        <div style="font-family:var(--fd);font-size:13px;font-weight:700;
           color:var(--sub);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">
           GROUP CODE
         </div>
-        <div id="gcode-display" style="font-family:'DM Serif Display',sans-serif;font-size:52px;
+        <div id="gcode-display" style="font-family:var(--fd);font-size:52px;
           font-weight:900;color:var(--y);letter-spacing:.2em;margin-bottom:4px;
           line-height:1">${_code}</div>
         <div style="font-size:10px;color:var(--sub);margin-bottom:24px">
@@ -312,7 +312,7 @@ window.GROUP = (function () {
         ${canNativeShare ? `
         <button onclick="GROUP._nativeShare()"
           style="width:100%;height:48px;background:var(--y);color:#000;border:none;
-          border-radius:14px;font-family:'DM Serif Display',sans-serif;font-size:14px;
+          border-radius:14px;font-family:var(--fd);font-size:14px;
           font-weight:800;cursor:pointer;margin-bottom:8px;
           display:flex;align-items:center;justify-content:center;gap:8px">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
@@ -320,7 +320,7 @@ window.GROUP = (function () {
         </button>` : `
         <button onclick="GROUP._copyLink()"
           style="width:100%;height:48px;background:var(--y);color:#000;border:none;
-          border-radius:14px;font-family:'DM Serif Display',sans-serif;font-size:14px;
+          border-radius:14px;font-family:var(--fd);font-size:14px;
           font-weight:800;cursor:pointer;margin-bottom:8px;
           display:flex;align-items:center;justify-content:center;gap:8px">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
@@ -392,7 +392,7 @@ window.GROUP = (function () {
         <div style="width:36px;height:3px;background:var(--brd);border-radius:2px;
           margin:0 auto 20px"></div>
 
-        <div style="font-family:'DM Serif Display',sans-serif;font-size:18px;font-weight:900;
+        <div style="font-family:var(--fd);font-size:18px;font-weight:900;
           color:var(--txt);margin-bottom:4px">Join a Group Trip</div>
         <div style="font-size:12px;color:var(--sub);margin-bottom:20px">
           Enter or paste the 6-character code from your friend
@@ -404,7 +404,7 @@ window.GROUP = (function () {
             <div style="flex:1;max-width:48px;height:56px;background:var(--card2);
               border:2px solid var(--brd);border-radius:12px;
               display:flex;align-items:center;justify-content:center;
-              font-family:'DM Serif Display',sans-serif;font-size:22px;font-weight:900;
+              font-family:var(--fd);font-size:22px;font-weight:900;
               color:var(--y);transition:border-color .15s" id="gji-box-${i}">
             </div>`).join('')}
         </div>
@@ -432,7 +432,7 @@ window.GROUP = (function () {
         <!-- Join button -->
         <button id="gji-btn" onclick="GROUP._submitJoin()"
           style="width:100%;height:50px;background:var(--brd);color:var(--sub);border:none;
-          border-radius:14px;font-family:'DM Serif Display',sans-serif;font-size:14px;
+          border-radius:14px;font-family:var(--fd);font-size:14px;
           font-weight:800;cursor:not-allowed;margin-bottom:8px;
           display:flex;align-items:center;justify-content:center;gap:8px;
           transition:background .2s,color .2s" disabled>
@@ -615,7 +615,7 @@ window.GROUP = (function () {
         <div style="display:flex;align-items:center;gap:6px">
           <div style="width:6px;height:6px;border-radius:50%;background:#6366f1;
             animation:tnavPulse 1.2s ease-in-out infinite"></div>
-          <span style="font-family:'DM Serif Display',sans-serif;font-size:10px;font-weight:800;
+          <span style="font-family:var(--fd);font-size:10px;font-weight:800;
             color:#6366f1;letter-spacing:.06em">GROUP · ${_code}</span>
         </div>
         <button onclick="GROUP.leave()"

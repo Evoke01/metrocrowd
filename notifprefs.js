@@ -125,7 +125,7 @@ window.NOTIFPREFS = (function () {
             </svg>
           </button>
           <div>
-            <div style="font-family:'DM Serif Display',sans-serif;font-size:18px;font-weight:900;
+            <div style="font-family:var(--fd);font-size:18px;font-weight:900;
               color:var(--txt)">Notifications</div>
             <div style="font-size:11px;color:var(--sub)">Smart alerts · never spammy</div>
           </div>
@@ -139,7 +139,7 @@ window.NOTIFPREFS = (function () {
         </div>
 
         <!-- Notification toggles -->
-        <div style="font-family:'DM Serif Display',sans-serif;font-size:10px;font-weight:800;
+        <div style="font-family:var(--fd);font-size:10px;font-weight:800;
           color:var(--sub);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px">
           Alert Types
         </div>
@@ -156,7 +156,7 @@ window.NOTIFPREFS = (function () {
               <div style="font-size:13px;font-weight:700;color:var(--txt)">Crowd Drop Threshold</div>
               <div style="font-size:11px;color:var(--sub)">Alert me when crowd falls below</div>
             </div>
-            <div style="font-family:'DM Serif Display',sans-serif;font-size:18px;font-weight:900;
+            <div style="font-family:var(--fd);font-size:18px;font-weight:900;
               color:var(--y)" id="threshold-display">${_prefs.drop_threshold}%</div>
           </div>
           <input type="range" id="threshold-slider"
@@ -202,7 +202,7 @@ window.NOTIFPREFS = (function () {
         <!-- Save button -->
         <button onclick="NOTIFPREFS._save()"
           style="width:100%;height:50px;background:var(--y);color:#000;border:none;
-          border-radius:14px;font-family:'DM Serif Display',sans-serif;font-size:14px;font-weight:900;
+          border-radius:14px;font-family:var(--fd);font-size:14px;font-weight:900;
           cursor:pointer;transition:opacity .2s" id="notif-save-btn">
           Save Preferences
         </button>

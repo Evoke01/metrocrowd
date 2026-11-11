@@ -51,7 +51,7 @@ window.SEARCH = (function(){
     const list = document.getElementById('ov-list');
     if(!list) return;
 
-    list.innerHTML = filtered.slice(0, 60).map(id => {
+    list.innerHTML = filtered.map(id => {
       const s = METRO.STATIONS[id]; if(!s) return '';
       const v = CROWD.state?.crowdMap?.[id] || 0;
       const vc = _color(v);

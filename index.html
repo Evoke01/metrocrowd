@@ -8,33 +8,43 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MetroCrowd">
-<meta name="theme-color" content="#030303">
+<meta name="theme-color" content="#07080B">
 <link rel="manifest" href="/manifest.json">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
 <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152.png">
 <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png">
 <title>Delhi Metro Crowd Levels &amp; Route Planner | MetroCrowd</title>
-<meta name="description" content="Check estimated crowd levels across Delhi Metro stations, compare less-crowded coaches, plan routes, and share on-the-ground reports with MetroCrowd.">
+<meta name="description" content="Check live estimated crowd levels at every Delhi Metro station, find the least crowded coach, plan crowd-aware routes, and earn reward points for trips and crowd reports.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="author" content="MetroCrowd">
+<meta name="application-name" content="MetroCrowd">
+<meta name="format-detection" content="telephone=no">
 <link rel="canonical" href="https://metrocrowd.vercel.app/">
+<link rel="alternate" hreflang="en-IN" href="https://metrocrowd.vercel.app/">
+<link rel="alternate" hreflang="x-default" href="https://metrocrowd.vercel.app/">
 <!-- Open Graph -->
 <meta property="og:type" content="website">
+<meta property="og:site_name" content="MetroCrowd">
+<meta property="og:locale" content="en_IN">
+<meta property="og:image:alt" content="MetroCrowd — Delhi Metro crowd levels">
 <meta property="og:url" content="https://metrocrowd.vercel.app/">
 <meta property="og:title" content="Delhi Metro Crowd Levels &amp; Route Planner | MetroCrowd">
 <meta property="og:description" content="Check estimated crowd levels across Delhi Metro stations, compare less-crowded coaches, plan routes, and share on-the-ground reports.">
 <meta property="og:image" content="https://metrocrowd.vercel.app/icons/icon-512.png">
 <meta property="og:image:width" content="512">
 <meta property="og:image:height" content="512">
-<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Delhi Metro Crowd Levels &amp; Route Planner | MetroCrowd">
 <meta name="twitter:description" content="Check estimated crowd levels, compare coaches, plan Delhi Metro routes, and share on-the-ground reports.">
 <meta name="twitter:image" content="https://metrocrowd.vercel.app/icons/icon-512.png">
 <!-- Preconnect for faster font load (LCP boost) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <!-- JSON-LD WebSite and WebApplication schema -->
 <script type="application/ld+json">
-{"@context":"https://schema.org","@graph":[{"@type":"WebSite","name":"MetroCrowd","url":"https://metrocrowd.vercel.app/"},{"@type":"WebApplication","name":"MetroCrowd","url":"https://metrocrowd.vercel.app/","description":"Explore estimated crowd levels at Delhi Metro stations, compare coach crowding, plan routes, and submit community crowd reports.","applicationCategory":"TransportationApplication","operatingSystem":"Any","featureList":["Delhi Metro station crowd estimates","Crowd-aware route planning","Coach crowding comparisons","Community crowd reports"],"offers":{"@type":"Offer","price":"0","priceCurrency":"INR"},"publisher":{"@type":"Organization","name":"MetroCrowd","url":"https://metrocrowd.vercel.app/"}}]}
+{"@context":"https://schema.org","@graph":[{"@type":"WebSite","name":"MetroCrowd","url":"https://metrocrowd.vercel.app/"},{"@type":"WebApplication","name":"MetroCrowd","url":"https://metrocrowd.vercel.app/","description":"Explore estimated crowd levels at Delhi Metro stations, compare coach crowding, plan routes, and submit community crowd reports.","applicationCategory":"TransportationApplication","operatingSystem":"Any","featureList":["Delhi Metro station crowd estimates","Crowd-aware route planning","Coach crowding comparisons","Community crowd reports","Reward points for trips and reports"],"inLanguage":["en-IN","hi-IN"],"offers":{"@type":"Offer","price":"0","priceCurrency":"INR"},"publisher":{"@type":"Organization","name":"MetroCrowd","url":"https://metrocrowd.vercel.app/","logo":"https://metrocrowd.vercel.app/icons/icon-512.png"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How crowded is the Delhi Metro right now?","acceptedAnswer":{"@type":"Answer","text":"MetroCrowd estimates crowd levels for every Delhi Metro station from historical ridership patterns, time of day and live community reports, and shows a 4-hour forecast."}},{"@type":"Question","name":"Which Delhi Metro coach is least crowded?","acceptedAnswer":{"@type":"Answer","text":"The Coach Finder suggests the least crowded coach for your station, line and direction based on exit-gate positions and crowd patterns."}},{"@type":"Question","name":"Is MetroCrowd free?","acceptedAnswer":{"@type":"Answer","text":"Yes. MetroCrowd is free to use without an account. Signing in lets you sync reports and earn reward points for completed trips, crowd reports and referrals."}},{"@type":"Question","name":"Is MetroCrowd official DMRC data?","acceptedAnswer":{"@type":"Answer","text":"No. MetroCrowd is an independent app and is not affiliated with DMRC. Crowd levels are estimates."}}]}]}
 </script>
 <link rel="stylesheet" href="style.css">
 <!-- Vercel Web Analytics & Speed Insights -->
@@ -74,46 +84,44 @@
   <!-- ═══ LOGIN GATE ════════════════════════════════════════════ -->
   <div id="login-gate" style="
     position:fixed;inset:0;z-index:9999;
-    background:#030303;
+    background:radial-gradient(900px 500px at 50% -10%,rgba(255,198,41,.14),transparent 60%),#07080B;
     display:flex;flex-direction:column;
     align-items:center;
-    font-family:'Outfit',sans-serif;
-    overflow:hidden;
+    font-family:var(--fb);
+    overflow-x:hidden;overflow-y:auto;
   ">
-    <!-- Background glow -->
-    <div style="position:absolute;top:30%;left:50%;transform:translate(-50%,-50%);width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(255,208,0,0.06),transparent 70%);pointer-events:none"></div>
+    <!-- Returning guests skip the gate before first paint -->
+    <script>try{if(localStorage.getItem('mc_guest')==='1'){document.getElementById('login-gate').style.display='none';}}catch(e){}</script>
 
     <!-- Top section: brand + hero -->
-    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px 20px;width:100%;max-width:400px">
+    <header style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:44px 24px 20px;width:100%;max-width:420px">
 
       <!-- Brand -->
-      <div style="font-family:'DM Serif Display',sans-serif;font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:32px">MetroCrowd</div>
-
-      <!-- Icon with glow ring -->
-      <div style="position:relative;margin-bottom:32px">
-        <div style="position:absolute;inset:-12px;border-radius:50%;border:1px solid rgba(255,208,0,.15);animation:ring-pulse 3s ease-in-out infinite"></div>
-        <div style="position:absolute;inset:-22px;border-radius:50%;border:1px solid rgba(255,208,0,.07);animation:ring-pulse 3s ease-in-out infinite .5s"></div>
-        <div style="width:64px;height:64px;border-radius:50%;background:rgba(255,208,0,.08);border:1px solid rgba(255,208,0,.2);display:flex;align-items:center;justify-content:center;color:#FFD000">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="7" width="20" height="11" rx="2"/>
-            <path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/>
-            <line x1="7" y1="12" x2="17" y2="12"/>
-            <path d="M7 18l-2 3M17 18l2 3"/>
-          </svg>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:28px">
+        <div style="width:40px;height:40px;border-radius:12px;background:#FFC629;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 30px rgba(255,198,41,.35)">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="14" rx="3"/><path d="M4 11h16M8 21l-2-2M16 21l2-2"/></svg>
         </div>
+        <div style="font-family:var(--fd);font-size:20px;font-weight:800;letter-spacing:-.03em;color:#F3F4F6">Metro<span style="color:#FFC629">Crowd</span></div>
       </div>
 
       <!-- Headline -->
-      <h1 style="font-family:'DM Serif Display',sans-serif;font-size:26px;font-weight:800;color:#F0F0F0;text-align:center;line-height:1.15;letter-spacing:-.5px;margin:0 0 12px">
-        Delhi Metro crowd levels<br>and route planning
+      <h1 style="font-family:var(--fd);font-size:32px;font-weight:800;color:#F3F4F6;text-align:center;line-height:1.1;letter-spacing:-.035em;margin:0 0 12px">
+        Skip the crush on the<br><span style="color:#FFC629">Delhi Metro</span>
       </h1>
-      <div style="font-size:13px;color:rgba(240,240,240,.35);text-align:center;line-height:1.7;max-width:260px">
-        Explore crowd estimates, compare coaches, plan routes, and share station reports.
+      <p style="font-size:15px;color:rgba(243,244,246,.62);text-align:center;line-height:1.6;max-width:320px;margin:0">
+        Live crowd estimates for every station, the emptiest coach to board, and routes that dodge the rush.
+      </p>
+
+      <div class="gate-feat">
+        <div><b>250+ stations</b>Crowd level &amp; 4-hour forecast</div>
+        <div><b>Coach finder</b>Board where it's emptiest</div>
+        <div><b>Smart routes</b>Least-packed path, not just shortest</div>
+        <div><b>Earn rewards</b>Points for trips &amp; reports, cash out via UPI</div>
       </div>
-    </div>
+    </header>
 
     <!-- Bottom CTA sheet -->
-    <div style="width:100%;max-width:400px;padding:24px 24px 16px;border-top:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02)">
+    <div style="width:100%;max-width:420px;padding:22px 24px 16px">
 
       <!-- Google button -->
       <button onclick="LEGAL.trySignIn('google')" id="lg-google" style="
@@ -135,11 +143,14 @@
         padding:15px 20px;font-size:14px;font-weight:700;
         cursor:pointer;
         display:flex;align-items:center;justify-content:center;gap:12px;
-        margin-bottom:24px;letter-spacing:.01em;
+        margin-bottom:10px;letter-spacing:.01em;
       ">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="#e6edf3"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.38.6.1.82-.26.82-.58v-2.04c-3.34.72-4.04-1.6-4.04-1.6-.54-1.38-1.33-1.75-1.33-1.75-1.08-.74.08-.72.08-.72 1.2.08 1.83 1.23 1.83 1.23 1.06 1.82 2.78 1.3 3.46 1 .1-.77.42-1.3.76-1.6-2.66-.3-5.47-1.33-5.47-5.93 0-1.3.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.17 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.3-1.23 3.3-1.23.66 1.65.24 2.87.12 3.17.77.84 1.24 1.9 1.24 3.22 0 4.6-2.8 5.63-5.48 5.92.43.37.82 1.1.82 2.22v3.3c0 .32.22.7.83.58A12 12 0 0 0 24 12C24 5.37 18.63 0 12 0z"/></svg>
         Continue with GitHub
       </button>
+
+      <!-- Guest mode: browse everything without an account -->
+      <button id="lg-guest" class="gate-guest" onclick="if(window.AUTH&&AUTH.continueAsGuest){AUTH.continueAsGuest()}else{try{localStorage.setItem('mc_guest','1')}catch(e){}location.reload()}">Explore without signing in</button>
 
       <!-- Loading state -->
       <div id="lg-loading" style="display:none;text-align:center">
@@ -148,7 +159,7 @@
 
       <!-- Consent gate -->
       <div id="lg-consent" style="display:none;width:100%">
-        <div style="font-family:'DM Serif Display',sans-serif;font-size:15px;font-weight:800;color:#F0F0F0;text-align:center;margin-bottom:4px">Before you continue</div>
+        <div style="font-family:var(--fd);font-size:15px;font-weight:800;color:#F0F0F0;text-align:center;margin-bottom:4px">Before you continue</div>
         <div style="font-size:12px;color:rgba(240,240,240,.35);text-align:center;margin-bottom:18px">Please review and accept to proceed</div>
 
         <label id="lg-c1-label" style="display:flex;align-items:flex-start;gap:12px;padding:14px;background:#0d0d0d;border:1px solid rgba(239,68,68,.2);border-radius:12px;cursor:pointer;margin-bottom:8px">
@@ -179,7 +190,7 @@
           </div>
         </label>
 
-        <button id="lg-consent-btn" onclick="LEGAL.proceedAfterConsent()" disabled style="width:100%;height:50px;background:#222;color:#555;border:none;border-radius:12px;font-family:'DM Serif Display',sans-serif;font-size:14px;font-weight:800;cursor:not-allowed;margin-bottom:10px;transition:all .2s">
+        <button id="lg-consent-btn" onclick="LEGAL.proceedAfterConsent()" disabled style="width:100%;height:50px;background:#222;color:#555;border:none;border-radius:12px;font-family:var(--fd);font-size:14px;font-weight:800;cursor:not-allowed;margin-bottom:10px;transition:all .2s">
           Continue
         </button>
         <div onclick="LEGAL.cancelConsent()" style="font-size:11px;color:rgba(240,240,240,.2);text-align:center;cursor:pointer;padding:8px">
@@ -188,29 +199,42 @@
       </div>
 
       <!-- Footer -->
-      <div id="lg-footer" style="font-size:11px;color:rgba(240,240,240,.18);text-align:center;line-height:1.8">
-        Helping 3M+ daily commuters &middot;
-        <a href="/legal.html" target="_blank" style="color:rgba(240,240,240,.28)">Legal</a>
-        <br><a href="mailto:evokes.in@gmail.com?subject=Advertising%20in%20MetroCrowd" style="color:rgba(240,240,240,.5);text-decoration:none">Advertise with MetroCrowd</a>
+      <div id="lg-footer" style="font-size:12px;color:rgba(243,244,246,.4);text-align:center;line-height:1.8">
+        Free for Delhi commuters &middot; Not affiliated with DMRC &middot;
+        <a href="/legal.html" style="color:rgba(243,244,246,.6)">Legal</a>
+        <br><a href="mailto:evokes.in@gmail.com?subject=Advertising%20in%20MetroCrowd" style="color:rgba(243,244,246,.5);text-decoration:none">Advertise with MetroCrowd</a>
       </div>
     </div>
+
+    <!-- About / FAQ — crawlable content matching the FAQPage schema -->
+    <section aria-label="About MetroCrowd" style="width:100%;max-width:420px;padding:8px 24px 40px;color:rgba(243,244,246,.62);font-size:13px;line-height:1.65">
+      <h2 style="font-family:var(--fd);font-size:17px;font-weight:800;color:#F3F4F6;margin:18px 0 10px;letter-spacing:-.02em">Delhi Metro crowd FAQ</h2>
+      <details style="border-top:1px solid rgba(255,255,255,.08);padding:12px 0"><summary style="cursor:pointer;color:#F3F4F6;font-weight:600">How crowded is the Delhi Metro right now?</summary><p style="margin:8px 0 0">MetroCrowd estimates crowd levels for every Delhi Metro station from historical ridership patterns, time of day and live community reports, and shows a 4-hour forecast.</p></details>
+      <details style="border-top:1px solid rgba(255,255,255,.08);padding:12px 0"><summary style="cursor:pointer;color:#F3F4F6;font-weight:600">Which Delhi Metro coach is least crowded?</summary><p style="margin:8px 0 0">The Coach Finder suggests the least crowded coach for your station, line and direction based on exit-gate positions and crowd patterns.</p></details>
+      <details style="border-top:1px solid rgba(255,255,255,.08);padding:12px 0"><summary style="cursor:pointer;color:#F3F4F6;font-weight:600">Is MetroCrowd free?</summary><p style="margin:8px 0 0">Yes. MetroCrowd is free to use without an account. Signing in lets you sync reports and earn reward points for completed trips, crowd reports and referrals.</p></details>
+      <details style="border-top:1px solid rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.08);padding:12px 0"><summary style="cursor:pointer;color:#F3F4F6;font-weight:600">Is MetroCrowd official DMRC data?</summary><p style="margin:8px 0 0">No. MetroCrowd is an independent app and is not affiliated with DMRC. Crowd levels are estimates.</p></details>
+    </section>
   </div>
 
-  <style>
-    @keyframes ring-pulse {
-      0%,100% { opacity:1; transform:scale(1); }
-      50% { opacity:0.4; transform:scale(1.05); }
-    }
-  </style>
+  <noscript>
+    <div style="padding:24px;font-family:system-ui,sans-serif;color:#F3F4F6;background:#07080B">
+      <h1>MetroCrowd — Delhi Metro crowd levels &amp; route planner</h1>
+      <p>Check estimated crowd levels at Delhi Metro stations, find the least crowded coach and plan crowd-aware routes. Please enable JavaScript to use the app.</p>
+    </div>
+  </noscript>
 
 <div id="app" style="visibility:hidden">
 
   <!-- ═══ STATUS BAR ═══════════════════════════════════════════ -->
   <div id="sbar">
-    <div id="sbar-brand">Metro<em>Crowd</em></div>
+    <div id="sbar-brand"><span>Metro<em>Crowd</em></span></div>
     <div id="sbar-right">
       <span id="sbar-clock"></span>
-      <div id="auth-btn" title="Account" onclick="AUTH.openModal()" style="color:var(--sub)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+      <button class="pts-chip" onclick="REWARDS.open()" aria-label="Rewards points">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span data-reward-balance>0</span>
+      </button>
+      <div id="auth-btn" role="button" tabindex="0" aria-label="Account" title="Account" onclick="AUTH.openModal()" style="color:var(--sub)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
     </div>
   </div>
 
@@ -223,7 +247,7 @@
         <!-- Greeting + date -->
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
           <div>
-            <div style="font-family:'DM Serif Display',sans-serif;font-size:20px;font-weight:800;color:var(--txt)" id="h-greet" data-i18n="good_morning">Good Morning</div>
+            <div style="font-family:var(--fd);font-size:20px;font-weight:800;color:var(--txt)" id="h-greet" data-i18n="good_morning">Good Morning</div>
             <div style="font-size:12px;color:var(--sub);margin-top:1px" id="h-date">—</div>
           </div>
           <div style="display:flex;align-items:center;gap:6px">
@@ -262,6 +286,16 @@
           </div>
         </div>
 
+        <!-- Rewards promo -->
+        <div class="rw-promo" role="button" tabindex="0" onclick="REWARDS.open()" onkeydown="if(event.key==='Enter')REWARDS.open()">
+          <div class="rw-promo-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg></div>
+          <div>
+            <div class="rw-promo-t">Earn while you ride</div>
+            <div class="rw-promo-s">Points for trips &amp; reports · cash out via UPI</div>
+          </div>
+          <div class="rw-promo-n"><span data-reward-balance>0</span><small>points</small></div>
+        </div>
+
         <!-- Pinned Stations Area -->
         <div id="home-pinned" style="display:none;margin-bottom:12px;gap:8px;flex-direction:column;">
           <!-- JS will inject pinned cards here -->
@@ -282,7 +316,7 @@
         <!-- All lines -->
         <div class="sec-head">
           <span class="sec-t"><span data-i18n="all_lines">All Lines</span></span>
-          <span class="sec-l" onclick="UI.navTo('s-route')"><span data-i18n="route_planner">Route planner →</span></span>
+          <span class="sec-l" onclick="UI.navTo('s-route')"><span data-i18n="route_planner_link">Route planner →</span></span>
         </div>
         <div class="card" id="line-list"></div>
       </div>
@@ -309,7 +343,7 @@
         <!-- Empty state when no station selected -->
         <div id="stn-empty" style="text-align:center;padding:48px 20px">
           <div style="margin-bottom:12px;color:var(--sub)"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="11" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><line x1="7" y1="12" x2="17" y2="12"/><path d="M7 18l-2 3M17 18l2 3"/></svg></div>
-          <div style="font-family:'DM Serif Display',sans-serif;font-size:16px;font-weight:800;color:var(--txt);margin-bottom:6px">Instant Crowd Lookup</div>
+          <div style="font-family:var(--fd);font-size:16px;font-weight:800;color:var(--txt);margin-bottom:6px">Instant Crowd Lookup</div>
           <div style="font-size:12px;color:var(--sub);line-height:1.6">Search any Delhi Metro station above<br>or tap the GPS button to auto-detect</div>
         </div>
 
@@ -322,11 +356,11 @@
               background:radial-gradient(circle,rgba(255,255,255,.03),transparent 70%);pointer-events:none" id="cc-glow"></div>
             <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px">
               <div>
-                <div style="font-size:10px;color:var(--sub);letter-spacing:.08em;text-transform:uppercase;font-family:'DM Serif Display',sans-serif;margin-bottom:4px" id="cc-meta">—</div>
-                <div style="font-family:'DM Serif Display',sans-serif;font-size:17px;font-weight:800;color:var(--txt)" id="cc-name">—</div>
+                <div style="font-size:10px;color:var(--sub);letter-spacing:.08em;text-transform:uppercase;font-family:var(--fd);margin-bottom:4px" id="cc-meta">—</div>
+                <div style="font-family:var(--fd);font-size:17px;font-weight:800;color:var(--txt)" id="cc-name">—</div>
               </div>
               <div style="text-align:right">
-                <div style="font-family:'DM Serif Display',sans-serif;font-size:48px;font-weight:900;line-height:1;color:var(--txt)" id="cc-num">—</div>
+                <div style="font-family:var(--fd);font-size:48px;font-weight:900;line-height:1;color:var(--txt)" id="cc-num">—</div>
                 <div style="font-size:11px;font-weight:700;margin-top:2px" id="cc-lbl">—</div>
               </div>
             </div>
@@ -367,7 +401,7 @@
 
           <!-- Next 4 hours -->
           <div id="mf-card" style="display:none;background:var(--card);border:1px solid var(--brd);border-radius:16px;padding:14px;margin-bottom:12px">
-            <div style="font-size:10px;color:var(--sub);letter-spacing:.08em;text-transform:uppercase;font-family:'DM Serif Display',sans-serif;margin-bottom:10px">Next 4 Hours</div>
+            <div style="font-size:10px;color:var(--sub);letter-spacing:.08em;text-transform:uppercase;font-family:var(--fd);margin-bottom:10px">Next 4 Hours</div>
             <div id="mf-rows"></div>
           </div>
 
@@ -375,7 +409,7 @@
           <div id="stn-etas" style="display:none;background:var(--card);border:1px solid var(--brd);
             border-radius:16px;overflow:hidden;margin-bottom:12px">
             <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--brd)">
-              <div style="font-family:'DM Serif Display',sans-serif;font-size:13px;font-weight:700;color:var(--txt)">Nearby Buses</div>
+              <div style="font-family:var(--fd);font-size:13px;font-weight:700;color:var(--txt)">Nearby Buses</div>
               <div style="display:flex;align-items:center;gap:4px"><div class="ldot"></div><span style="font-size:9px;color:var(--sub)">GTFS-RT</span></div>
             </div>
             <div id="stn-etas-content" style="padding:0 14px"></div>
@@ -400,7 +434,7 @@
           <!-- Community reports -->
           <div id="comm-card" style="display:none;background:var(--card);border:1px solid var(--brd);border-radius:16px;overflow:hidden;margin-bottom:12px">
             <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--brd)">
-              <div style="font-family:'DM Serif Display',sans-serif;font-size:13px;font-weight:700;color:var(--txt)">Community Reports</div>
+              <div style="font-family:var(--fd);font-size:13px;font-weight:700;color:var(--txt)">Community Reports</div>
               <div style="font-size:10px;color:var(--sub)">Last 2 hrs</div>
             </div>
             <div id="comm-items" style="padding:8px 0"></div>
@@ -456,7 +490,7 @@
     <!-- ── ROUTE ──────────────────────────────────────────────── -->
     <div class="screen" id="s-route">
       <div class="sv">
-        <div style="font-family:'DM Serif Display',sans-serif;font-size:22px;font-weight:900;color:var(--txt);margin-bottom:4px" data-i18n="route_planner_title">Route Planner</div>
+        <div style="font-family:var(--fd);font-size:22px;font-weight:900;color:var(--txt);margin-bottom:4px" data-i18n="route_planner_title">Route Planner</div>
         <div style="font-size:11px;color:var(--sub);margin-bottom:18px" data-i18n="route_planner_sub">Crowd-aware · least-packed path</div>
 
         <!-- Input card -->
@@ -516,7 +550,7 @@
     <!-- ── REPORT ─────────────────────────────────────────────── -->
     <div class="screen" id="s-report">
       <div class="sv">
-        <div style="font-family:'DM Serif Display',sans-serif;font-size:22px;font-weight:900;color:var(--txt);margin-bottom:4px">Report Crowd</div>
+        <div style="font-family:var(--fd);font-size:22px;font-weight:900;color:var(--txt);margin-bottom:4px">Report Crowd</div>
         <div style="font-size:11px;color:var(--sub);margin-bottom:16px" data-i18n="report_sub">Your reports power the AI for 3M+ commuters</div>
 
         <!-- Karma banner -->
@@ -528,7 +562,7 @@
             <div style="font-size:11px;font-weight:700;color:var(--txt)" data-i18n="your_impact">Your impact this week</div>
             <div style="font-size:10px;color:var(--sub);margin-top:1px" data-i18n="reports_submitted">Reports submitted</div>
           </div>
-          <div style="font-family:'DM Serif Display',sans-serif;font-size:32px;font-weight:900;color:var(--y)" id="karma-num">0</div>
+          <div style="font-family:var(--fd);font-size:32px;font-weight:900;color:var(--y)" id="karma-num">0</div>
         </div>
 
         <!-- Station picker -->
@@ -599,7 +633,7 @@
         <div id="rep-ok" style="display:none;text-align:center;padding:20px;background:rgba(74,222,128,.08);
           border:1px solid rgba(74,222,128,.2);border-radius:16px;margin-bottom:14px">
           <div style="margin-bottom:8px;color:#4ade80"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
-          <div style="font-family:'DM Serif Display',sans-serif;font-size:15px;font-weight:800;color:var(--txt)" data-i18n="report_success">Report submitted!</div>
+          <div style="font-family:var(--fd);font-size:15px;font-weight:800;color:var(--txt)" data-i18n="report_success">Report submitted!</div>
           <div style="font-size:11px;color:var(--sub);margin-top:4px" data-i18n="report_success_sub">Your data helps other commuters</div>
           <div style="font-size:11px;color:var(--y);margin-top:6px;font-weight:700">+1 ★ Karma · Total: <span id="rs-karma">0</span></div>
         </div>
@@ -669,14 +703,14 @@
   <div id="alert-modal" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.8);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:24px">
     <div style="background:var(--card);border:1px solid var(--brd);border-radius:24px;width:100%;max-width:340px;padding:24px;box-shadow:var(--shadow-float)">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-        <div style="font-family:'DM Serif Display',sans-serif;font-size:18px;font-weight:800;color:var(--txt)">Set Crowd Alert</div>
+        <div style="font-family:var(--fd);font-size:18px;font-weight:800;color:var(--txt)">Set Crowd Alert</div>
         <div onclick="UI.closeAlertModal()" style="color:var(--sub);cursor:pointer;padding:4px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
       </div>
       <div style="font-size:13px;color:var(--sub);line-height:1.5;margin-bottom:20px">
         We'll notify you when crowd at <strong style="color:var(--txt)" id="alert-stn-name">this station</strong> drops below your target.
       </div>
       
-      <div style="text-align:center;font-family:'DM Serif Display',sans-serif;font-size:32px;font-weight:800;color:var(--y);margin-bottom:4px" id="alert-val-disp">50%</div>
+      <div style="text-align:center;font-family:var(--fd);font-size:32px;font-weight:800;color:var(--y);margin-bottom:4px" id="alert-val-disp">50%</div>
       <div style="text-align:center;font-size:11px;color:var(--sub);margin-bottom:16px">Target maximum crowd</div>
       
       <input type="range" id="alert-slider" min="10" max="90" step="5" value="50" oninput="document.getElementById('alert-val-disp').textContent=this.value+'%'" style="width:100%;accent-color:var(--y);margin-bottom:24px">
@@ -721,7 +755,7 @@
 
       <!-- Sign-in view -->
       <div id="auth-signout-view">
-        <div style="font-family:'DM Serif Display',sans-serif;font-size:18px;font-weight:800;color:var(--txt);margin-bottom:4px">Sign In</div>
+        <div style="font-family:var(--fd);font-size:18px;font-weight:800;color:var(--txt);margin-bottom:4px">Sign In</div>
         <div style="font-size:11px;color:var(--sub);margin-bottom:22px">Your reports sync across devices when signed in</div>
         <button onclick="LEGAL.trySignIn('google')" style="width:100%;background:#fff;color:#222;border:none;border-radius:12px;padding:13px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px">
           <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.8 2.5 30.2 0 24 0 14.7 0 6.8 5.5 3 13.5l7.8 6C12.8 13.2 17.9 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4 7.1-10 7.1-17z"/><path fill="#FBBC05" d="M10.8 28.5A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.1.8-4.5L2.5 13.5A24 24 0 0 0 0 24c0 3.8.9 7.4 2.5 10.5l8.3-6z"/><path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.2-5.5l-7.5-5.8c-2 1.4-4.6 2.3-7.7 2.3-6.1 0-11.2-3.7-13.2-9l-7.8 6C6.8 42.5 14.7 48 24 48z"/></svg>
@@ -741,7 +775,7 @@
         <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
           <img id="auth-user-avatar" src="" style="width:48px;height:48px;border-radius:50%;object-fit:cover;display:none">
           <div style="min-width:0">
-            <div id="auth-user-name" style="font-family:'DM Serif Display',sans-serif;font-size:15px;font-weight:800;color:var(--txt)"></div>
+            <div id="auth-user-name" style="font-family:var(--fd);font-size:15px;font-weight:800;color:var(--txt)"></div>
             <div id="auth-user-email" style="font-size:10px;color:var(--sub);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
             <div id="auth-user-provider" style="font-size:10px;color:var(--y);margin-top:2px"></div>
           </div>
@@ -750,16 +784,16 @@
         <!-- Stats row -->
         <div style="display:flex;gap:10px;margin-bottom:14px">
           <div style="flex:1;background:var(--card2);border-radius:10px;padding:12px;text-align:center">
-            <div id="auth-stat-reports" style="font-family:'DM Serif Display',sans-serif;font-size:20px;font-weight:800;color:var(--y)">—</div>
+            <div id="auth-stat-reports" style="font-family:var(--fd);font-size:20px;font-weight:800;color:var(--y)">—</div>
             <div style="font-size:9px;color:var(--sub);margin-top:2px" data-i18n="reports_stat">REPORTS</div>
           </div>
           <div style="flex:1;background:var(--card2);border-radius:10px;padding:12px;text-align:center">
-            <div id="auth-stat-session" style="font-family:'DM Serif Display',sans-serif;font-size:14px;font-weight:800;color:var(--txt)">—</div>
+            <div id="auth-stat-session" style="font-family:var(--fd);font-size:14px;font-weight:800;color:var(--txt)">—</div>
             <div style="font-size:9px;color:var(--sub);margin-top:2px" data-i18n="member_since">MEMBER SINCE</div>
           </div>
         </div>
 
-        <button onclick="REWARDS.open()" style="width:100%;background:rgba(255,208,0,.08);color:var(--y);border:1px solid rgba(255,208,0,.2);border-radius:11px;padding:11px;font-size:11px;font-weight:800;cursor:pointer;margin-bottom:14px">🎁 Rewards points &amp; referrals</button>
+        <button onclick="AUTH.closeModal();REWARDS.open()" class="btn-y" style="height:48px;font-size:14px;margin-bottom:14px">Rewards · <span data-reward-balance>0</span> points</button>
 
         <!-- Quick guide -->
         <div style="background:var(--card2);border:1px solid var(--brd);border-radius:12px;padding:12px 14px;margin-bottom:14px">

@@ -476,7 +476,7 @@ window.ROUTE=(function(){
       <div style="display:flex;gap:8px;margin-top:10px;margin-bottom:6px">
         <button id="trip-start-btn" onclick="TRIPNAV.active ? TRIPNAV.stop() : TRIPNAV.start(window._lastRouteResult)"
           style="flex:1;height:44px;background:var(--y);color:#000;border:none;border-radius:12px;
-          font-family:'DM Serif Display',sans-serif;font-size:13px;font-weight:800;cursor:pointer;
+          font-family:var(--fd);font-size:13px;font-weight:800;cursor:pointer;
           display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
           ${T ? T('start_navigation') || 'Start Navigation' : 'Start Navigation'}
@@ -492,7 +492,7 @@ window.ROUTE=(function(){
           title="Join a friend's trip"
           style="width:44px;height:44px;background:rgba(99,102,241,.12);color:#6366f1;
           border:1px solid rgba(99,102,241,.25);border-radius:12px;font-size:14px;
-          font-family:'DM Serif Display',sans-serif;font-weight:800;
+          font-family:var(--fd);font-weight:800;
           cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">
           +
         </button>
@@ -500,7 +500,7 @@ window.ROUTE=(function(){
       <div style="display:none"><!-- legacy single btn placeholder -->
         style="width:100%;margin-top:10px;margin-bottom:6px;height:44px;
         background:var(--y);color:#000;border:none;border-radius:12px;
-        font-family:'DM Serif Display',sans-serif;font-size:13px;font-weight:800;
+        font-family:var(--fd);font-size:13px;font-weight:800;
         cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
         transition:all .2s">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="8" stroke-dasharray="2 2" opacity=".5"/></svg>
@@ -509,7 +509,7 @@ window.ROUTE=(function(){
     </div>
     <div style="background:var(--card);border:1px solid var(--brd);border-radius:16px;padding:14px;margin-top:8px">
       <div style="font-size:9px;color:var(--sub);letter-spacing:.08em;text-transform:uppercase;
-        font-family:'DM Serif Display',sans-serif;margin-bottom:10px">${T ? T('station_by_station') : 'Station by Station'}</div>
+        font-family:var(--fd);margin-bottom:10px">${T ? T('station_by_station') : 'Station by Station'}</div>
       <div class="rh-list">${hopsHTML}</div>
     </div>`;
   }

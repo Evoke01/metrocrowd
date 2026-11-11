@@ -113,6 +113,12 @@ window.SB = (function(){
     if(!isReady) return {ok:true, local:true};
 
     try{
+      // Use the live session — userId captured at boot may be the anonymous
+      // user from before an OAuth sign-in.
+      try{
+        const { data } = await client.auth.getSession();
+        if(data?.session?.user?.id) userId = data.session.user.id;
+      }catch(_){}
       const {error} = await client
         .from('crowd_reports')
         .insert({
@@ -121,8 +127,6 @@ window.SB = (function(){
           level,
           crowd_value:  crowdValue,
           user_id:      userId,
-          session_id:   sessionId,
-          anon_id:      (typeof ANON!=='undefined'?ANON.id():null),
           line_codes:   s.l,
         });
 
@@ -144,6 +148,7 @@ window.SB = (function(){
       await pushSnapshot();
 
       console.log(`[SB] Report saved: ${s.n} → ${level}`);
+      if(typeof REWARDS !== 'undefined' && REWARDS.awardReport) REWARDS.awardReport();
       return {ok:true};
     }catch(err){
       console.warn('[SB] submitReport error:', err.message);
@@ -155,10 +160,17 @@ window.SB = (function(){
   async function loadReportsFromDB(){
     if(!isReady) return;
     try{
-      const {data, error} = await client
-        .from('station_latest_reports')  // uses the VIEW we created
-        .select('station_id, level, crowd_value, created_at');
+      // Latest report per station within the 2h window (newest first).
+      const since = new Date(Date.now() - 2*3600*1000).toISOString();
+      const {data: rows, error} = await client
+        .from('crowd_reports')
+        .select('station_id, level, crowd_value, created_at')
+        .gt('created_at', since)
+        .order('created_at', {ascending:false})
+        .limit(500);
       if(error) throw error;
+      const seen = new Set();
+      const data = (rows||[]).filter(r => !seen.has(r.station_id) && seen.add(r.station_id));
 
       if(data?.length){
         data.forEach(row => {
@@ -168,7 +180,7 @@ window.SB = (function(){
           }
         });
         CROWD.recomputeAll();
-        MAP.updateMarkers();
+        if(typeof MAP!=='undefined'&&MAP.updateMarkers) MAP.updateMarkers();
         UI.updateHeader();
         console.log(`[SB] Loaded ${data.length} station reports from DB`);
       }
@@ -271,7 +283,7 @@ window.SB = (function(){
         mapped.forEach(ev => { if(!existingIds.has(ev.id)) CROWD.state.newsEvents.push(ev) });
 
         CROWD.recomputeAll();
-        MAP.updateMarkers();
+        if(typeof MAP!=='undefined'&&MAP.updateMarkers) MAP.updateMarkers();
         UI.updateHeader();
         if(typeof UI.refreshIfActive==='function') UI.refreshIfActive('events');
         console.log(`[SB] Loaded ${data.length} cached news events from DB`);
@@ -373,11 +385,11 @@ window.SB = (function(){
           const row = payload.new;
           if(!row.station_id) return;
           // Don't re-apply our own reports
-          if(row.session_id === sessionId) return;
+          if(row.user_id && userId && row.user_id === userId) return;
 
           CROWD.state.userReports[row.station_id] = row.level;
           CROWD.recomputeAll();
-          MAP.updateMarkers();
+          if(typeof MAP!=='undefined'&&MAP.updateMarkers) MAP.updateMarkers();
           UI.updateHeader();
           if(typeof UI.refreshPanel==='function') UI.refreshPanel();
 
@@ -408,7 +420,7 @@ window.SB = (function(){
               CROWD.state.crowdMap[id] = v;
             }
           });
-          MAP.updateMarkers();
+          if(typeof MAP!=='undefined'&&MAP.updateMarkers) MAP.updateMarkers();
           UI.updateHeader();
           console.log('[SB RT] Crowd snapshot updated');
         }
@@ -437,7 +449,7 @@ window.SB = (function(){
           };
           CROWD.state.newsEvents.unshift(ev);
           CROWD.recomputeAll();
-          MAP.updateMarkers();
+          if(typeof MAP!=='undefined'&&MAP.updateMarkers) MAP.updateMarkers();
           UI.updateHeader();
           if(typeof UI.refreshIfActive==='function') UI.refreshIfActive('events');
 

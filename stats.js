@@ -98,7 +98,7 @@ window.STATS = (function () {
           </svg>
         </button>
         <div>
-          <div style="font-family:'DM Serif Display',sans-serif;font-size:18px;font-weight:900;
+          <div style="font-family:var(--fd);font-size:18px;font-weight:900;
             color:var(--txt)">My Commute Stats</div>
           <div style="font-size:11px;color:var(--sub)">Last 30 trips · All time</div>
         </div>
@@ -135,10 +135,10 @@ window.STATS = (function () {
           border:1px solid rgba(255,208,0,.2);border-radius:20px;padding:20px;
           margin-bottom:16px;text-align:center">
           <div style="font-size:11px;color:var(--sub);letter-spacing:.08em;
-            text-transform:uppercase;font-family:'DM Serif Display',sans-serif;margin-bottom:6px">
+            text-transform:uppercase;font-family:var(--fd);margin-bottom:6px">
             Average Commute
           </div>
-          <div style="font-family:'DM Serif Display',sans-serif;font-size:52px;font-weight:900;
+          <div style="font-family:var(--fd);font-size:52px;font-weight:900;
             color:var(--y);line-height:1">${avgMin > 0 ? avgMin : '—'}</div>
           <div style="font-size:13px;color:var(--sub);margin-top:2px">minutes</div>
           ${avgEst > 0 ? `<div style="font-size:11px;color:var(--sub);margin-top:6px">
@@ -170,7 +170,7 @@ window.STATS = (function () {
           padding:14px 16px;margin-bottom:16px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
             <div style="font-size:11px;font-weight:700;color:var(--txt)">Estimate Accuracy</div>
-            <div style="font-family:'DM Serif Display',sans-serif;font-size:14px;font-weight:800;
+            <div style="font-family:var(--fd);font-size:14px;font-weight:800;
               color:${accuracy>80?'#4ade80':accuracy>60?'var(--y)':'#f87171'}">${accuracy}%</div>
           </div>
           <div style="height:6px;background:var(--brd2);border-radius:3px;overflow:hidden">
@@ -187,7 +187,7 @@ window.STATS = (function () {
         ${monthly.length > 0 ? _monthlyChart(monthly) : ''}
 
         <!-- Trip history list -->
-        <div style="font-family:'DM Serif Display',sans-serif;font-size:10px;font-weight:800;
+        <div style="font-family:var(--fd);font-size:10px;font-weight:800;
           color:var(--sub);letter-spacing:.08em;text-transform:uppercase;
           margin-bottom:10px;margin-top:4px">
           Recent Trips
@@ -207,7 +207,7 @@ window.STATS = (function () {
     return `
       <div style="text-align:center;padding:48px 24px">
         <div style="font-size:48px;margin-bottom:12px">🚇</div>
-        <div style="font-family:'DM Serif Display',sans-serif;font-size:16px;font-weight:800;
+        <div style="font-family:var(--fd);font-size:16px;font-weight:800;
           color:var(--txt);margin-bottom:8px">No trips yet</div>
         <div style="font-size:12px;color:var(--sub);line-height:1.6">
           Use the Route planner and tap<br>"Start Live Navigation" to log your first trip.<br>
@@ -225,7 +225,7 @@ window.STATS = (function () {
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${color}"
           stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
           style="margin-bottom:2px">${svgPath}</svg>
-        <div style="font-family:'DM Serif Display',sans-serif;font-size:22px;font-weight:900;
+        <div style="font-family:var(--fd);font-size:22px;font-weight:900;
           color:${color};line-height:1">${value}</div>
         <div style="font-size:10px;color:var(--txt);font-weight:600">${label}</div>
         <div style="font-size:9px;color:var(--sub)">${sub}</div>
@@ -326,7 +326,7 @@ window.STATS = (function () {
           <!-- Time -->
           <div style="text-align:right;flex-shrink:0;margin-left:12px">
             ${actMin ? `
-              <div style="font-family:'DM Serif Display',sans-serif;font-size:16px;font-weight:800;
+              <div style="font-family:var(--fd);font-size:16px;font-weight:800;
                 color:var(--txt)">${actMin}m</div>
               ${estMin ? `<div style="font-size:9px;color:var(--sub)">est ${estMin}m</div>` : ''}
             ` : '<div style="font-size:10px;color:var(--sub)">—</div>'}

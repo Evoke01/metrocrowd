@@ -78,7 +78,7 @@ window.GUIDE = (function () {
         padding:14px 16px;margin-top:10px">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
           <span style="font-size:16px">🚉</span>
-          <span style="font-family:'DM Serif Display',sans-serif;font-size:12px;font-weight:800;
+          <span style="font-family:var(--fd);font-size:12px;font-weight:800;
             color:var(--txt)">Platform & Gate Guide</span>
           <div style="width:6px;height:6px;border-radius:50%;background:var(--y);
             animation:tnavPulse 1s infinite;margin-left:auto"></div>
@@ -121,7 +121,7 @@ window.GUIDE = (function () {
             align-items:center;justify-content:center">
             <div style="font-size:8px;font-weight:700;color:rgba(0,0,0,.6);
               letter-spacing:.05em">PLAT</div>
-            <div style="font-family:'DM Serif Display',sans-serif;font-size:22px;font-weight:900;
+            <div style="font-family:var(--fd);font-size:22px;font-weight:900;
               color:#000;line-height:1">${bp.platform_no}</div>
           </div>
           <!-- Direction info -->
@@ -158,7 +158,7 @@ window.GUIDE = (function () {
             background:${lc2};display:flex;flex-direction:column;
             align-items:center;justify-content:center">
             <div style="font-size:8px;font-weight:700;color:rgba(0,0,0,.6)">PLAT</div>
-            <div style="font-family:'DM Serif Display',sans-serif;font-size:22px;font-weight:900;
+            <div style="font-family:var(--fd);font-size:22px;font-weight:900;
               color:#000;line-height:1">${tp.platform_no}</div>
           </div>
           <div>
@@ -190,7 +190,7 @@ window.GUIDE = (function () {
           </div>
           ${recs.map(r => `
             <div style="display:flex;align-items:baseline;gap:6px;margin-top:4px">
-              <span style="font-family:'DM Serif Display',sans-serif;font-size:13px;font-weight:900;
+              <span style="font-family:var(--fd);font-size:13px;font-weight:900;
                 color:var(--y)">Gate ${r.recommended_gate}</span>
               <span style="font-size:11px;color:var(--txt)">→ ${r.destination}</span>
               ${r.walk_minutes ? `<span style="font-size:10px;color:var(--sub);margin-left:auto">
@@ -211,7 +211,7 @@ window.GUIDE = (function () {
             <div style="width:32px;height:32px;border-radius:8px;flex-shrink:0;
               background:var(--card2);border:1px solid var(--brd2);
               display:flex;align-items:center;justify-content:center;
-              font-family:'DM Serif Display',sans-serif;font-size:11px;font-weight:800;color:var(--txt)">
+              font-family:var(--fd);font-size:11px;font-weight:800;color:var(--txt)">
               ${g.gate_no}
             </div>
             <div style="flex:1;min-width:0">
@@ -239,7 +239,7 @@ window.GUIDE = (function () {
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
           <span style="font-size:18px">🚉</span>
           <div>
-            <div style="font-family:'DM Serif Display',sans-serif;font-size:13px;font-weight:900;
+            <div style="font-family:var(--fd);font-size:13px;font-weight:900;
               color:var(--txt)">Platform & Gate Guide</div>
             <div style="font-size:10px;color:var(--sub)">
               ${fromName} → ${toName}
@@ -280,7 +280,7 @@ window.GUIDE = (function () {
           <div style="display:flex;gap:6px;margin-left:auto">
             ${rows.map(r => `
               <div style="background:${lcolor};border-radius:6px;padding:2px 8px;
-                font-family:'DM Serif Display',sans-serif;font-size:11px;font-weight:800;color:#000">
+                font-family:var(--fd);font-size:11px;font-weight:800;color:#000">
                 P${r.platform_no}
                 <span style="font-size:9px;font-weight:400;opacity:.7">→ ${r.toward}</span>
               </div>`).join('')}
@@ -307,7 +307,7 @@ window.GUIDE = (function () {
     el.innerHTML = `
       <div style="background:var(--card);border:1px solid var(--brd);border-radius:16px;
         padding:14px 16px;margin-top:10px">
-        <div style="font-family:'DM Serif Display',sans-serif;font-size:13px;font-weight:900;
+        <div style="font-family:var(--fd);font-size:13px;font-weight:900;
           color:var(--txt);margin-bottom:12px">🚉 ${name} — Platform & Gates</div>
         ${platRows ? `<div style="margin-bottom:12px">${platRows}</div>` : ''}
         ${gateRows  ? `<div>${gateRows}</div>` : 

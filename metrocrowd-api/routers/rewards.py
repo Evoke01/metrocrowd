@@ -46,11 +46,21 @@ def _ensure_account(db, user_id: str) -> dict:
     return result.data
 
 
+_BASE_SETTINGS = "enabled,commute_points,referral_points,min_withdrawal_points,rupees_per_1000_points"
+
+
 def _settings(db) -> dict:
-    result = db.table("reward_settings").select(
-        "enabled,commute_points,referral_points,min_withdrawal_points,rupees_per_1000_points"
-    ).eq("singleton", True).single().execute()
-    return result.data
+    # report_points / daily_report_cap come from 20261111_report_rewards.sql;
+    # fall back gracefully if that migration has not been applied yet.
+    try:
+        return db.table("reward_settings").select(
+            _BASE_SETTINGS + ",report_points,daily_report_cap"
+        ).eq("singleton", True).single().execute().data
+    except Exception:
+        data = db.table("reward_settings").select(_BASE_SETTINGS) \
+            .eq("singleton", True).single().execute().data
+        data.update({"report_points": 0, "daily_report_cap": 0})
+        return data
 
 
 class ReferralClaim(BaseModel):
@@ -74,6 +84,8 @@ class SettingsUpdate(BaseModel):
     referral_points: int = Field(ge=0, le=100_000)
     min_withdrawal_points: int = Field(gt=0, le=10_000_000)
     rupees_per_1000_points: float = Field(gt=0, le=1_000_000)
+    report_points: Optional[int] = Field(default=None, ge=0, le=100_000)
+    daily_report_cap: Optional[int] = Field(default=None, ge=0, le=100)
 
 
 @router.get("/me")
@@ -112,6 +124,17 @@ async def claim_referral(req: ReferralClaim, user_id: str = Depends(_user_id)):
     except Exception as exc:
         logger.error("[Rewards] referral claim failed for %s: %s", user_id, exc)
         raise HTTPException(status_code=503, detail="Could not save referral code yet")
+
+
+@router.post("/report")
+async def award_report(user_id: str = Depends(_user_id)):
+    """Award points for the caller's latest crowd report (caps enforced in SQL)."""
+    try:
+        result = _db().rpc("rewards_award_report", {"p_user": user_id}).execute()
+        return {"ok": True, "awarded": int(result.data or 0)}
+    except Exception as exc:
+        logger.warning("[Rewards] report award skipped for %s: %s", user_id, exc)
+        return {"ok": True, "awarded": 0}
 
 
 @router.post("/payouts")
@@ -171,14 +194,19 @@ async def admin_resolve_payout(request_id: UUID, req: PayoutAction, _admin: str 
 @router.put("/admin/settings")
 async def admin_update_settings(req: SettingsUpdate, _admin: str = Depends(_admin_id)):
     try:
-        result = _db().table("reward_settings").update({
+        update = {
             "enabled": req.enabled,
             "commute_points": req.commute_points,
             "referral_points": req.referral_points,
             "min_withdrawal_points": req.min_withdrawal_points,
             "rupees_per_1000_points": req.rupees_per_1000_points,
             "updated_at": datetime.now(timezone.utc).isoformat(),
-        }).eq("singleton", True).execute()
+        }
+        if req.report_points is not None:
+            update["report_points"] = req.report_points
+        if req.daily_report_cap is not None:
+            update["daily_report_cap"] = req.daily_report_cap
+        result = _db().table("reward_settings").update(update).eq("singleton", True).execute()
         if not result.data:
             raise HTTPException(status_code=503, detail="Reward settings row is missing")
         return {"ok": True, "settings": result.data[0]}

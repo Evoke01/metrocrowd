@@ -10,8 +10,8 @@ window.SETTINGS = (function () {
   const THEMES = ['dark','system','light'];
   let _theme = localStorage.getItem('mc_theme') || 'dark';
 
-  const DARK_VARS  = '--blk:#080808;--card:#141414;--card2:#1c1c1c;--brd:rgba(255,255,255,0.07);--brd2:rgba(255,255,255,0.13);--txt:#EFEFEF;--sub:rgba(255,255,255,0.40);--dim:rgba(255,255,255,0.16);--muted:rgba(255,255,255,0.38);--border:rgba(255,255,255,0.07);--text:#EFEFEF;--bg2:#141414;--bg3:#1c1c1c;--low:#FFD000;--pk:#FF5252;--a2:#FFD000;';
-  const LIGHT_VARS = '--blk:#F5F5F5;--card:#FFFFFF;--card2:#EDEDED;--brd:rgba(0,0,0,0.08);--brd2:rgba(0,0,0,0.14);--txt:#111111;--sub:rgba(0,0,0,0.45);--dim:rgba(0,0,0,0.18);--muted:rgba(0,0,0,0.38);--border:rgba(0,0,0,0.08);--text:#111111;--bg2:#FFFFFF;--bg3:#EDEDED;--low:#1a9e4a;--pk:#e53935;--a2:#b8960a;';
+  const DARK_VARS  = '--bg:#07080B;--blk:#07080B;--s0:#0D0F13;--s1:#121419;--s2:#1A1D24;--card:#121419;--card2:#1A1D24;--brd:rgba(255,255,255,0.07);--brd2:rgba(255,255,255,0.12);--brd3:rgba(255,255,255,0.18);--txt:#F3F4F6;--txt2:rgba(243,244,246,0.78);--sub:rgba(243,244,246,0.58);--dim:rgba(243,244,246,0.26);--muted:rgba(243,244,246,0.5);--border:rgba(255,255,255,0.07);--text:#F3F4F6;--bg2:#121419;--bg3:#1A1D24;--y:#FFC629;--y-ink:#FFC629;--y-dim:rgba(255,198,41,0.10);--y-glow:rgba(255,198,41,0.18);--y-brd:rgba(255,198,41,0.28);--low:#FFC629;--pk:#FF5C5C;--a2:#FFC629;--glass:rgba(13,15,19,0.78);--shadow-card:0 1px 0 rgba(255,255,255,0.04) inset,0 8px 24px rgba(0,0,0,0.35);';
+  const LIGHT_VARS = '--bg:#F3F4F6;--blk:#F3F4F6;--s0:#FFFFFF;--s1:#FFFFFF;--s2:#EEF0F3;--card:#FFFFFF;--card2:#EEF0F3;--brd:rgba(15,17,21,0.08);--brd2:rgba(15,17,21,0.14);--brd3:rgba(15,17,21,0.22);--txt:#0F1115;--txt2:rgba(15,17,21,0.78);--sub:rgba(15,17,21,0.6);--dim:rgba(15,17,21,0.28);--muted:rgba(15,17,21,0.5);--border:rgba(15,17,21,0.08);--text:#0F1115;--bg2:#FFFFFF;--bg3:#EEF0F3;--y:#FFB800;--y-ink:#9A6B00;--y-dim:rgba(255,184,0,0.14);--y-glow:rgba(255,184,0,0.22);--y-brd:rgba(200,140,0,0.35);--low:#1a9e4a;--pk:#e53935;--a2:#9A6B00;--glass:rgba(255,255,255,0.82);--shadow-card:0 1px 2px rgba(15,17,21,0.05),0 8px 24px rgba(15,17,21,0.06);';
 
   function _applyTheme(t) {
     const dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme:dark)').matches);
@@ -19,7 +19,9 @@ window.SETTINGS = (function () {
     if (!s) { s = document.createElement('style'); s.id = '_theme_vars'; document.head.appendChild(s); }
     s.textContent = ':root{' + (dark ? DARK_VARS : LIGHT_VARS) + '}';
     document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-    document.body.style.background = dark ? '#0a0a0a' : '#f0f0f0';
+    document.body.style.background = dark ? '#07080B' : '#F3F4F6';
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', dark ? '#07080B' : '#F3F4F6');
   }
   function setTheme(t) { _theme=t; localStorage.setItem('mc_theme',t); _applyTheme(t); _updateThemeBtn(); }
   function cycleTheme() { setTheme(THEMES[(THEMES.indexOf(_theme)+1)%THEMES.length]); }
@@ -55,7 +57,7 @@ window.SETTINGS = (function () {
       moderate_wait:'Moderate — wait may help',
       very_packed:'Very packed — try next train',
       network_crowd:'Network Crowd — Next 4 Hours',
-      all_lines:'All Lines', route_planner_link:'Route planner →',
+      all_lines:'All Lines', route_planner_link:'Route planner →', two_tap:'2-tap submit', pinned_stations:'Pinned Stations',
       closed:'Closed',
       // Crowd levels
       crowd_closed:'Station Closed', crowd_empty:'Empty',
@@ -187,7 +189,7 @@ window.SETTINGS = (function () {
       moderate_wait:'मध्यम भीड़ — थोड़ा इंतज़ार करें',
       very_packed:'बहुत भीड़ — अगली ट्रेन लें',
       network_crowd:'नेटवर्क भीड़ — अगले 4 घंटे',
-      all_lines:'सभी लाइनें', route_planner_link:'मार्ग योजना →',
+      all_lines:'सभी लाइनें', route_planner_link:'मार्ग योजना →', two_tap:'2-टैप सबमिट', pinned_stations:'पिन किए स्टेशन',
       closed:'बंद',
       // Crowd levels
       crowd_closed:'स्टेशन बंद', crowd_empty:'खाली',
@@ -346,16 +348,10 @@ window.SETTINGS = (function () {
   function _buildPill() {
     var sbarRight = document.getElementById('sbar-right'); if (!sbarRight) return;
     var pill = document.createElement('div');
-    pill.style.cssText = 'display:flex;align-items:center;gap:4px';
+    pill.style.cssText = 'display:flex;align-items:center;gap:6px';
     pill.innerHTML =
-      '<button id="settings-lang-btn" onclick="SETTINGS.toggleLang()" ' +
-      'style="height:28px;padding:0 9px;border-radius:20px;background:var(--card2);' +
-      'border:1px solid var(--brd2);font-family:\'DM Serif Display\',sans-serif;font-size:11px;' +
-      'font-weight:800;color:var(--sub);cursor:pointer;transition:all .15s;letter-spacing:.02em">हिं</button>' +
-      '<button id="settings-theme-btn" onclick="SETTINGS.cycleTheme()" ' +
-      'style="width:28px;height:28px;border-radius:50%;background:var(--card2);' +
-      'border:1px solid var(--brd2);display:flex;align-items:center;justify-content:center;' +
-      'color:var(--sub);cursor:pointer;transition:all .15s"></button>';
+      '<button id="settings-lang-btn" class="top-btn top-btn-txt" onclick="SETTINGS.toggleLang()" aria-label="Switch language">हिं</button>' +
+      '<button id="settings-theme-btn" class="top-btn" onclick="SETTINGS.cycleTheme()" aria-label="Change theme"></button>';
     var authBtn = document.getElementById('auth-btn');
     if (authBtn) sbarRight.insertBefore(pill, authBtn);
     else sbarRight.appendChild(pill);

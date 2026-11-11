@@ -1,4 +1,4 @@
-const CACHE = 'metro-v5';
+const CACHE = 'metro-v6';
 const CACHE_FILES = [
   '/', '/index.html', '/style.css',
   '/data.js', '/crowd.js', '/route.js', '/gps.js',
@@ -9,6 +9,7 @@ const CACHE_FILES = [
   '/stats.js', '/rewards.js', '/notifprefs.js', '/guide.js',
   '/ui/home.js', '/ui/station.js', '/ui/route.js',
   '/ui/report.js', '/ui/search.js', '/ui/nav.js',
+  '/icons.js', '/ui-proxy.js', '/legal.html', '/manifest.json',
   '/icons/icon-192.png', '/icons/icon-512.png'
 ];
 
@@ -37,7 +38,7 @@ self.addEventListener('push', e => {
   const url   = data.url   || '/';
   e.waitUntil(
     self.registration.showNotification(title, {
-      body, icon: '/icons/icon-192.png', badge: '/icons/badge-72.png',
+      body, icon: '/icons/icon-192.png', badge: '/icons/icon-72.png',
       tag: data.tag || 'metro-alert',
       data: { url, stationId: data.stationId },
       actions: [{ action: 'view', title: 'View' }, { action: 'dismiss', title: 'Dismiss' }]
@@ -59,18 +60,25 @@ self.addEventListener('notificationclick', e => {
   );
 });
 
-// Network first, fall back to cache
+// Network first, fall back to cache (same-origin + Google Fonts only)
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
-  // Never cache API calls
-  if (e.request.url.includes('supabase.co') || e.request.url.includes('onrender.com')) return;
+  const url = new URL(e.request.url);
+  const sameOrigin = url.origin === self.location.origin;
+  const isFont = url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com';
+  if (!sameOrigin && !isFont) return;           // APIs, analytics, CDNs: straight to network
+  if (sameOrigin && url.pathname.startsWith('/_vercel/')) return;
   e.respondWith(
     fetch(e.request)
       .then(res => {
-        const clone = res.clone();
-        caches.open(CACHE).then(c => c.put(e.request, clone));
+        if (res && (res.ok || res.type === 'opaque')) {
+          const clone = res.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone)).catch(() => {});
+        }
         return res;
       })
-      .catch(() => caches.match(e.request))
+      .catch(() => caches.match(e.request).then(hit =>
+        hit || (e.request.mode === 'navigate' ? caches.match('/index.html') : undefined)
+      ))
   );
 });

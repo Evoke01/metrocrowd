@@ -118,10 +118,10 @@ window.UI=(function(){
       
       html += `
         <div onclick="UI.openPanel('${id}'); UI.switchTab('map');" style="background:var(--s1);border:1px solid var(--brd);border-radius:14px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:border-color .2s">
-          <div style="font-family:'DM Serif Display',sans-serif;font-size:15px;font-weight:700;color:var(--txt)">${s.n}</div>
+          <div style="font-family:var(--fd);font-size:15px;font-weight:700;color:var(--txt)">${s.n}</div>
           <div style="background:rgba(255,255,255,0.04);border:1px solid var(--brd);border-radius:8px;padding:4px 8px;display:flex;align-items:center;gap:6px">
             <div style="width:6px;height:6px;border-radius:50%;background:${c};box-shadow:0 0 8px ${c}"></div>
-            <span style="font-family:'DM Serif Display',sans-serif;font-size:13px;font-weight:700;color:var(--txt)">${v}%</span>
+            <span style="font-family:var(--fd);font-size:13px;font-weight:700;color:var(--txt)">${v}%</span>
           </div>
         </div>
       `;
@@ -1143,7 +1143,7 @@ window.UI=(function(){
       const twoHrsAgo=new Date(Date.now()-REPORT_EXPIRY).toISOString();
       const {data,error}=await SB.client
         .from('crowd_reports')
-        .select('id,station_id,station_name,level,created_at,session_id')
+        .select('id,station_id,station_name,level,created_at')
         .eq('station_id', stationId)
         .gt('created_at', twoHrsAgo)     // only within 2h expiry window
         .order('created_at',{ascending:false})
@@ -1188,7 +1188,7 @@ window.UI=(function(){
       const twoHrsAgo=new Date(Date.now()-REPORT_EXPIRY).toISOString();
       const {data,error}=await SB.client
         .from('crowd_reports')
-        .select('id,station_id,station_name,level,created_at,session_id')
+        .select('id,station_id,station_name,level,created_at')
         .gt('created_at', twoHrsAgo)
         .order('created_at',{ascending:false})
         .limit(30);
@@ -1232,7 +1232,7 @@ window.UI=(function(){
       const twoHrsAgo=new Date(Date.now()-REPORT_EXPIRY).toISOString();
       const {data,error}=await SB.client
         .from('crowd_reports')
-        .select('id,station_id,station_name,level,created_at,session_id')
+        .select('id,station_id,station_name,level,created_at')
         .eq('station_id', stationId)
         .gt('created_at', twoHrsAgo)
         .order('created_at',{ascending:false})
