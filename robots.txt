@@ -6,6 +6,7 @@ Allow: /
 Allow: /legal.html
 
 # Block non-public / low-value surfaces
+Disallow: /admin
 Disallow: /api/
 Disallow: /_app/
 Disallow: /metrocrowd-api/

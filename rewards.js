@@ -142,7 +142,7 @@ window.REWARDS = (function () {
   }
 
   function _ways(s) {
-    const rate = Number(s.rupees_per_1000_points || 10);
+    const rate = Number(s.rupees_per_1000_points || 100);
     const items = [
       ['M3 12h18M7 5l-4 7 4 7M17 5l4 7-4 7', 'Complete a trip', 'Use Trip Navigation and reach your destination', `+${s.commute_points ?? 10}`],
       ['M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7', 'Report crowd levels', `Up to ${s.daily_report_cap ?? 5} rewarded reports a day`, `+${s.report_points ?? 2}`],

@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/admin",
+      "destination": "/admin.html"
+    },
+    {
       "source": "/_app/static/js/analytics.js",
       "destination": "/_vercel/insights/script.js"
     },

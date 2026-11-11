@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>MetroCrowd Admin</title>
+<link rel="icon" href="/icons/icon-72.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/dist/umd/supabase.min.js"></script>
+<style>
+  :root {
+    --bg:#07080B; --card:#121419; --card2:#1A1D24; --brd:rgba(255,255,255,.08);
+    --txt:#F3F4F6; --sub:rgba(243,244,246,.62); --y:#FFC629; --ink:#111;
+    --ok:#4ADE80; --warn:#FBBF24; --bad:#F87171; --info:#60A5FA;
+    --fd:'Plus Jakarta Sans',system-ui,sans-serif; --fb:'Inter',system-ui,sans-serif; --fm:'JetBrains Mono',monospace;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--txt); font:14px/1.5 var(--fb); }
+  a { color:var(--y); }
+  .wrap { max-width:1180px; margin:0 auto; padding:24px 16px 64px; }
+  header { display:flex; align-items:center; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
+  .logo { width:36px; height:36px; border-radius:10px; background:var(--y); color:var(--ink); display:grid; place-items:center; font:800 18px var(--fd); }
+  h1 { font:800 22px var(--fd); margin:0; letter-spacing:-.02em; }
+  h1 em { font-style:normal; color:var(--y); }
+  .who { margin-left:auto; color:var(--sub); font-size:13px; display:flex; gap:10px; align-items:center; }
+  .tabs { display:flex; gap:6px; margin-bottom:18px; overflow-x:auto; }
+  .tab { background:var(--card); border:1px solid var(--brd); color:var(--sub); padding:9px 16px; border-radius:999px; font:600 13px var(--fb); cursor:pointer; white-space:nowrap; }
+  .tab.on { background:var(--y); color:var(--ink); border-color:var(--y); }
+  .tab .n { display:inline-block; min-width:18px; padding:0 5px; margin-left:6px; border-radius:9px; background:rgba(0,0,0,.25); font-size:11px; }
+  .card { background:var(--card); border:1px solid var(--brd); border-radius:16px; padding:18px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-bottom:16px; }
+  .stat .k { color:var(--sub); font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.06em; }
+  .stat .v { font:800 28px var(--fd); margin-top:4px; }
+  .stat .s { color:var(--sub); font-size:12px; }
+  .toolbar { display:flex; gap:10px; align-items:center; margin-bottom:12px; flex-wrap:wrap; }
+  input, select, textarea { background:var(--card2); border:1px solid var(--brd); color:var(--txt); border-radius:10px; padding:9px 12px; font:14px var(--fb); }
+  input:focus, select:focus { outline:2px solid var(--y); outline-offset:-1px; }
+  .search { flex:1; min-width:220px; }
+  .tbl-wrap { overflow-x:auto; border-radius:16px; border:1px solid var(--brd); }
+  table { width:100%; border-collapse:collapse; background:var(--card); }
+  th, td { text-align:left; padding:11px 14px; border-bottom:1px solid var(--brd); white-space:nowrap; }
+  th { color:var(--sub); font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; background:var(--card2); position:sticky; top:0; cursor:default; }
+  th[data-sort] { cursor:pointer; } th[data-sort]:hover { color:var(--txt); }
+  tr:last-child td { border-bottom:none; }
+  td.num, th.num { text-align:right; font-variant-numeric:tabular-nums; }
+  .mono { font-family:var(--fm); font-size:12.5px; }
+  .muted { color:var(--sub); }
+  .pill { display:inline-block; padding:2px 10px; border-radius:999px; font-size:12px; font-weight:600; }
+  .p-pending { background:rgba(251,191,36,.15); color:var(--warn); }
+  .p-approved { background:rgba(96,165,250,.15); color:var(--info); }
+  .p-paid { background:rgba(74,222,128,.15); color:var(--ok); }
+  .p-rejected { background:rgba(248,113,113,.15); color:var(--bad); }
+  .pos { color:var(--ok); } .neg { color:var(--bad); }
+  .btn { border:none; border-radius:10px; padding:8px 14px; font:600 13px var(--fb); cursor:pointer; background:var(--card2); color:var(--txt); border:1px solid var(--brd); }
+  .btn:hover { border-color:rgba(255,255,255,.25); }
+  .btn-y { background:var(--y); color:var(--ink); border-color:var(--y); }
+  .btn-ok { background:rgba(74,222,128,.15); color:var(--ok); border-color:rgba(74,222,128,.3); }
+  .btn-bad { background:rgba(248,113,113,.12); color:var(--bad); border-color:rgba(248,113,113,.3); }
+  .btn:disabled { opacity:.5; cursor:not-allowed; }
+  .row-actions { display:flex; gap:6px; }
+  .copy { cursor:pointer; border-bottom:1px dashed var(--sub); }
+  .empty { padding:40px; text-align:center; color:var(--sub); }
+  .gate { max-width:520px; margin:12vh auto; text-align:center; }
+  .gate h2 { font:800 24px var(--fd); margin:0 0 8px; }
+  .gate p { color:var(--sub); }
+  .gate code { display:block; margin:14px 0; padding:12px; background:var(--card2); border-radius:10px; font:13px var(--fm); word-break:break-all; }
+  .form { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px; }
+  .form label { display:flex; flex-direction:column; gap:6px; color:var(--sub); font-size:13px; font-weight:600; }
+  .switch { display:flex; align-items:center; gap:10px; color:var(--txt) !important; font-size:15px !important; }
+  .switch input { width:20px; height:20px; accent-color:var(--y); }
+  .hint { color:var(--sub); font-size:12.5px; margin-top:12px; }
+  .toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:var(--card2); border:1px solid var(--brd); padding:10px 18px; border-radius:12px; font-weight:600; opacity:0; transition:opacity .2s; pointer-events:none; z-index:9; }
+  .toast.on { opacity:1; }
+  .hidden { display:none !important; }
+  @media (max-width:640px) { .who { margin-left:0; width:100%; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">M</div>
+    <h1>Metro<em>Crowd</em> Admin</h1>
+    <div class="who" id="who"></div>
+  </header>
+
+  <div id="gate" class="gate"><p>Loading…</p></div>
+
+  <div id="app" class="hidden">
+    <nav class="tabs" id="tabs">
+      <button class="tab on" data-tab="overview">Overview</button>
+      <button class="tab" data-tab="users">Users</button>
+      <button class="tab" data-tab="payouts">Payouts <span class="n" id="n-pending">0</span></button>
+      <button class="tab" data-tab="activity">Activity</button>
+      <button class="tab" data-tab="settings">Settings</button>
+    </nav>
+
+    <section id="t-overview"></section>
+
+    <section id="t-users" class="hidden">
+      <div class="toolbar">
+        <input class="search" id="u-q" placeholder="Search email, name or referral code…">
+        <span class="muted" id="u-count"></span>
+        <button class="btn" onclick="exportUsers()">Export CSV</button>
+      </div>
+      <div class="tbl-wrap"><table>
+        <thead><tr>
+          <th data-sort="email">User</th>
+          <th class="num" data-sort="balance_points">Balance</th>
+          <th class="num" data-sort="earned">Earned</th>
+          <th class="num" data-sort="trips">Trips</th>
+          <th class="num" data-sort="reports">Reports</th>
+          <th class="num" data-sort="referrals">Referrals</th>
+          <th class="num" data-sort="paid_rupees">Paid out</th>
+          <th>Code</th>
+          <th data-sort="created_at">Joined</th>
+        </tr></thead>
+        <tbody id="u-body"></tbody>
+      </table></div>
+    </section>
+
+    <section id="t-payouts" class="hidden">
+      <div class="toolbar">
+        <select id="p-status">
+          <option value="pending">Pending</option>
+          <option value="approved">Approved (to pay)</option>
+          <option value="paid">Paid</option>
+          <option value="rejected">Rejected</option>
+          <option value="all">All</option>
+        </select>
+        <span class="muted">Approve → send the money by UPI → mark paid with the transaction reference. Rejecting refunds the points.</span>
+      </div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Requested</th><th>User</th><th class="num">Points</th><th class="num">Amount</th><th>UPI ID</th><th>Status</th><th>Note / ref</th><th></th></tr></thead>
+        <tbody id="p-body"></tbody>
+      </table></div>
+    </section>
+
+    <section id="t-activity" class="hidden">
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>When</th><th>User</th><th>Reason</th><th class="num">Points</th><th>Reference</th></tr></thead>
+        <tbody id="a-body"></tbody>
+      </table></div>
+    </section>
+
+    <section id="t-settings" class="hidden">
+      <div class="card">
+        <div class="form" id="s-form"></div>
+        <div style="margin-top:16px;display:flex;gap:10px;align-items:center">
+          <button class="btn btn-y" id="s-save">Save settings</button>
+          <span class="muted" id="s-preview"></span>
+        </div>
+        <div class="hint">Changes apply immediately to everyone. Points already earned keep their value at the new rate.</div>
+      </div>
+    </section>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const API = 'https://metrocrowd.onrender.com/rewards';
+const sb = window.supabase.createClient(
+  'https://tfuxpslcmhdvwidfcdch.supabase.co',
+  'sb_publishable_nmPz260NMnm3AIk7ZGVowQ_dlfkOKEp',
+  { auth: { persistSession:true, autoRefreshToken:true, storageKey:'metrocrowd_auth', storage:localStorage, flowType:'pkce' } }
+);
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const num = n => Number(n || 0).toLocaleString('en-IN');
+const inr = r => new Intl.NumberFormat('en-IN', { style:'currency', currency:'INR' }).format(Number(r) || 0);
+const when = t => t ? new Date(t).toLocaleString('en-IN', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' }) : '—';
+const REASON = { commute:'Trip', referral:'Referral', report:'Crowd report', payout:'Payout request', payout_refund:'Payout refund', admin_adjustment:'Adjustment' };
+
+function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), 2600); }
+function copy(text) { navigator.clipboard?.writeText(text).then(() => toast('Copied')); }
+
+async function api(path, opts = {}, retried = false) {
+  const { data } = await sb.auth.getSession();
+  const token = data?.session?.access_token;
+  if (!token) throw new Error('Not signed in');
+  const res = await fetch(API + path, { ...opts, headers: { 'Content-Type':'application/json', Authorization:`Bearer ${token}`, ...(opts.headers || {}) } });
+  if (res.status === 401 && !retried) { const r = await sb.auth.refreshSession(); if (!r.error) return api(path, opts, true); }
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(body.detail || `Request failed (${res.status})`);
+  return body;
+}
+
+// ── Access ────────────────────────────────────────────────────
+async function boot() {
+  const { data } = await sb.auth.getSession();
+  const user = data?.session?.user;
+  if (!user || user.is_anonymous) {
+    $('gate').innerHTML = `<h2>Sign in first</h2><p>Sign in to MetroCrowd with your admin Google or GitHub account, then come back to this page.</p><p><a class="btn btn-y" href="/" style="text-decoration:none;display:inline-block">Open MetroCrowd</a></p>`;
+    return;
+  }
+  $('who').innerHTML = `<span>${esc(user.email)}</span><button class="btn" id="signout">Sign out</button>`;
+  $('signout').onclick = async () => { await sb.auth.signOut(); location.reload(); };
+  let me;
+  try { me = await api('/admin/me'); }
+  catch (e) { $('gate').innerHTML = `<h2>Can't reach the API</h2><p>${esc(e.message)}</p><p><button class="btn btn-y" onclick="location.reload()">Retry</button></p>`; return; }
+  if (!me.is_admin) {
+    $('gate').innerHTML = `<h2>Not an admin yet</h2><p>Add this user ID to <b>REWARDS_ADMIN_USER_IDS</b> on the Render service, then reload.</p><code>${esc(me.user_id)}</code><button class="btn" onclick="copy('${esc(me.user_id)}')">Copy ID</button>`;
+    return;
+  }
+  $('gate').classList.add('hidden');
+  $('app').classList.remove('hidden');
+  loadOverview(); loadPayouts(); loadUsers(); loadActivity();
+}
+
+// ── Tabs ──────────────────────────────────────────────────────
+$('tabs').onclick = e => {
+  const b = e.target.closest('.tab'); if (!b) return;
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t === b));
+  document.querySelectorAll('section[id^="t-"]').forEach(s => s.classList.toggle('hidden', s.id !== 't-' + b.dataset.tab));
+};
+
+// ── Overview + settings ───────────────────────────────────────
+let SETTINGS = null;
+async function loadOverview() {
+  try {
+    const o = await api('/admin/overview');
+    SETTINGS = o.settings;
+    const p = o.payouts || {}, g = k => p[k] || { count:0, rupees:0 };
+    $('n-pending').textContent = g('pending').count;
+    $('t-overview').innerHTML = `
+      <div class="grid">
+        <div class="card stat"><div class="k">Program</div><div class="v" style="color:${o.settings.enabled ? 'var(--ok)' : 'var(--bad)'}">${o.settings.enabled ? 'Live' : 'Off'}</div><div class="s">${o.settings.enabled ? 'Users are earning points' : 'Turn on in Settings'}</div></div>
+        <div class="card stat"><div class="k">Users with points</div><div class="v">${num(o.users)}</div><div class="s">reward accounts</div></div>
+        <div class="card stat"><div class="k">Points outstanding</div><div class="v">${num(o.outstanding_points)}</div><div class="s">worth ${inr(o.outstanding_rupees)} if all cashed out</div></div>
+        <div class="card stat"><div class="k">Earned last 7 days</div><div class="v">${num(o.earned_7d_points)}</div><div class="s">points</div></div>
+      </div>
+      <div class="grid">
+        <div class="card stat"><div class="k">Pending payouts</div><div class="v" style="color:var(--warn)">${g('pending').count}</div><div class="s">${inr(g('pending').rupees)} requested</div></div>
+        <div class="card stat"><div class="k">Approved, to pay</div><div class="v" style="color:var(--info)">${g('approved').count}</div><div class="s">${inr(g('approved').rupees)}</div></div>
+        <div class="card stat"><div class="k">Paid out</div><div class="v" style="color:var(--ok)">${inr(g('paid').rupees)}</div><div class="s">${g('paid').count} payouts</div></div>
+        <div class="card stat"><div class="k">Rate</div><div class="v">${inr(o.settings.rupees_per_1000_points / 10)}</div><div class="s">per 100 points · min payout ${num(o.settings.min_withdrawal_points)} pts</div></div>
+      </div>`;
+    renderSettings();
+  } catch (e) { $('t-overview').innerHTML = `<div class="card empty">${esc(e.message)}</div>`; }
+}
+
+const FIELDS = [
+  ['commute_points', 'Points per completed trip', 1],
+  ['report_points', 'Points per crowd report', 1],
+  ['daily_report_cap', 'Rewarded reports per day', 1],
+  ['referral_points', 'Points per qualifying referral', 1],
+  ['min_withdrawal_points', 'Minimum points per payout', 1],
+  ['rupees_per_1000_points', 'Rupees per 1,000 points', 0.01],
+];
+function renderSettings() {
+  const s = SETTINGS;
+  $('s-form').innerHTML = `<label class="switch" style="grid-column:1/-1"><input type="checkbox" id="s-enabled" ${s.enabled ? 'checked' : ''}> Rewards program is live</label>` +
+    FIELDS.map(([k, label, step]) => `<label>${label}<input type="number" min="0" step="${step}" id="s-${k}" value="${esc(s[k] ?? 0)}"></label>`).join('');
+  const preview = () => { const r = Number($('s-rupees_per_1000_points').value) || 0; $('s-preview').textContent = `100 points = ${inr(r / 10)} · 1,000 points = ${inr(r)}`; };
+  $('s-rupees_per_1000_points').oninput = preview; preview();
+}
+$('s-save').onclick = async () => {
+  const body = { enabled: $('s-enabled').checked };
+  FIELDS.forEach(([k]) => body[k] = Number($('s-' + k).value));
+  $('s-save').disabled = true;
+  try { await api('/admin/settings', { method:'PUT', body: JSON.stringify(body) }); toast('Settings saved'); loadOverview(); }
+  catch (e) { toast(e.message); }
+  $('s-save').disabled = false;
+};
+
+// ── Users ─────────────────────────────────────────────────────
+let USERS = [], SORT = { key:'balance_points', dir:-1 };
+async function loadUsers() {
+  $('u-body').innerHTML = `<tr><td colspan="9" class="empty">Loading…</td></tr>`;
+  try { USERS = (await api('/admin/users')).users || []; renderUsers(); }
+  catch (e) { $('u-body').innerHTML = `<tr><td colspan="9" class="empty">${esc(e.message)}</td></tr>`; }
+}
+function filteredUsers() {
+  const q = $('u-q').value.trim().toLowerCase();
+  const rows = USERS.filter(u => !q || [u.email, u.name, u.referral_code, u.user_id].some(v => String(v || '').toLowerCase().includes(q)));
+  return rows.sort((a, b) => { const x = a[SORT.key] ?? '', y = b[SORT.key] ?? ''; return (x > y ? 1 : x < y ? -1 : 0) * SORT.dir; });
+}
+function renderUsers() {
+  const rows = filteredUsers();
+  $('u-count').textContent = `${rows.length} of ${USERS.length} users`;
+  $('u-body').innerHTML = rows.length ? rows.map(u => `<tr>
+    <td><div>${esc(u.name || u.email || 'Unknown')}</div><div class="muted mono">${esc(u.name ? u.email : u.user_id.slice(0, 8) + '…')}</div></td>
+    <td class="num"><b>${num(u.balance_points)}</b><div class="muted">${inr(u.balance_rupees)}</div></td>
+    <td class="num">${num(u.earned)}</td><td class="num">${num(u.trips)}</td><td class="num">${num(u.reports)}</td><td class="num">${num(u.referrals)}</td>
+    <td class="num">${inr(u.paid_rupees)}</td>
+    <td class="mono">${esc(u.referral_code)}</td>
+    <td class="muted">${when(u.created_at)}</td></tr>`).join('')
+    : `<tr><td colspan="9" class="empty">No users yet</td></tr>`;
+}
+$('u-q').oninput = renderUsers;
+document.querySelector('#t-users thead').onclick = e => {
+  const k = e.target.closest('th')?.dataset.sort; if (!k) return;
+  SORT = { key:k, dir: SORT.key === k ? -SORT.dir : -1 }; renderUsers();
+};
+function exportUsers() {
+  const cols = ['email','name','user_id','balance_points','balance_rupees','earned','trips','reports','referrals','paid_rupees','referral_code','created_at'];
+  const csv = [cols.join(',')].concat(filteredUsers().map(u => cols.map(c => `"${String(u[c] ?? '').replace(/"/g, '""')}"`).join(','))).join('\n');
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type:'text/csv' })); a.download = 'metrocrowd-users.csv'; a.click();
+}
+
+// ── Payouts ───────────────────────────────────────────────────
+async function loadPayouts() {
+  const status = $('p-status').value;
+  $('p-body').innerHTML = `<tr><td colspan="8" class="empty">Loading…</td></tr>`;
+  try {
+    const rows = (await api('/admin/payouts?status=' + status)).payouts || [];
+    if (status === 'pending') $('n-pending').textContent = rows.length;
+    $('p-body').innerHTML = rows.length ? rows.map(p => `<tr>
+      <td class="muted">${when(p.created_at)}</td>
+      <td>${esc(p.email || p.user_id.slice(0, 8) + '…')}</td>
+      <td class="num">${num(p.points)}</td>
+      <td class="num"><b>${inr(p.amount_paise / 100)}</b></td>
+      <td class="mono"><span class="copy" onclick="copy('${esc(p.upi_id)}')" title="Copy">${esc(p.upi_id)}</span></td>
+      <td><span class="pill p-${p.status}">${p.status}</span></td>
+      <td class="muted">${esc(p.payout_reference || p.admin_note || '')}</td>
+      <td><div class="row-actions">
+        ${p.status === 'pending' ? `<button class="btn btn-ok" onclick="act('${p.id}','approve')">Approve</button>` : ''}
+        ${p.status === 'approved' ? `<button class="btn btn-y" onclick="act('${p.id}','paid')">Mark paid</button>` : ''}
+        ${p.status === 'pending' || p.status === 'approved' ? `<button class="btn btn-bad" onclick="act('${p.id}','reject')">Reject</button>` : ''}
+      </div></td></tr>`).join('')
+      : `<tr><td colspan="8" class="empty">No ${status === 'all' ? '' : status} payout requests</td></tr>`;
+  } catch (e) { $('p-body').innerHTML = `<tr><td colspan="8" class="empty">${esc(e.message)}</td></tr>`; }
+}
+$('p-status').onchange = loadPayouts;
+async function act(id, action) {
+  const body = { action };
+  if (action === 'paid') {
+    const ref = prompt('UPI transaction reference (UTR) for this transfer:'); if (!ref) return;
+    body.payout_reference = ref.trim();
+  }
+  if (action === 'reject') {
+    const note = prompt('Reason for rejecting (shown to the user). Points will be refunded.'); if (note === null) return;
+    body.note = note.trim() || null;
+  }
+  try { await api('/admin/payouts/' + encodeURIComponent(id), { method:'POST', body: JSON.stringify(body) }); toast({ approve:'Approved', paid:'Marked paid', reject:'Rejected and refunded' }[action]); loadPayouts(); loadOverview(); if (action === 'reject') loadUsers(); }
+  catch (e) { toast(e.message); }
+}
+
+// ── Activity ──────────────────────────────────────────────────
+async function loadActivity() {
+  try {
+    const rows = (await api('/admin/activity')).activity || [];
+    $('a-body').innerHTML = rows.length ? rows.map(r => `<tr>
+      <td class="muted">${when(r.created_at)}</td>
+      <td>${esc(r.email || r.user_id.slice(0, 8) + '…')}</td>
+      <td>${esc(REASON[r.reason] || r.reason)}</td>
+      <td class="num ${r.points_delta > 0 ? 'pos' : 'neg'}">${r.points_delta > 0 ? '+' : ''}${num(r.points_delta)}</td>
+      <td class="muted mono">${esc(String(r.reference_id).slice(0, 18))}</td></tr>`).join('')
+      : `<tr><td colspan="5" class="empty">No activity yet</td></tr>`;
+  } catch (e) { $('a-body').innerHTML = `<tr><td colspan="5" class="empty">${esc(e.message)}</td></tr>`; }
+}
+
+boot();
+</script>
+</body>
+</html>

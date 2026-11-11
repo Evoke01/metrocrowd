@@ -155,15 +155,143 @@ async def request_payout(req: PayoutRequest, user_id: str = Depends(_user_id)):
         raise HTTPException(status_code=503, detail="Could not create payout request")
 
 
+def _people(db) -> dict:
+    """Map user_id -> {email, name} from Supabase Auth (service key)."""
+    people = {}
+    try:
+        page = 1
+        while page <= 20:
+            users = db.auth.admin.list_users(page=page, per_page=1000) or []
+            for u in users:
+                meta = getattr(u, "user_metadata", None) or {}
+                people[str(u.id)] = {
+                    "email": getattr(u, "email", None),
+                    "name": meta.get("full_name") or meta.get("name") or meta.get("user_name"),
+                }
+            if len(users) < 1000:
+                break
+            page += 1
+    except Exception as exc:
+        logger.warning("[Rewards] could not list auth users: %s", exc)
+    return people
+
+
+def _rupees(points: int, settings: dict) -> float:
+    return round((points or 0) * float(settings.get("rupees_per_1000_points") or 0) / 1000, 2)
+
+
+@router.get("/admin/me")
+async def admin_me(user_id: str = Depends(_user_id)):
+    """Lets the admin page check access and show the caller's user id."""
+    allowed = {v.strip() for v in os.getenv("REWARDS_ADMIN_USER_IDS", "").split(",") if v.strip()}
+    return {"ok": True, "user_id": user_id, "is_admin": user_id in allowed}
+
+
+@router.get("/admin/overview")
+async def admin_overview(_admin: str = Depends(_admin_id)):
+    try:
+        db = _db()
+        settings = _settings(db)
+        accounts = db.table("reward_accounts").select("balance_points").limit(100000).execute().data or []
+        payouts = db.table("reward_payout_requests").select("status,points,amount_paise") \
+            .limit(100000).execute().data or []
+        since = datetime.now(timezone.utc).timestamp() - 7 * 86400
+        recent = db.table("reward_ledger").select("points_delta,reason") \
+            .gte("created_at", datetime.fromtimestamp(since, timezone.utc).isoformat()) \
+            .limit(100000).execute().data or []
+        outstanding = sum(a["balance_points"] or 0 for a in accounts)
+        by_status = {}
+        for p in payouts:
+            s = by_status.setdefault(p["status"], {"count": 0, "points": 0, "rupees": 0.0})
+            s["count"] += 1
+            s["points"] += p["points"] or 0
+            s["rupees"] += (p["amount_paise"] or 0) / 100
+        earned_7d = sum(r["points_delta"] for r in recent if r["points_delta"] > 0 and r["reason"] != "payout_refund")
+        return {
+            "ok": True,
+            "settings": settings,
+            "users": len(accounts),
+            "outstanding_points": outstanding,
+            "outstanding_rupees": _rupees(outstanding, settings),
+            "payouts": by_status,
+            "earned_7d_points": earned_7d,
+        }
+    except Exception as exc:
+        logger.error("[Rewards] admin overview failed: %s", exc)
+        raise HTTPException(status_code=503, detail="Could not load overview")
+
+
+@router.get("/admin/users")
+async def admin_users(_admin: str = Depends(_admin_id)):
+    try:
+        db = _db()
+        settings = _settings(db)
+        accounts = db.table("reward_accounts").select("user_id,referral_code,balance_points,created_at") \
+            .order("balance_points", desc=True).limit(5000).execute().data or []
+        ledger = db.table("reward_ledger").select("user_id,points_delta,reason") \
+            .limit(100000).execute().data or []
+        payouts = db.table("reward_payout_requests").select("user_id,status,amount_paise") \
+            .limit(100000).execute().data or []
+        people = _people(db)
+        stats = {}
+        for row in ledger:
+            s = stats.setdefault(row["user_id"], {"earned": 0, "trips": 0, "reports": 0, "referrals": 0})
+            if row["points_delta"] > 0 and row["reason"] != "payout_refund":
+                s["earned"] += row["points_delta"]
+            if row["reason"] == "commute": s["trips"] += 1
+            elif row["reason"] == "report": s["reports"] += 1
+            elif row["reason"] == "referral": s["referrals"] += 1
+        paid = {}
+        for p in payouts:
+            if p["status"] == "paid":
+                paid[p["user_id"]] = paid.get(p["user_id"], 0) + (p["amount_paise"] or 0) / 100
+        users = []
+        for a in accounts:
+            uid = a["user_id"]
+            who = people.get(uid, {})
+            users.append({
+                **a,
+                "email": who.get("email"),
+                "name": who.get("name"),
+                "balance_rupees": _rupees(a["balance_points"], settings),
+                "paid_rupees": round(paid.get(uid, 0), 2),
+                **stats.get(uid, {"earned": 0, "trips": 0, "reports": 0, "referrals": 0}),
+            })
+        return {"ok": True, "users": users}
+    except Exception as exc:
+        logger.error("[Rewards] admin users failed: %s", exc)
+        raise HTTPException(status_code=503, detail="Could not load users")
+
+
+@router.get("/admin/activity")
+async def admin_activity(_admin: str = Depends(_admin_id)):
+    try:
+        db = _db()
+        rows = db.table("reward_ledger").select("user_id,points_delta,reason,reference_id,created_at") \
+            .order("created_at", desc=True).limit(100).execute().data or []
+        people = _people(db)
+        for r in rows:
+            r["email"] = people.get(r["user_id"], {}).get("email")
+        return {"ok": True, "activity": rows}
+    except Exception as exc:
+        logger.error("[Rewards] admin activity failed: %s", exc)
+        raise HTTPException(status_code=503, detail="Could not load activity")
+
+
 @router.get("/admin/payouts")
 async def admin_payouts(status: str = "pending", _admin: str = Depends(_admin_id)):
     if status not in {"pending", "approved", "paid", "rejected", "all"}:
         raise HTTPException(status_code=400, detail="Invalid payout status")
     try:
-        query = _db().table("reward_payout_requests").select("*")
+        db = _db()
+        query = db.table("reward_payout_requests").select("*")
         if status != "all":
             query = query.eq("status", status)
-        rows = query.order("created_at", desc=True).limit(100).execute().data or []
+        rows = query.order("created_at", desc=True).limit(200).execute().data or []
+        if rows:
+            people = _people(db)
+            for r in rows:
+                r["email"] = people.get(r["user_id"], {}).get("email")
         return {"ok": True, "payouts": rows}
     except Exception as exc:
         logger.error("[Rewards] admin payouts failed: %s", exc)

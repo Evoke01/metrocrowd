@@ -10,7 +10,7 @@ create table if not exists public.reward_settings (
   commute_points integer not null default 10 check (commute_points >= 0),
   referral_points integer not null default 50 check (referral_points >= 0),
   min_withdrawal_points integer not null default 1000 check (min_withdrawal_points > 0),
-  rupees_per_1000_points numeric(10,2) not null default 10.00 check (rupees_per_1000_points > 0),
+  rupees_per_1000_points numeric(10,2) not null default 100.00 check (rupees_per_1000_points > 0),
   updated_at timestamptz not null default now()
 );
 
