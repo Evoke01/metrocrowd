@@ -63,14 +63,14 @@ window.SB = (function(){
       if(typeof ANON !== 'undefined') await ANON.init(client);
       sessionId = getSessionId();
 
-      // Sign in anonymously so RLS allows writes
-      const { data: authData, error: authErr } = await client.auth.signInAnonymously();
-      if(authErr){
-        console.warn('[SB] Anonymous auth failed:', authErr.message);
-      } else {
-        userId = authData?.user?.id || null;
-        console.log('[SB] Signed in anonymously. userId:', userId?.slice(0,8)+'…');
-      }
+      // Only real (Google/GitHub) sessions are used. Clear any anonymous
+      // session left over from older versions of the app.
+      try{
+        const { data: sess } = await client.auth.getSession();
+        const u = sess?.session?.user;
+        if(u?.is_anonymous) await client.auth.signOut({ scope: 'local' });
+        else userId = u?.id || null;
+      }catch(_){}
 
       isReady = true;
       setStatus('Connected ✓', 'ok');
@@ -113,12 +113,17 @@ window.SB = (function(){
     if(!isReady) return {ok:true, local:true};
 
     try{
-      // Use the live session — userId captured at boot may be the anonymous
-      // user from before an OAuth sign-in.
+      // Use the live session (the user may have signed in since boot).
       try{
         const { data } = await client.auth.getSession();
-        if(data?.session?.user?.id) userId = data.session.user.id;
+        const u = data?.session?.user;
+        userId = (u && !u.is_anonymous) ? u.id : null;
       }catch(_){}
+      if(!userId){
+        // Guests: keep the report on this device; sharing needs an account.
+        showToast('Saved on this device. Sign in to share reports with everyone.');
+        return {ok:true, local:true};
+      }
       const {error} = await client
         .from('crowd_reports')
         .insert({
