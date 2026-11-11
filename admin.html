@@ -75,6 +75,23 @@
   .toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:var(--card2); border:1px solid var(--brd); padding:10px 18px; border-radius:12px; font-weight:600; opacity:0; transition:opacity .2s; pointer-events:none; z-index:9; }
   .toast.on { opacity:1; }
   .hidden { display:none !important; }
+  .fb-item { background:var(--card); border:1px solid var(--brd); border-radius:16px; padding:14px 16px; margin-bottom:10px; }
+  .fb-top { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:8px; }
+  .fb-msg { white-space:pre-wrap; word-break:break-word; line-height:1.55; }
+  .fb-meta { color:var(--sub); font-size:12px; margin-top:8px; display:flex; gap:14px; flex-wrap:wrap; }
+  .fb-meta details summary { cursor:pointer; }
+  .fb-stars-txt { color:var(--y); letter-spacing:2px; font-size:16px; }
+  .k-bug { background:rgba(248,113,113,.15); color:var(--bad); }
+  .k-rating { background:rgba(255,198,41,.15); color:var(--y); }
+  .k-idea { background:rgba(96,165,250,.15); color:var(--info); }
+  .p-open { background:rgba(251,191,36,.15); color:var(--warn); }
+  .p-in_progress { background:rgba(96,165,250,.15); color:var(--info); }
+  .p-resolved { background:rgba(74,222,128,.15); color:var(--ok); }
+  .p-dismissed { background:rgba(255,255,255,.08); color:var(--sub); }
+  .fb-actions { margin-left:auto; display:flex; gap:6px; flex-wrap:wrap; }
+  .bar { display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--sub); }
+  .bar i { flex:1; height:6px; border-radius:3px; background:var(--card2); overflow:hidden; }
+  .bar i b { display:block; height:100%; background:var(--y); }
   @media (max-width:640px) { .who { margin-left:0; width:100%; } }
 </style>
 </head>
@@ -93,11 +110,22 @@
       <button class="tab on" data-tab="overview">Overview</button>
       <button class="tab" data-tab="users">Users</button>
       <button class="tab" data-tab="payouts">Payouts <span class="n" id="n-pending">0</span></button>
+      <button class="tab" data-tab="feedback">Feedback <span class="n" id="n-bugs">0</span></button>
       <button class="tab" data-tab="activity">Activity</button>
       <button class="tab" data-tab="settings">Settings</button>
     </nav>
 
     <section id="t-overview"></section>
+
+    <section id="t-feedback" class="hidden">
+      <div class="grid" id="f-summary"></div>
+      <div class="toolbar">
+        <select id="f-kind"><option value="all">Ratings &amp; bugs</option><option value="bug">Bugs</option><option value="rating">Ratings</option></select>
+        <select id="f-status"><option value="all">Any status</option><option value="open">Open</option><option value="in_progress">In progress</option><option value="resolved">Resolved</option><option value="dismissed">Dismissed</option></select>
+        <span class="muted" id="f-count"></span>
+      </div>
+      <div id="f-list"></div>
+    </section>
 
     <section id="t-users" class="hidden">
       <div class="toolbar">
@@ -207,7 +235,7 @@ async function boot() {
   }
   $('gate').classList.add('hidden');
   $('app').classList.remove('hidden');
-  loadOverview(); loadPayouts(); loadUsers(); loadActivity();
+  loadOverview(); loadPayouts(); loadUsers(); loadFeedback(); loadActivity();
 }
 
 // ── Tabs ──────────────────────────────────────────────────────
@@ -338,6 +366,64 @@ async function act(id, action) {
   try { await api('/admin/payouts/' + encodeURIComponent(id), { method:'POST', body: JSON.stringify(body) }); toast({ approve:'Approved', paid:'Marked paid', reject:'Rejected and refunded' }[action]); loadPayouts(); loadOverview(); if (action === 'reject') loadUsers(); }
   catch (e) { toast(e.message); }
 }
+
+// ── Feedback (ratings + bug reports) ──────────────────────────
+const FAPI = API.replace(/\/rewards$/, '/feedback');
+async function fapi(path, opts) {
+  const { data } = await sb.auth.getSession();
+  const res = await fetch(FAPI + path, { ...opts, headers: { 'Content-Type':'application/json', Authorization:`Bearer ${data?.session?.access_token || ''}` } });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(body.detail || `Request failed (${res.status})`);
+  return body;
+}
+const STATUS_LABEL = { open:'Open', in_progress:'In progress', resolved:'Resolved', dismissed:'Dismissed' };
+async function loadFeedback() {
+  $('f-list').innerHTML = `<div class="card empty">Loading…</div>`;
+  try {
+    const r = await fapi(`/admin?kind=${$('f-kind').value}&status=${$('f-status').value}`);
+    const s = r.summary || {};
+    $('n-bugs').textContent = s.open_bugs || 0;
+    const dist = s.distribution || {}, max = Math.max(1, ...Object.values(dist));
+    $('f-summary').innerHTML = `
+      <div class="card stat"><div class="k">Average rating</div><div class="v">${s.average ? s.average.toFixed(1) + ' <span class="fb-stars-txt">★</span>' : '—'}</div><div class="s">${num(s.ratings)} rating${s.ratings === 1 ? '' : 's'}</div></div>
+      <div class="card stat"><div class="k">Open bugs</div><div class="v" style="color:${s.open_bugs ? 'var(--bad)' : 'var(--ok)'}">${num(s.open_bugs)}</div><div class="s">open or in progress</div></div>
+      <div class="card stat"><div class="k">Rating breakdown</div>${[5,4,3,2,1].map(i => `<div class="bar">${i}★<i><b style="width:${(dist[i] || 0) / max * 100}%"></b></i>${dist[i] || 0}</div>`).join('')}</div>`;
+    const items = r.items || [];
+    $('f-count').textContent = `${items.length} shown`;
+    $('f-list').innerHTML = items.length ? items.map(f => `
+      <div class="fb-item">
+        <div class="fb-top">
+          <span class="pill k-${f.kind}">${f.kind === 'bug' ? 'Bug' : f.kind === 'rating' ? 'Rating' : 'Idea'}</span>
+          ${f.rating ? `<span class="fb-stars-txt">${'★'.repeat(f.rating)}<span style="opacity:.25">${'★'.repeat(5 - f.rating)}</span></span>` : ''}
+          <span class="pill p-${f.status}">${STATUS_LABEL[f.status]}</span>
+          <span class="muted">${when(f.created_at)}</span>
+          <div class="fb-actions">
+            ${f.status !== 'in_progress' && f.kind === 'bug' ? `<button class="btn" onclick="fbSet('${f.id}','in_progress')">In progress</button>` : ''}
+            ${f.status !== 'resolved' ? `<button class="btn btn-ok" onclick="fbSet('${f.id}','resolved')">Resolve</button>` : ''}
+            ${f.status !== 'dismissed' ? `<button class="btn" onclick="fbSet('${f.id}','dismissed')">Dismiss</button>` : ''}
+            ${f.status !== 'open' ? `<button class="btn" onclick="fbSet('${f.id}','open')">Reopen</button>` : ''}
+          </div>
+        </div>
+        ${f.message ? `<div class="fb-msg">${esc(f.message)}</div>` : `<div class="muted">No comment</div>`}
+        ${f.admin_note ? `<div class="fb-meta">Note: ${esc(f.admin_note)}</div>` : ''}
+        <div class="fb-meta">
+          <span>${esc(f.email || 'Guest')}</span>
+          ${f.page ? `<span>Screen: ${esc(f.page.replace(/^s-/, ''))}</span>` : ''}
+          ${f.app_version ? `<span>v${esc(f.app_version)}</span>` : ''}
+          ${f.device ? `<details><summary>Device</summary><span class="mono">${esc(f.device)}</span></details>` : ''}
+        </div>
+      </div>`).join('')
+      : `<div class="card empty">No feedback yet</div>`;
+  } catch (e) { $('f-list').innerHTML = `<div class="card empty">${esc(e.message)}</div>`; $('f-summary').innerHTML = ''; }
+}
+async function fbSet(id, status) {
+  const body = { status };
+  if (status === 'resolved' || status === 'dismissed') { const n = prompt('Optional note (only visible to admins):', ''); if (n === null) return; body.admin_note = n; }
+  try { await fapi('/admin/' + encodeURIComponent(id), { method:'POST', body: JSON.stringify(body) }); toast(STATUS_LABEL[status]); loadFeedback(); }
+  catch (e) { toast(e.message); }
+}
+$('f-kind').onchange = loadFeedback;
+$('f-status').onchange = loadFeedback;
 
 // ── Activity ──────────────────────────────────────────────────
 async function loadActivity() {

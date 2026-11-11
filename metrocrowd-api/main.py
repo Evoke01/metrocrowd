@@ -18,6 +18,7 @@ from routers.stats          import router as stats_router
 from routers.notifications  import router as notif_router
 from routers.guide         import router as guide_router
 from routers.rewards       import router as rewards_router
+from routers.feedback      import router as feedback_router
 
 logger = logging.getLogger(__name__)
 
@@ -65,6 +66,7 @@ app.include_router(stats_router,    prefix="/stats",       tags=["Stats"])
 app.include_router(notif_router,    prefix="/notifications", tags=["Notifications"])
 app.include_router(guide_router,    prefix="/guide",          tags=["Guide"])
 app.include_router(rewards_router,  prefix="/rewards",        tags=["Rewards"])
+app.include_router(feedback_router, prefix="/feedback",       tags=["Feedback"])
 
 @app.get("/health")
 def health():

@@ -319,6 +319,18 @@
           <span class="sec-l" onclick="UI.navTo('s-route')"><span data-i18n="route_planner_link">Route planner →</span></span>
         </div>
         <div class="card" id="line-list"></div>
+
+        <!-- Feedback -->
+        <div class="fb-home">
+          <div>
+            <div class="fb-home-t">How’s MetroCrowd working for you?</div>
+            <div class="fb-home-s">Rate the app or tell us about a bug.</div>
+          </div>
+          <div class="fb-home-a">
+            <button class="fb-home-b" onclick="FEEDBACK.open('rating')">★ Rate</button>
+            <button class="fb-home-b" onclick="FEEDBACK.open('bug')">🐞 Bug</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -793,7 +805,11 @@
           </div>
         </div>
 
-        <button onclick="AUTH.closeModal();REWARDS.open()" class="btn-y" style="height:48px;font-size:14px;margin-bottom:14px">Rewards · <span data-reward-balance>0</span> points</button>
+        <button onclick="AUTH.closeModal();REWARDS.open()" class="btn-y" style="height:48px;font-size:14px;margin-bottom:10px">Rewards · <span data-reward-balance>0</span> points</button>
+        <div style="display:flex;gap:8px;margin-bottom:14px">
+          <button onclick="AUTH.closeModal();FEEDBACK.open('rating')" class="fb-home-b" style="flex:1;height:42px">★ Rate the app</button>
+          <button onclick="AUTH.closeModal();FEEDBACK.open('bug')" class="fb-home-b" style="flex:1;height:42px">🐞 Report a bug</button>
+        </div>
 
         <!-- Quick guide -->
         <div style="background:var(--card2);border:1px solid var(--brd);border-radius:12px;padding:12px 14px;margin-bottom:14px">
@@ -871,6 +887,7 @@
 <script src="guide.js" defer></script>
 <script src="stats.js" defer></script>
 <script src="rewards.js" defer></script>
+<script src="feedback.js" defer></script>
 <script src="notifprefs.js" defer></script>
 <script src="legal.js" defer></script>
 <script src="ui-proxy.js" defer></script>
